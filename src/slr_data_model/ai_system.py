@@ -105,7 +105,7 @@ class AIAgent(BaseModel):
         description="Specialized role of this agent (orchestrator, coder, planner, etc.)."
     )
     reasoning_capabilities: Set[ReasoningCapabilitiesType] = Field(
-        description="Reasoning approaches used (rule-based, ReAct, chain-of-thought, etc.)."
+        description="Reasoning approaches used (rule-based, ReAct, chain-of-thought, etc.). State at least one."
     )
     memory: Memory = Field(
         description="Memory configuration for this agent."
@@ -134,9 +134,9 @@ class AgentArchitecture(BaseModel):
     )
     orchestration_pattern: Optional[OrchestrationPattern] = Field(
         default=None,
-        description="Coordination pattern for multi-agent systems. None for single-agent systems."
+        description="Coordination pattern for multi-agent systems. Leave as None when there is only a single agent."
     )
-    autonomy_level: Set[AutonomyLevel] = Field(
+    autonomy_level: AutonomyLevel = Field(
         description="Level(s) of autonomy exhibited by the system."
     )
     shared_memory: bool = Field(
@@ -150,7 +150,8 @@ class AgentArchitecture(BaseModel):
         if len(agents) > 1 and v is None:
             raise ValueError("Multi-agent system must specify orchestration pattern")
         if len(agents) == 1 and v is not None:
-            raise ValueError("Single-agent system should not have orchestration pattern")
+            # raise ValueError("Single-agent system should not have orchestration pattern")
+            v = None
         return v
 
 class AISystem(BaseModel):
