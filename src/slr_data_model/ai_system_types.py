@@ -1,4 +1,3 @@
-from enum import Enum
 from .descriptive_enum import DescriptiveEnum
 
 class ModalityType(DescriptiveEnum):

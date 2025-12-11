@@ -1,6 +1,8 @@
-from pydantic import BaseModel, Field
 from enum import Enum
-from typing import List, Optional, Set
+from typing import Optional, Set
+
+from pydantic import BaseModel, Field
+
 
 class ValidationMethod(str, Enum):
     SIMULATION = "simulation"

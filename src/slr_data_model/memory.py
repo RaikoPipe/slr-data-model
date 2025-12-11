@@ -1,6 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import Optional, Set
 from enum import Enum
+from typing import Set
+
+from pydantic import BaseModel, Field
+
 
 class MemoryType(str, Enum):
     """Memory storage mechanisms."""

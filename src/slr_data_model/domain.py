@@ -1,6 +1,5 @@
-from pydantic import BaseModel, Field
-from descriptive_enum import DescriptiveEnum
-from typing import Set
+from .descriptive_enum import DescriptiveEnum
+
 
 class DomainType(DescriptiveEnum):
     """Domain classification for production and logistics papers based on SCOR model + extensions"""
