@@ -95,7 +95,7 @@ find . -type f -name "*.pyc" -delete
 ```
 slr-data-model/
 ├── src/
-│   └── model/                # Main package
+│   └── slr_data_model/       # Main package
 │       ├── __init__.py
 │       ├── ai_system.py
 │       ├── ai_system_types.py
@@ -119,13 +119,14 @@ slr-data-model/
 After installation, the package can be imported as:
 
 ```python
-# Main package
-import model
+# Import the main package
+import slr_data_model
 
-# Specific components
-from model import AISystem, AIAgent, GenAIModel
-from model import Memory, MemoryType, MemoryScope
-from model import ValidationMethod, DomainType
+# Import specific components
+from slr_data_model import AISystem, AIAgent, GenAIModel
+from slr_data_model import Memory, MemoryType, MemoryScope
+from slr_data_model import ValidationMethod, DomainType
+from slr_data_model import ParadigmType, ModalityType, AgentRoleType
 ```
 
 ## Testing

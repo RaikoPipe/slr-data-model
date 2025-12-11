@@ -48,7 +48,8 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["*"]
+include = ["slr_data_model*"]
+exclude = ["tests*"]
 
 [tool.pytest.ini_options]
 testpaths = ["test"]

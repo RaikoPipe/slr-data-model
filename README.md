@@ -37,13 +37,21 @@ pip install -e ".[dev]"
 ## Usage
 
 ```python
-from slr_data_model import AISystem, AIAgent, GenAIModel, AutonomyLevel
+from slr_data_model import (
+    AISystem,
+    AIAgent,
+    GenAIModel,
+    AutonomyLevel,
+    ParadigmType,
+    ModalityType
+)
 
 # Create a GenAI model
 model = GenAIModel(
     name="GPT-4",
     provider="OpenAI",
-    model_family="GPT"
+    model_family="GPT",
+    modalities=[ModalityType.TEXT]
 )
 
 # Create an AI agent
@@ -57,6 +65,7 @@ agent = AIAgent(
 # Create an AI system
 system = AISystem(
     name="Research AI System",
+    paradigm=ParadigmType.AGENT_BASED,
     agents=[agent]
 )
 
