@@ -1,14 +1,14 @@
 from pydantic import BaseModel, Field, field_validator
 from enum import Enum
 from typing import List, Optional, Set
-from memory import Memory
-from ai_system_types import (
+from .memory import Memory
+from .ai_system_types import (
     ParadigmType, ExternalToolsType, CapabilityAcquisitionType,
     ReasoningCapabilitiesType, AgentRoleType, CollaborationStrategyType,
     CollaborationMechanismType, CollaborationStructureType, ModalityType
 )
-from validation import ValidationMethod, ReportedOutcomes
-from domain import Domain
+from .validation import ValidationMethod, ReportedOutcomes
+from .domain import Domain
 
 class GenerativeAIParadigm(BaseModel):
     """Classification of the system's AI paradigm based on autonomy and capabilities."""
