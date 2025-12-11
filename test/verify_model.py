@@ -11,7 +11,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 try:
-    from model.ai_system import (
+    from slr_data_model import (
         AISystem,
         AgentArchitecture,
         AIAgent,
@@ -20,18 +20,20 @@ try:
         ToolUse,
         ContextEngineeringTechniques,
         AutonomyLevel,
-    )
-    from model.memory import Memory, MemoryType, MemoryScope, RetrievalStrategy
-    from model.ai_system_types import (
+        Memory,
+        MemoryType,
+        MemoryScope,
+        RetrievalStrategy,
         ParadigmType,
         AgentRoleType,
         ReasoningCapabilitiesType,
         CapabilityAcquisitionType,
         ModalityType,
         ExternalToolsType,
+        ValidationMethod,
+        ReportedOutcomes,
+        DomainType,
     )
-    from model.validation import ValidationMethod, ReportedOutcomes
-    from model.domain import DomainType
 
     print("✓ All imports successful!")
 
