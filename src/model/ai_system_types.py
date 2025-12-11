@@ -1,5 +1,5 @@
 from enum import Enum
-from src.descriptive_enum import DescriptiveEnum
+from src.model.descriptive_enum import DescriptiveEnum
 
 class ModalityType(DescriptiveEnum):
     """Input/output modalities supported by the system."""
