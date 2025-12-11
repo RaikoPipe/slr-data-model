@@ -1,6 +1,6 @@
 import pytest
 from pydantic import ValidationError
-from slr_data_model import *
+from src.slr_data_model import *
 
 
 def test_minimal_single_agent_system():

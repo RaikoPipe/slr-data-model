@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from src.model.descriptive_enum import DescriptiveEnum
+from descriptive_enum import DescriptiveEnum
 from typing import Set
 
 class DomainType(DescriptiveEnum):
