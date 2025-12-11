@@ -31,7 +31,7 @@ try:
         ExternalToolsType,
     )
     from model.validation import ValidationMethod, ReportedOutcomes
-    from model.domain import Domain, DomainType
+    from model.domain import DomainType
 
     print("✓ All imports successful!")
 
@@ -101,7 +101,7 @@ try:
     )
     print("✓ Reported outcomes created")
 
-    domain = Domain(name={DomainType.OTHER})
+    domain = DomainType.SIMULATION
     print("✓ Domain created")
 
     ai_system = AISystem(

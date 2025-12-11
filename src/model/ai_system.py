@@ -8,7 +8,7 @@ from .ai_system_types import (
     CollaborationMechanismType, CollaborationStructureType, ModalityType
 )
 from .validation import ValidationMethod, ReportedOutcomes
-from .domain import Domain
+from .domain import DomainType
 
 class GenerativeAIParadigm(BaseModel):
     """Classification of the system's AI paradigm based on autonomy and capabilities."""
@@ -157,7 +157,7 @@ class AISystem(BaseModel):
     """Complete AI system specification extracted from a paper."""
 
     # domain application
-    application_domains: Set[Domain] = Field(
+    application_domains: Set[DomainType] = Field(
         default_factory=set,
         description="Specific application domains and phases targeted by the system."
     )

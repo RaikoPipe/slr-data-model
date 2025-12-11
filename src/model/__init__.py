@@ -31,7 +31,7 @@ from .ai_system_types import (
     CollaborationStrategyType,
 )
 from .validation import ValidationMethod, ReportedOutcomes
-from .domain import Domain, DomainType
+from .domain import DomainType
 from .descriptive_enum import DescriptiveEnum
 
 __all__ = [
@@ -66,7 +66,6 @@ __all__ = [
     "ValidationMethod",
     "ReportedOutcomes",
     # Domain
-    "Domain",
     "DomainType",
     # Base
     "DescriptiveEnum",
