@@ -1,4 +1,7 @@
+from dataclasses import Field
+
 from .descriptive_enum import DescriptiveEnum
+from pydantic import Field
 
 class ModalityType(DescriptiveEnum):
     """Input/output modalities supported by the system."""

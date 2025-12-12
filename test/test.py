@@ -43,7 +43,7 @@ def test_minimal_single_agent_system():
     agent_architecture = AgentArchitecture(
         agents=[agent],
         orchestration_pattern=None,
-        autonomy_level=AutonomyLevel.SEMI_AUTONOMOUS,
+        autonomy_level=AutonomyLevelType.SEMI_AUTONOMOUS,
         shared_memory=False
     )
 
@@ -60,7 +60,7 @@ def test_minimal_single_agent_system():
         agent_architecture=agent_architecture,
         paradigm=ParadigmType.AGENTIC_AI,
         paradigm_reasoning="Uses chain-of-thought reasoning",
-        validation_methods={ValidationMethod.CASE_STUDY},
+        validation_methods={ValidationMethodType.CASE_STUDY},
         reported_outcomes=outcomes,
         application_domains_reasoning="Focused on production logistics tasks",
         application_domains={DomainType.SIMULATION}
@@ -79,8 +79,8 @@ def test_multi_agent_with_rag_system():
     memory = Memory(
         has_memory=True,
         memory_types={MemoryType.VECTOR_DATABASE},
-        memory_scopes={MemoryScope.LONG_TERM},
-        retrieval_strategies={RetrievalStrategy.SEMANTIC_SEARCH},
+        memory_scopes={MemoryScopeType.LONG_TERM},
+        retrieval_strategies={RetrievalStrategyType.SEMANTIC_SEARCH},
         shared_across_agents=True
     )
 
@@ -130,7 +130,7 @@ def test_multi_agent_with_rag_system():
     agent_architecture = AgentArchitecture(
         agents=[orchestrator, planner],
         orchestration_pattern=orchestration,
-        autonomy_level=AutonomyLevel.EXPERT_IN_LOOP,
+        autonomy_level=AutonomyLevelType.EXPERT_IN_LOOP,
         shared_memory=True
     )
 
@@ -142,7 +142,7 @@ def test_multi_agent_with_rag_system():
         application_domains_reasoning="Reasoning",
         paradigm=ParadigmType.AGENTIC_AI,
         paradigm_reasoning="Multi-agent with ReAct and dynamic tool use",
-        validation_methods={ValidationMethod.SIMULATION},
+        validation_methods={ValidationMethodType.SIMULATION},
         reported_outcomes=outcomes
     )
 
@@ -187,7 +187,7 @@ def test_validation_single_agent_cannot_have_orchestration():
         AgentArchitecture(
             agents=[agent],
             orchestration_pattern=orchestration,
-            autonomy_level=AutonomyLevel.FIXED_WORKFLOW,
+            autonomy_level=AutonomyLevelType.FIXED_WORKFLOW,
             shared_memory=False
         )
 

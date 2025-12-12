@@ -1,23 +1,17 @@
 from pydantic import BaseModel, Field, field_validator
 from enum import Enum
 from typing import List, Optional, Set
+
+from . import DescriptiveEnum
 from .memory import Memory
 from .ai_system_types import (
     ParadigmType, ExternalToolsType, CapabilityAcquisitionType,
     ReasoningCapabilitiesType, AgentRoleType, CollaborationStrategyType,
     CollaborationMechanismType, CollaborationStructureType, ModalityType
 )
-from .validation import ValidationMethod, ReportedOutcomes
+from .validation import ValidationMethodType, ReportedOutcomes
 from .domain import DomainType
-
-class GenerativeAIParadigm(BaseModel):
-    """Classification of the system's AI paradigm based on autonomy and capabilities."""
-    reasoning: str = Field(
-        description="Justification for the paradigm classification based on observed system characteristics."
-    )
-    paradigm_type: ParadigmType = Field(
-        description="The identified paradigm: generative-ai (simple generation), ai-agent (fixed workflows), or agentic-ai (autonomous reasoning)."
-    )
+from .annotation_helper import make_type_annotations
 
 class ToolUse(BaseModel):
     """External tools and integrations available to the agent."""
@@ -26,41 +20,41 @@ class ToolUse(BaseModel):
     )
     external_tools: Set[ExternalToolsType] = Field(
         default_factory=set,
-        description="Types of external tools utilized. Empty set if no tools."
+        description="Types of external tools utilized. Empty set if no tools." + make_type_annotations(ExternalToolsType)
     )
     choice_reasoning: Optional[str] = Field(
         default=None,
         description="Explanation of which tools are used and why, if applicable."
     )
 
-class FinetuningDataset(str, Enum):
+class FinetuningDatasetType(DescriptiveEnum):
     """Source and type of data used for model fine-tuning."""
-    HUMAN_ANNOTATED = "human-annotated"
-    LLM_GENERATED = "llm-generated"
-    REAL_WORLD = "real-world"
-    SYNTHETIC = "synthetic"
+    HUMAN_ANNOTATED = "human-annotated", "Datasets labeled or curated by human annotators for specific tasks."
+    LLM_GENERATED = "llm-generated", "Datasets created by other large language models to augment training data."
+    REAL_WORLD = "real-world", "Data collected from real-world applications and user interactions."
+    SYNTHETIC = "synthetic", "Artificially generated data designed to simulate specific scenarios or tasks."
 
 class ModelCapabilities(BaseModel):
     """Capabilities and characteristics of the underlying generative AI model."""
     capability_acquisition_methods: Set[CapabilityAcquisitionType] = Field(
         default_factory=set,
-        description="Methods used to acquire task-specific capabilities (fine-tuning, prompt-engineering, or both)."
+        description="Methods used to acquire task-specific capabilities (fine-tuning, prompt-engineering, or both)." + make_type_annotations(CapabilityAcquisitionType)
     )
     supported_modalities: Set[ModalityType] = Field(
         default_factory=set,
-        description="Input/output modalities the model supports (text, image, audio, video)."
+        description="Input/output modalities the model supports (text, image, audio, video)." + make_type_annotations(ModalityType)
     )
 
 class OrchestrationPattern(BaseModel):
     """Multi-agent coordination patterns and strategies."""
     collaboration_mechanism: CollaborationMechanismType = Field(
-        description="How agents align individual or shared objectives."
+        description="How agents align individual or shared objectives." + make_type_annotations(CollaborationMechanismType)
     )
     collaboration_structure: CollaborationStructureType = Field(
-        description="Organizational structure of agent interactions."
+        description="Organizational structure of agent interactions." + make_type_annotations(CollaborationStructureType)
     )
     collaboration_strategy: CollaborationStrategyType = Field(
-        description="Strategy for task allocation"
+        description="Strategy for task allocation" + make_type_annotations(CollaborationStrategyType)
     )
 
 class GenAIModel(BaseModel):
@@ -71,17 +65,17 @@ class GenAIModel(BaseModel):
     model_capabilities: ModelCapabilities = Field(
         description="Capabilities and modalities supported by the model."
     )
-    finetuning_datasets: Set[FinetuningDataset] = Field(
+    finetuning_datasets: Set[FinetuningDatasetType] = Field(
         default_factory=set,
-        description="Types of datasets used for fine-tuning. Empty if model is not fine-tuned."
+        description="Types of datasets used for fine-tuning. Empty if model is not fine-tuned." + make_type_annotations(FinetuningDatasetType)
     )
 
-class AutonomyLevel(str, Enum):
+class AutonomyLevelType(DescriptiveEnum):
     """Level of autonomy in agent decision-making and operation."""
-    FIXED_WORKFLOW = "fixed-workflow"  # Predefined steps, no adaptation
-    SEMI_AUTONOMOUS = "semi-autonomous"  # Some dynamic decisions within constraints
-    FULLY_AUTONOMOUS = "fully-autonomous"  # Independent decision-making without human intervention
-    EXPERT_IN_LOOP = "expert-in-loop"  # Human expert validates/guides decisions
+    FIXED_WORKFLOW = "fixed-workflow", "Predefined sequence of steps without dynamic adaptation."
+    SEMI_AUTONOMOUS = "semi-autonomous", "Some dynamic decision-making within constraints"
+    FULLY_AUTONOMOUS = "fully-autonomous", "Fully independent decision making without human intervention"
+    EXPERT_IN_LOOP = "expert-in-loop", "Human expert validates/guides decisions"
 
 # class ContextEngineeringTechniques(BaseModel):
 #     """Context engineering methods used to provide information and capabilities to the LLM."""
@@ -99,10 +93,10 @@ class AutonomyLevel(str, Enum):
 class AIAgent(BaseModel):
     """Individual agent within the system with specific role and capabilities."""
     agent_role: AgentRoleType = Field(
-        description="Specialized role of this agent (orchestrator, coder, planner, etc.)."
+        description="Specialized role of this agent (orchestrator, coder, planner, etc.)." + make_type_annotations(AgentRoleType)
     )
     reasoning_capabilities: Set[ReasoningCapabilitiesType] = Field(
-        description="Reasoning approaches used (rule-based, ReAct, chain-of-thought, etc.). State at least one."
+        description="Reasoning approaches used (rule-based, ReAct, chain-of-thought, etc.). State at least one."+ make_type_annotations(ReasoningCapabilitiesType)
     )
     memory: Memory = Field(
         description="Memory configuration for this agent."
@@ -137,8 +131,8 @@ class AgentArchitecture(BaseModel):
         default=None,
         description="Coordination pattern for multi-agent systems. Only define when agent architecture is comprised of multiple agents."
     )
-    autonomy_level: AutonomyLevel = Field(
-        description="Level(s) of autonomy exhibited by the system."
+    autonomy_level: AutonomyLevelType = Field(
+        description="Level(s) of autonomy exhibited by the system."  + make_type_annotations(AutonomyLevelType)
     )
     shared_memory: bool = Field(
         default=False,
@@ -159,8 +153,7 @@ class AISystem(BaseModel):
 
     # domain application
     application_domains: Set[DomainType] = Field(
-        default_factory=set,
-        description="Specific application domains and phases targeted by the system."
+        description='Specific application domains and phases targeted by the system.' + make_type_annotations(DomainType)
     )
     application_domains_reasoning: str = Field(
         description="Explanation of the chosen application domains."
@@ -168,7 +161,7 @@ class AISystem(BaseModel):
 
     # Paradigm classification
     paradigm: ParadigmType = Field(
-        description="Overall system paradigm classification."
+        description="Overall system paradigm classification."  + make_type_annotations(ParadigmType)
     )
     paradigm_reasoning: str = Field(
         description="Justification for paradigm classification."
@@ -180,9 +173,9 @@ class AISystem(BaseModel):
     )
 
     # Validation and outcomes
-    validation_methods: Set[ValidationMethod] = Field(
+    validation_methods: Set[ValidationMethodType] = Field(
         default_factory=set,
-        description="Methods used to validate system performance."
+        description="Methods used to validate system performance." + make_type_annotations(ValidationMethodType)
     )
     reported_outcomes: ReportedOutcomes = Field(
         description="Performance outcomes and limitations."

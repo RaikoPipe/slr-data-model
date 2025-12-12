@@ -4,7 +4,7 @@ AI System Data Model
 This module provides Pydantic models for representing AI systems,
 including their architecture, capabilities, and validation methods.
 """
-
+from .descriptive_enum import DescriptiveEnum
 from .ai_system import (
     AISystem,
     AgentArchitecture,
@@ -12,12 +12,11 @@ from .ai_system import (
     GenAIModel,
     ModelCapabilities,
     ToolUse,
-    AutonomyLevel,
-    FinetuningDataset,
+    AutonomyLevelType,
+    FinetuningDatasetType,
     OrchestrationPattern,
-    GenerativeAIParadigm,
 )
-from .memory import Memory, MemoryType, MemoryScope, RetrievalStrategy
+from .memory import Memory, MemoryType, MemoryScopeType, RetrievalStrategyType
 from .ai_system_types import (
     ParadigmType,
     AgentRoleType,
@@ -29,9 +28,9 @@ from .ai_system_types import (
     CollaborationStructureType,
     CollaborationStrategyType,
 )
-from .validation import ValidationMethod, ReportedOutcomes
+from .validation import ValidationMethodType, ReportedOutcomes
 from .domain import DomainType
-from .descriptive_enum import DescriptiveEnum
+
 
 __all__ = [
     # Main system
@@ -41,15 +40,14 @@ __all__ = [
     "GenAIModel",
     "ModelCapabilities",
     "ToolUse",
-    "AutonomyLevel",
-    "FinetuningDataset",
+    "AutonomyLevelType",
+    "FinetuningDatasetType",
     "OrchestrationPattern",
-    "GenerativeAIParadigm",
     # Memory
     "Memory",
     "MemoryType",
-    "MemoryScope",
-    "RetrievalStrategy",
+    "MemoryScopeType",
+    "RetrievalStrategyType",
     # Types
     "ParadigmType",
     "AgentRoleType",
@@ -61,7 +59,7 @@ __all__ = [
     "CollaborationStructureType",
     "CollaborationStrategyType",
     # Validation
-    "ValidationMethod",
+    "ValidationMethodType",
     "ReportedOutcomes",
     # Domain
     "DomainType",
