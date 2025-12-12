@@ -3,7 +3,7 @@ from typing import Optional, Set
 
 from pydantic import BaseModel, Field
 
-from src.slr_data_model import DescriptiveEnum
+from . import DescriptiveEnum
 
 
 class ValidationMethodType(DescriptiveEnum):

@@ -152,8 +152,8 @@ class AISystem(BaseModel):
     """Complete AI system specification extracted from a paper."""
 
     # domain application
-    application_domains: Set[DomainType] = Field(
-        description='Specific application domains and phases targeted by the system.' + make_type_annotations(DomainType)
+    application_domain: DomainType = Field(
+        description='Primary field of application targeted by the paper.' + make_type_annotations(DomainType)
     )
     application_domains_reasoning: str = Field(
         description="Explanation of the chosen application domains."

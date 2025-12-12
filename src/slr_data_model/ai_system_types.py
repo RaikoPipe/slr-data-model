@@ -38,7 +38,7 @@ class ReasoningCapabilitiesType(DescriptiveEnum):
     PLANNING_GRAPH = "planning-graph", "Graph-based planning with predefined state transitions"
 
     # Iterative/adaptive approaches (Agentic AI)
-    REACT = "react", "Reasoning and Acting framework with iterative observation-thought-action cycles"
+    REACT = "ReAct", "Reasoning and Acting framework with iterative observation-thought-action cycles"
     CHAIN_OF_THOUGHT = "chain-of-thought", "Step-by-step reasoning with intermediate thought processes"
     TREE_OF_THOUGHT = "tree-of-thought", "Explores multiple reasoning paths in a tree structure for complex problem-solving"
 
