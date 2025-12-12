@@ -63,7 +63,7 @@ def test_minimal_single_agent_system():
         validation_methods={ValidationMethodType.CASE_STUDY},
         reported_outcomes=outcomes,
         application_domains_reasoning="Focused on production logistics tasks",
-        application_domains={DomainType.SIMULATION}
+        primary_application_domain={DomainType.SIMULATION}
     )
 
     # Assertions
@@ -138,7 +138,7 @@ def test_multi_agent_with_rag_system():
 
     system = AISystem(
         agent_architecture=agent_architecture,
-        application_domains={DomainType.SIMULATION},
+        primary_application_domain={DomainType.SIMULATION},
         application_domains_reasoning="Reasoning",
         paradigm=ParadigmType.AGENTIC_AI,
         paradigm_reasoning="Multi-agent with ReAct and dynamic tool use",
