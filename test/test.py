@@ -37,19 +37,13 @@ def test_minimal_single_agent_system():
         memory=memory,
         tools=tool_use,
         genai_model=genai_model,
-        multiple_instances=False
-    )
-
-    context_engineering = ContextEngineeringTechniques(
-        tool_use=tool_use,
-        memory=memory,
-        prompt_engineering_details="Uses system prompts with task instructions"
+        generated_workers=False
     )
 
     agent_architecture = AgentArchitecture(
         agents=[agent],
         orchestration_pattern=None,
-        autonomy_level={AutonomyLevel.SEMI_AUTONOMOUS},
+        autonomy_level=AutonomyLevel.SEMI_AUTONOMOUS,
         shared_memory=False
     )
 
@@ -64,7 +58,6 @@ def test_minimal_single_agent_system():
     # Create system
     system = AISystem(
         agent_architecture=agent_architecture,
-        context_engineering=context_engineering,
         paradigm=ParadigmType.AGENTIC_AI,
         paradigm_reasoning="Uses chain-of-thought reasoning",
         validation_methods={ValidationMethod.CASE_STUDY},
@@ -116,7 +109,7 @@ def test_multi_agent_with_rag_system():
         memory=memory,
         tools=tools,
         genai_model=genai_model,
-        multiple_instances=False
+        generated_workers=False
     )
 
     planner = AIAgent(
@@ -125,25 +118,19 @@ def test_multi_agent_with_rag_system():
         memory=memory,
         tools=tools,
         genai_model=genai_model,
-        multiple_instances=False
+        generated_workers=False
     )
 
     orchestration = OrchestrationPattern(
-        collaboration_mechanism=set(),
-        collaboration_structure={CollaborationStructureType.HIERARCHICAL},
-        collaboration_strategy=set()
-    )
-
-    context_engineering = ContextEngineeringTechniques(
-        tool_use=tools,
-        memory=memory,
-        prompt_engineering_details="RAG with semantic search"
+        collaboration_mechanism=CollaborationMechanismType.COMPETITION,
+        collaboration_structure=CollaborationStructureType.HIERARCHICAL,
+        collaboration_strategy=CollaborationStrategyType.MODEL_BASED
     )
 
     agent_architecture = AgentArchitecture(
         agents=[orchestrator, planner],
         orchestration_pattern=orchestration,
-        autonomy_level={AutonomyLevel.EXPERT_IN_LOOP},
+        autonomy_level=AutonomyLevel.EXPERT_IN_LOOP,
         shared_memory=True
     )
 
@@ -151,7 +138,6 @@ def test_multi_agent_with_rag_system():
 
     system = AISystem(
         agent_architecture=agent_architecture,
-        context_engineering=context_engineering,
         application_domains={DomainType.SIMULATION},
         application_domains_reasoning="Reasoning",
         paradigm=ParadigmType.AGENTIC_AI,
@@ -164,8 +150,6 @@ def test_multi_agent_with_rag_system():
     assert len(system.agent_architecture.agents) == 2
     assert system.agent_architecture.shared_memory is True
     assert system.agent_architecture.orchestration_pattern is not None
-    assert system.context_engineering.memory.has_memory is True
-
 
 def test_validation_single_agent_cannot_have_orchestration():
     """Test that single-agent systems cannot have orchestration patterns."""
@@ -193,9 +177,9 @@ def test_validation_single_agent_cannot_have_orchestration():
     )
 
     orchestration = OrchestrationPattern(
-        collaboration_mechanism=set(),
-        collaboration_structure={CollaborationStructureType.CENTRALIZED},
-        collaboration_strategy=set()
+        collaboration_mechanism=CollaborationMechanismType.COMPETITION,
+        collaboration_structure=CollaborationStructureType.CENTRALIZED,
+        collaboration_strategy=CollaborationStrategyType.RULE_BASED
     )
 
     # Should raise ValidationError
@@ -203,7 +187,7 @@ def test_validation_single_agent_cannot_have_orchestration():
         AgentArchitecture(
             agents=[agent],
             orchestration_pattern=orchestration,
-            autonomy_level={AutonomyLevel.FIXED_WORKFLOW},
+            autonomy_level=AutonomyLevel.FIXED_WORKFLOW,
             shared_memory=False
         )
 

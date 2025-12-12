@@ -18,7 +18,6 @@ try:
         GenAIModel,
         ModelCapabilities,
         ToolUse,
-        ContextEngineeringTechniques,
         AutonomyLevel,
         Memory,
         MemoryType,
@@ -87,13 +86,6 @@ try:
     )
     print("✓ Agent architecture created")
 
-    context_engineering = ContextEngineeringTechniques(
-        tool_use=tool_use,
-        memory=memory,
-        prompt_engineering_details="System prompt with coding guidelines and few-shot examples"
-    )
-    print("✓ Context engineering created")
-
     reported_outcomes = ReportedOutcomes(
         decision_quality_improvement="Code quality improved by 30% compared to baseline",
         response_time_impact="Average response time: 5 seconds",
@@ -112,7 +104,6 @@ try:
         paradigm=ParadigmType.AGENTIC_AI,
         paradigm_reasoning="Uses ReAct reasoning with autonomous tool use and iterative problem-solving",
         agent_architecture=agent_architecture,
-        context_engineering=context_engineering,
         validation_methods={ValidationMethod.BENCHMARK, ValidationMethod.CASE_STUDY},
         reported_outcomes=reported_outcomes
     )

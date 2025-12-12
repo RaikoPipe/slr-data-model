@@ -53,17 +53,14 @@ class ModelCapabilities(BaseModel):
 
 class OrchestrationPattern(BaseModel):
     """Multi-agent coordination patterns and strategies."""
-    collaboration_mechanism: Set[CollaborationMechanismType] = Field(
-        default_factory=set,
-        description="How agents align objectives: cooperation, competition, or coopetition."
+    collaboration_mechanism: CollaborationMechanismType = Field(
+        description="How agents align individual or shared objectives."
     )
-    collaboration_structure: Set[CollaborationStructureType] = Field(
-        default_factory=set,
-        description="Organizational structure: centralized, distributed, or hierarchical."
+    collaboration_structure: CollaborationStructureType = Field(
+        description="Organizational structure of agent interactions."
     )
-    collaboration_strategy: Set[CollaborationStrategyType] = Field(
-        default_factory=set,
-        description="Strategy for task allocation: rule-based, role-based, or model-based."
+    collaboration_strategy: CollaborationStrategyType = Field(
+        description="Strategy for task allocation"
     )
 
 class GenAIModel(BaseModel):
@@ -86,18 +83,18 @@ class AutonomyLevel(str, Enum):
     FULLY_AUTONOMOUS = "fully-autonomous"  # Independent decision-making without human intervention
     EXPERT_IN_LOOP = "expert-in-loop"  # Human expert validates/guides decisions
 
-class ContextEngineeringTechniques(BaseModel):
-    """Context engineering methods used to provide information and capabilities to the LLM."""
-    tool_use: ToolUse = Field(
-        description="External tools and APIs available to the agent."
-    )
-    memory: Memory = Field(
-        description="Memory systems for storing and retrieving information."
-    )
-    prompt_engineering_details: Optional[str] = Field(
-        default=None,
-        description="Description of prompt engineering approaches used (system prompts, few-shot examples, etc.)."
-    )
+# class ContextEngineeringTechniques(BaseModel):
+#     """Context engineering methods used to provide information and capabilities to the LLM."""
+#     tool_use: ToolUse = Field(
+#         description="External tools and APIs available to the agent."
+#     )
+#     memory: Memory = Field(
+#         description="Memory systems for storing and retrieving information."
+#     )
+#     prompt_engineering_details: Optional[str] = Field(
+#         default=None,
+#         description="Description of prompt engineering approaches used (system prompts, few-shot examples, etc.)."
+#     )
 
 class AIAgent(BaseModel):
     """Individual agent within the system with specific role and capabilities."""
@@ -116,9 +113,13 @@ class AIAgent(BaseModel):
     genai_model: GenAIModel = Field(
         description="The underlying generative AI model powering this agent."
     )
-    multiple_instances: bool = Field(
+    generated_workers: bool = Field(
         default=False,
-        description="Whether multiple instances of this agent type exist (e.g., multiple worker agents)."
+        description="Whether multiple instances of this agent are spawned dynamically by the system."
+    )
+    prompt_engineering_details: Optional[str] = Field(
+        default=None,
+        description="Description of prompt engineering approaches used (system prompts, few-shot examples, etc.)."
     )
 
     @field_validator('reasoning_capabilities')
@@ -134,7 +135,7 @@ class AgentArchitecture(BaseModel):
     )
     orchestration_pattern: Optional[OrchestrationPattern] = Field(
         default=None,
-        description="Coordination pattern for multi-agent systems. Leave as None when there is only a single agent."
+        description="Coordination pattern for multi-agent systems. Only define when agent architecture is comprised of multiple agents."
     )
     autonomy_level: AutonomyLevel = Field(
         description="Level(s) of autonomy exhibited by the system."
@@ -150,8 +151,7 @@ class AgentArchitecture(BaseModel):
         if len(agents) > 1 and v is None:
             raise ValueError("Multi-agent system must specify orchestration pattern")
         if len(agents) == 1 and v is not None:
-            # raise ValueError("Single-agent system should not have orchestration pattern")
-            v = None
+            raise ValueError("Single-agent system should not have orchestration pattern")
         return v
 
 class AISystem(BaseModel):
@@ -179,12 +179,7 @@ class AISystem(BaseModel):
         description="Agent architecture and coordination patterns."
     )
 
-    # Context engineering (RQ2)
-    context_engineering: ContextEngineeringTechniques = Field(
-        description="Context engineering techniques employed."
-    )
-
-    # Validation and outcomes (RQ3)
+    # Validation and outcomes
     validation_methods: Set[ValidationMethod] = Field(
         default_factory=set,
         description="Methods used to validate system performance."
