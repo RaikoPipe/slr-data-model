@@ -15,6 +15,8 @@ from .annotation_helper import make_type_annotations
 
 class ToolUse(BaseModel):
     """External tools and integrations available to the agent."""
+    tool_use_description: str = Field(description="Description of the function and purpose of tool use as reported in the paper.")
+
     has_tools: bool = Field(
         description="Whether the agent uses any external tools beyond the base LLM."
     )
@@ -36,6 +38,8 @@ class FinetuningDatasetType(DescriptiveEnum):
 
 class ModelCapabilities(BaseModel):
     """Capabilities and characteristics of the underlying generative AI model."""
+    model_capabilities_description: str = Field(description="Description of the model's capabilities as reported in the paper.")
+
     capability_acquisition_methods: Set[CapabilityAcquisitionType] = Field(
         default_factory=set,
         description="Methods used to acquire task-specific capabilities (fine-tuning, prompt-engineering, or both)." + make_type_annotations(CapabilityAcquisitionType)
@@ -47,6 +51,8 @@ class ModelCapabilities(BaseModel):
 
 class OrchestrationPattern(BaseModel):
     """Multi-agent coordination patterns and strategies."""
+    orchestration_pattern_description: str = Field(description="Description of the orchestration pattern as reported in the paper.")
+
     collaboration_mechanism: CollaborationMechanismType = Field(
         description="How agents align individual or shared objectives." + make_type_annotations(CollaborationMechanismType)
     )
@@ -65,10 +71,13 @@ class GenAIModel(BaseModel):
     model_capabilities: ModelCapabilities = Field(
         description="Capabilities and modalities supported by the model."
     )
+    finetuning_dataset_description: str = Field(description="Description of the dataset used for fine-tuning.")
+
     finetuning_datasets: Set[FinetuningDatasetType] = Field(
         default_factory=set,
         description="Types of datasets used for fine-tuning. Empty if model is not fine-tuned." + make_type_annotations(FinetuningDatasetType)
     )
+
 
 class AutonomyLevelType(DescriptiveEnum):
     """Level of autonomy in agent decision-making and operation."""
@@ -92,6 +101,8 @@ class AutonomyLevelType(DescriptiveEnum):
 
 class AIAgent(BaseModel):
     """Individual agent within the system with specific role and capabilities."""
+    agent_description: Optional[str] = Field(description="Description of the agent's purpose and functionality as reported in the paper.")
+
     agent_role: AgentRoleType = Field(
         description="Specialized role of this agent (orchestrator, coder, planner, etc.)." + make_type_annotations(AgentRoleType)
     )

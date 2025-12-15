@@ -28,6 +28,8 @@ class RetrievalStrategyType(DescriptiveEnum):
 class Memory(BaseModel):
     """Memory system configuration for agent."""
 
+    memory_description: str = Field(description="Description of the memory system as reported in the paper.")
+
     has_memory: bool = Field(
         description="Whether agent uses any explicit memory system beyond base model"
     )
