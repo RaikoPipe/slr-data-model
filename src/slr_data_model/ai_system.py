@@ -170,10 +170,10 @@ class HumanIntegration(BaseModel):
 
 class TaskExecutionType(DescriptiveEnum):
     """How tasks flow through the system"""
-    single_step = "One-shot generation, no iteration"
-    deterministic_workflow = "Fixed sequence of steps (FSM, pipeline)"
-    dynamic_decomposition = "Runtime task breakdown with planning"
-    iterative_refinement = "ReAct loops, CoT with backtracking"
+    single_step = "single-step", "One-shot generation, no iteration"
+    deterministic_workflow = "deterministic_workflow", "Fixed sequence of steps (FSM, pipeline)"
+    dynamic_decomposition = "dynamic-decomposition", "Runtime task breakdown with planning"
+    iterative_refinement = "iterative-refinement", "ReAct loops, CoT with backtracking"
 
 class OrchestrationPattern(BaseModel):
     """Orchestration pattern for LLM-based AI systems."""
