@@ -43,7 +43,7 @@ def test_minimal_single_agent_system():
     agent_architecture = SystemArchitecture(
         agents=[agent],
         orchestration_pattern=None,
-        autonomy_level=AutonomyLevelType.SEMI_AUTONOMOUS,
+        trigger=TriggerType.SEMI_AUTONOMOUS,
         shared_memory=False
     )
 
@@ -121,16 +121,16 @@ def test_multi_agent_with_rag_system():
         generated_workers=False
     )
 
-    orchestration = OrchestrationPattern(
-        collaboration_mechanism=CollaborationMechanismType.COMPETITION,
-        collaboration_structure=CollaborationStructureType.HIERARCHICAL,
-        collaboration_strategy=CollaborationStrategyType.MODEL_BASED
+    orchestration = InterAgentBehaviour(
+        task_alignment=TaskAlignmentType.COMPETITION,
+        organizational_structure=OrganizationalStructureType.HIERARCHICAL,
+        behaviour_strategy=BehaviourStrategyType.MODEL_BASED
     )
 
     agent_architecture = SystemArchitecture(
         agents=[orchestrator, planner],
         orchestration_pattern=orchestration,
-        autonomy_level=AutonomyLevelType.EXPERT_IN_LOOP,
+        trigger=TriggerType.EXPERT_IN_LOOP,
         shared_memory=True
     )
 
@@ -176,10 +176,10 @@ def test_validation_single_agent_cannot_have_orchestration():
         genai_model=genai_model
     )
 
-    orchestration = OrchestrationPattern(
-        collaboration_mechanism=CollaborationMechanismType.COMPETITION,
-        collaboration_structure=CollaborationStructureType.CENTRALIZED,
-        collaboration_strategy=CollaborationStrategyType.RULE_BASED
+    orchestration = InterAgentBehaviour(
+        task_alignment=TaskAlignmentType.COMPETITION,
+        organizational_structure=OrganizationalStructureType.CENTRALIZED,
+        behaviour_strategy=BehaviourStrategyType.RULE_BASED
     )
 
     # Should raise ValidationError
@@ -187,7 +187,7 @@ def test_validation_single_agent_cannot_have_orchestration():
         SystemArchitecture(
             agents=[agent],
             orchestration_pattern=orchestration,
-            autonomy_level=AutonomyLevelType.FIXED_WORKFLOW,
+            trigger=TriggerType.FIXED_WORKFLOW,
             shared_memory=False
         )
 

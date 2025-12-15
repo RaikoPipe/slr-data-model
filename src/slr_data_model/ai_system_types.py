@@ -53,20 +53,18 @@ class AgentRoleType(DescriptiveEnum):
     RETRIEVER = "retriever", "Searches and retrieves relevant information from knowledge sources"
     OTHER = "other", "Specialized role not covered by standard categories"
 
-class CollaborationMechanismType(DescriptiveEnum):
+class TaskAlignmentType(DescriptiveEnum):
     """Agent interaction paradigm defining how agents align or conflict in their objectives."""
     COOPERATION = "cooperation", "Agents align individual objectives with shared collective goals"
     COMPETITION = "competition", "Agents prioritize their own objectives which may conflict with others"
     COOPETITION = "coopetition", "Hybrid model where agents collaborate on shared tasks while competing on others"
 
-class CollaborationStructureType(DescriptiveEnum):
+class OrganizationalStructureType(DescriptiveEnum):
     """Organizational structure defining control and communication patterns between agents."""
-    CENTRALIZED = "centralized", "Single central controller manages all agent coordination and decision-making"
     DISTRIBUTED = "distributed", "Agents coordinate as peers without central authority"
-    HIERARCHICAL = "hierarchical", "Multi-level structure with manager agents overseeing worker agents"
+    HIERARCHICAL = "hierarchical", "Manager agents overseeing worker agents"
 
-class CollaborationStrategyType(DescriptiveEnum):
-    """Strategy for determining agent behavior and task allocation in multi-agent systems."""
+class BehaviourStrategyType(DescriptiveEnum):
+    """Strategy for determining agent behavior in multi-agent systems."""
     RULE_BASED = "rule-based", "Agent behavior determined by predefined rules and conditions"
     ROLE_BASED = "role-based", "Agent behavior and task assignment based on specialized roles"
-    MODEL_BASED = "model-based", "Agent behavior learned or optimized through models (RL, optimization)"

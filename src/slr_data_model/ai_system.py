@@ -1,13 +1,12 @@
 from pydantic import BaseModel, Field, field_validator
-from enum import Enum
 from typing import List, Optional, Set
 
-from . import DescriptiveEnum
+from .descriptive_enum import DescriptiveEnum
 from .memory import Memory
 from .ai_system_types import (
     ParadigmType, ExternalToolsType, CapabilityAcquisitionType,
-    ReasoningCapabilitiesType, AgentRoleType, CollaborationStrategyType,
-    CollaborationMechanismType, CollaborationStructureType, ModalityType
+    ReasoningCapabilitiesType, AgentRoleType, BehaviourStrategyType,
+    TaskAlignmentType, OrganizationalStructureType, ModalityType
 )
 from .validation import ValidationMethodType, ReportedOutcomes
 from .domain import DomainType
@@ -49,18 +48,18 @@ class ModelCapabilities(BaseModel):
         description="Input/output modalities the model supports (text, image, audio, video)." + make_type_annotations(ModalityType)
     )
 
-class OrchestrationPattern(BaseModel):
-    """Multi-agent coordination patterns and strategies."""
-    orchestration_pattern_description: str = Field(description="Description of the orchestration pattern as reported in the paper.")
+class InterAgentBehaviour(BaseModel):
+    """Multi-agent coordination patterns and collaboration strategies."""
+    inter_agent_behaviour_pattern: str = Field(description="Description of the inter-agent behaviour pattern as reported in the paper.")
 
-    collaboration_mechanism: CollaborationMechanismType = Field(
-        description="How agents align individual or shared objectives." + make_type_annotations(CollaborationMechanismType)
+    task_alignment: TaskAlignmentType = Field(
+        description="How agents align individual or shared objectives." + make_type_annotations(TaskAlignmentType)
     )
-    collaboration_structure: CollaborationStructureType = Field(
-        description="Organizational structure of agent interactions." + make_type_annotations(CollaborationStructureType)
+    organizational_structure: OrganizationalStructureType = Field(
+        description="Organizational structure of agent interactions." + make_type_annotations(OrganizationalStructureType)
     )
-    collaboration_strategy: CollaborationStrategyType = Field(
-        description="Strategy for task allocation" + make_type_annotations(CollaborationStrategyType)
+    behaviour_strategy: BehaviourStrategyType = Field(
+        description="Strategy for task allocation" + make_type_annotations(BehaviourStrategyType)
     )
 
 class GenAIModel(BaseModel):
@@ -79,11 +78,10 @@ class GenAIModel(BaseModel):
     )
 
 
-class AutonomyLevelType(DescriptiveEnum):
+class TriggerType(DescriptiveEnum):
     """Level of autonomy in agent decision-making and operation."""
-    HUMAN_INITIATED = "human-initiated", "System assists, but requires human triggering"
-    SEMI_AUTONOMOUS = "semi-autonomous", "System proposes, human approves before action."
-    FULLY_AUTONOMOUS = "fully-autonomous", "System acts independently, human notified post-action."
+    HUMAN_TRIGGERED = "human-initiated", "System assists, but requires human triggering"
+    EVENT_TRIGGERED = "system-initiated", "AI system is triggered in response to events without human input"
 
 # class ContextEngineeringTechniques(BaseModel):
 #     """Context engineering methods used to provide information and capabilities to the LLM."""
@@ -138,7 +136,7 @@ class HumanOversightType(DescriptiveEnum):
     PRE_ACTION_VALIDATION = "pre-action-validation", "Humans acts as approval gate for AI outputs prior to critical actions."
     REAL_TIME_MONITORING = "real-time-monitoring", "Humans monitor AI decisions and actions and intervenes if necessary during operation."
     RISK_BASED_ESCALATION = "risk-based-escalation", "System escalates problem to human/reverts to human control on uncertainty or errors."
-    POST_ACTION_REVIEW = "post-action-review", "Humans provide post hoc feedback on AI decision and/or action to improve future performance."
+    POST_ACTION_REVIEW = "post-action-review", "AI decides and acts independently, with only human review and possibly feedback after the fact."
 
 class InteractionModalityType(DescriptiveEnum):
     """Modalities through which humans interact with the AI system."""
@@ -170,6 +168,34 @@ class HumanIntegration(BaseModel):
         description="Methods for incorporating human feedback into system learning and adaptation." + make_type_annotations(FeedbackAndLearningType)
     )
 
+class TaskExecutionType(DescriptiveEnum):
+    """How tasks flow through the system"""
+    single_step = "One-shot generation, no iteration"
+    deterministic_workflow = "Fixed sequence of steps (FSM, pipeline)"
+    dynamic_decomposition = "Runtime task breakdown with planning"
+    iterative_refinement = "ReAct loops, CoT with backtracking"
+
+class OrchestrationPattern(BaseModel):
+    """Orchestration pattern for LLM-based AI systems."""
+    orchestration_pattern_description: str = Field(description="Description of the orchestration pattern as reported in the paper.")
+    task_execution_pattern: str = Field(
+        description="How tasks flow through the system."
+    )
+    inter_agent_behaviour: Optional[InterAgentBehaviour] = Field(
+        default=None,
+        description="Collaboration mechanisms for multi-agent systems. Only define when there is dynamic decomposition."
+    )
+
+    # @field_validator('orchestration_pattern')
+    # def validate_orchestration(cls, v, info):
+    #     agents = info.data.get('agents', [])
+    #     if len(agents) > 1 and v is None:
+    #         raise ValueError("Multi-agent system must specify orchestration pattern")
+    #     if len(agents) == 1 and v is not None:
+    #         raise ValueError("Single-agent system should not have orchestration pattern")
+    #     return v
+
+
 class SystemArchitecture(BaseModel):
     """Overall architecture of the LLM-based system."""
     agents: List[AIAgent] = Field(
@@ -177,11 +203,13 @@ class SystemArchitecture(BaseModel):
     )
     orchestration_pattern: Optional[OrchestrationPattern] = Field(
         default=None,
-        description="Coordination pattern for multi-agent systems. Only define when agent architecture is comprised of multiple agents."
+        description="Orchestration pattern of the AI system."
     )
-    autonomy_level: AutonomyLevelType = Field(
-        description="Level(s) of autonomy exhibited by the system."  + make_type_annotations(AutonomyLevelType)
+
+    trigger: TriggerType = Field(
+        description="Mechanism that initiates system."  + make_type_annotations(TriggerType)
     )
+
     human_integration: Optional[HumanIntegration] = Field(
         default=None,
         description="Human integration aspects of the system, if applicable."
@@ -191,15 +219,6 @@ class SystemArchitecture(BaseModel):
         default=False,
         description="Whether agents share memory/knowledge with each other."
     )
-
-    @field_validator('orchestration_pattern')
-    def validate_orchestration(cls, v, info):
-        agents = info.data.get('agents', [])
-        if len(agents) > 1 and v is None:
-            raise ValueError("Multi-agent system must specify orchestration pattern")
-        if len(agents) == 1 and v is not None:
-            raise ValueError("Single-agent system should not have orchestration pattern")
-        return v
 
 class AISystem(BaseModel):
     """Complete AI system specification extracted from a paper."""

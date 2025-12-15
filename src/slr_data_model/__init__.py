@@ -12,9 +12,9 @@ from .ai_system import (
     GenAIModel,
     ModelCapabilities,
     ToolUse,
-    AutonomyLevelType,
+    TriggerType,
     FinetuningDatasetType,
-    OrchestrationPattern,
+    InterAgentBehaviour,
 )
 from .memory import Memory, MemoryType, MemoryScopeType, RetrievalStrategyType
 from .ai_system_types import (
@@ -24,9 +24,9 @@ from .ai_system_types import (
     CapabilityAcquisitionType,
     ModalityType,
     ExternalToolsType,
-    CollaborationMechanismType,
-    CollaborationStructureType,
-    CollaborationStrategyType,
+    TaskAlignmentType,
+    OrganizationalStructureType,
+    BehaviourStrategyType,
 )
 from .validation import ValidationMethodType, ReportedOutcomes
 from .domain import DomainType
@@ -40,9 +40,9 @@ __all__ = [
     "GenAIModel",
     "ModelCapabilities",
     "ToolUse",
-    "AutonomyLevelType",
+    "TriggerType",
     "FinetuningDatasetType",
-    "OrchestrationPattern",
+    "InterAgentBehaviour",
     # Memory
     "Memory",
     "MemoryType",
@@ -55,9 +55,9 @@ __all__ = [
     "CapabilityAcquisitionType",
     "ModalityType",
     "ExternalToolsType",
-    "CollaborationMechanismType",
-    "CollaborationStructureType",
-    "CollaborationStrategyType",
+    "TaskAlignmentType",
+    "OrganizationalStructureType",
+    "BehaviourStrategyType",
     # Validation
     "ValidationMethodType",
     "ReportedOutcomes",
