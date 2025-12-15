@@ -29,6 +29,7 @@ class CapabilityAcquisitionType(DescriptiveEnum):
     """Method by which the model acquires task-specific capabilities."""
     FINETUNING = "fine-tuning", "Model weights updated through supervised training on task-specific data"
     PROMPT_ENGINEERING = "prompt-engineering", "Capabilities acquired through carefully designed prompts without weight updates"
+    IN_CONTEXT_LEARNING = "in-context-learning", "Learning from examples provided in the input context without weight updates"
 
 class ReasoningCapabilitiesType(DescriptiveEnum):
     """Reasoning approaches used by the agent for decision-making and task execution."""

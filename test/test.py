@@ -40,7 +40,7 @@ def test_minimal_single_agent_system():
         generated_workers=False
     )
 
-    agent_architecture = AgentArchitecture(
+    agent_architecture = SystemArchitecture(
         agents=[agent],
         orchestration_pattern=None,
         autonomy_level=AutonomyLevelType.SEMI_AUTONOMOUS,
@@ -57,7 +57,7 @@ def test_minimal_single_agent_system():
 
     # Create system
     system = AISystem(
-        agent_architecture=agent_architecture,
+        system_architecture=agent_architecture,
         paradigm=ParadigmType.AGENTIC_AI,
         paradigm_reasoning="Uses chain-of-thought reasoning",
         validation_methods={ValidationMethodType.CASE_STUDY},
@@ -68,8 +68,8 @@ def test_minimal_single_agent_system():
 
     # Assertions
     assert system.paradigm == ParadigmType.AGENTIC_AI
-    assert len(system.agent_architecture.agents) == 1
-    assert system.agent_architecture.orchestration_pattern is None
+    assert len(system.system_architecture.agents) == 1
+    assert system.system_architecture.orchestration_pattern is None
 
 
 def test_multi_agent_with_rag_system():
@@ -127,7 +127,7 @@ def test_multi_agent_with_rag_system():
         collaboration_strategy=CollaborationStrategyType.MODEL_BASED
     )
 
-    agent_architecture = AgentArchitecture(
+    agent_architecture = SystemArchitecture(
         agents=[orchestrator, planner],
         orchestration_pattern=orchestration,
         autonomy_level=AutonomyLevelType.EXPERT_IN_LOOP,
@@ -137,7 +137,7 @@ def test_multi_agent_with_rag_system():
     outcomes = ReportedOutcomes()
 
     system = AISystem(
-        agent_architecture=agent_architecture,
+        system_architecture=agent_architecture,
         primary_application_domain={DomainType.SIMULATION},
         application_domains_reasoning="Reasoning",
         paradigm=ParadigmType.AGENTIC_AI,
@@ -147,9 +147,9 @@ def test_multi_agent_with_rag_system():
     )
 
     # Assertions
-    assert len(system.agent_architecture.agents) == 2
-    assert system.agent_architecture.shared_memory is True
-    assert system.agent_architecture.orchestration_pattern is not None
+    assert len(system.system_architecture.agents) == 2
+    assert system.system_architecture.shared_memory is True
+    assert system.system_architecture.orchestration_pattern is not None
 
 def test_validation_single_agent_cannot_have_orchestration():
     """Test that single-agent systems cannot have orchestration patterns."""
@@ -184,7 +184,7 @@ def test_validation_single_agent_cannot_have_orchestration():
 
     # Should raise ValidationError
     with pytest.raises(ValidationError, match="Single-agent system should not have orchestration pattern"):
-        AgentArchitecture(
+        SystemArchitecture(
             agents=[agent],
             orchestration_pattern=orchestration,
             autonomy_level=AutonomyLevelType.FIXED_WORKFLOW,

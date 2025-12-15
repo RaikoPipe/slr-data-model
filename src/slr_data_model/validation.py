@@ -17,7 +17,7 @@ class ReportedOutcomes(BaseModel):
     """Performance outcomes and limitations reported in the paper."""
     decision_quality_improvement: Optional[str] = Field(
         default=None,
-        description="Reported improvements in decision quality or accuracy."
+        description="Reported improvements in decision quality or accuracy against traditional methods are ablation of context engineering techniques."
     )
     response_time_impact: Optional[str] = Field(
         default=None,

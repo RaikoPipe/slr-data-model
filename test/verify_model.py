@@ -57,7 +57,7 @@ try:
 
     model_capabilities = ModelCapabilities(
         capability_acquisition_methods={CapabilityAcquisitionType.PROMPT_ENGINEERING},
-        supported_modalities={ModalityType.TEXT}
+        supported_modalities={ModalityType.Conversational}
     )
     print("✓ Model capabilities created")
 
@@ -114,14 +114,14 @@ try:
     assert ai_system.paradigm == ParadigmType.AGENTIC_AI
     print(f"  - Paradigm: {ai_system.paradigm.value}")
 
-    assert len(ai_system.agent_architecture.agents) == 1
-    print(f"  - Number of agents: {len(ai_system.agent_architecture.agents)}")
+    assert len(ai_system.system_architecture.agents) == 1
+    print(f"  - Number of agents: {len(ai_system.system_architecture.agents)}")
 
-    assert ai_system.agent_architecture.agents[0].agent_role == AgentRoleType.CODER
-    print(f"  - Agent role: {ai_system.agent_architecture.agents[0].agent_role.value}")
+    assert ai_system.system_architecture.agents[0].agent_role == AgentRoleType.CODER
+    print(f"  - Agent role: {ai_system.system_architecture.agents[0].agent_role.value}")
 
-    assert ReasoningCapabilitiesType.REACT in ai_system.agent_architecture.agents[0].reasoning_capabilities
-    print(f"  - Reasoning capabilities: {[r.value for r in ai_system.agent_architecture.agents[0].reasoning_capabilities]}")
+    assert ReasoningCapabilitiesType.REACT in ai_system.system_architecture.agents[0].reasoning_capabilities
+    print(f"  - Reasoning capabilities: {[r.value for r in ai_system.system_architecture.agents[0].reasoning_capabilities]}")
 
     # Test serialization
     print("\nTesting serialization...")

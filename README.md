@@ -51,7 +51,7 @@ model = GenAIModel(
     name="GPT-4",
     provider="OpenAI",
     model_family="GPT",
-    modalities=[ModalityType.TEXT]
+    modalities=[ModalityType.Conversational]
 )
 
 # Create an AI agent

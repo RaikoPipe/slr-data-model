@@ -81,10 +81,9 @@ class GenAIModel(BaseModel):
 
 class AutonomyLevelType(DescriptiveEnum):
     """Level of autonomy in agent decision-making and operation."""
-    FIXED_WORKFLOW = "fixed-workflow", "Predefined sequence of steps without dynamic adaptation."
-    SEMI_AUTONOMOUS = "semi-autonomous", "Some dynamic decision-making within constraints"
-    FULLY_AUTONOMOUS = "fully-autonomous", "Fully independent decision making without human intervention"
-    EXPERT_IN_LOOP = "expert-in-loop", "Human expert validates/guides decisions"
+    HUMAN_INITIATED = "human-initiated", "System assists, but requires human triggering"
+    SEMI_AUTONOMOUS = "semi-autonomous", "System proposes, human approves before action."
+    FULLY_AUTONOMOUS = "fully-autonomous", "System acts independently, human notified post-action."
 
 # class ContextEngineeringTechniques(BaseModel):
 #     """Context engineering methods used to provide information and capabilities to the LLM."""
@@ -133,10 +132,48 @@ class AIAgent(BaseModel):
             raise ValueError("Agent must have at least one reasoning capability")
         return v
 
-class AgentArchitecture(BaseModel):
-    """Overall architecture of the agent system."""
+class HumanOversightType(DescriptiveEnum):
+    """Types of human oversight mechanisms integrated into the system."""
+
+    PRE_ACTION_VALIDATION = "pre-action-validation", "Humans acts as approval gate for AI outputs prior to critical actions."
+    REAL_TIME_MONITORING = "real-time-monitoring", "Humans monitor AI decisions and actions and intervenes if necessary during operation."
+    RISK_BASED_ESCALATION = "risk-based-escalation", "System escalates problem to human/reverts to human control on uncertainty or errors."
+    POST_ACTION_REVIEW = "post-action-review", "Humans provide post hoc feedback on AI decision and/or action to improve future performance."
+
+class InteractionModalityType(DescriptiveEnum):
+    """Modalities through which humans interact with the AI system."""
+    CONVERSATIONAL_TEXT = "conversational-text", "Textual interfaces for conversation-based interaction."
+    CONVERSATIONAL_VOICE = "voice", "Speech-based interaction."
+    FORM_TEXT = "form-text", "Structured text forms for input/output."
+    DASHBOARD_GUI = "dashboard-gui", "Graphical user interfaces with visual dashboards and context-sensitive controls."
+
+class FeedbackAndLearningType(DescriptiveEnum):
+    """Methods for incorporating human feedback into system learning and adaptation."""
+    CORRECTIVE_FEEDBACK = "corrective-feedback", "Humans provide corrections to AI outputs to guide learning."
+    PREFERENCE_ALIGNMENT = "preference-alignment", "System learns user preferences over time."
+    ACTIVE_LEARNING = "active-learning", "System actively solicits human input on uncertain cases to improve performance."
+    CONTINUOUS_IMPROVEMENT = "continuous-improvement", "Ongoing human feedback loops for iterative system enhancement."
+
+class HumanIntegration(BaseModel):
+    """Human integration aspects of the LLM-based system."""
+    human_integration_description: str = Field(description="Overall description of human integration aspects as reported in the paper.")
+    human_oversight_mechanism: Set[str] = Field(
+        default_factory=set,
+        description="Types of human oversight mechanisms integrated into the system." + make_type_annotations(HumanOversightType)
+    )
+    interaction_modalities: Set[ModalityType] = Field(
+        default_factory=set,
+        description="Modalities through which humans interact with the AI system." + make_type_annotations(InteractionModalityType)
+    )
+    feedback_and_learning_methods: Set[FeedbackAndLearningType] = Field(
+        default_factory=set,
+        description="Methods for incorporating human feedback into system learning and adaptation." + make_type_annotations(FeedbackAndLearningType)
+    )
+
+class SystemArchitecture(BaseModel):
+    """Overall architecture of the LLM-based system."""
     agents: List[AIAgent] = Field(
-        description="List of agents in the system. Single-agent systems have one element."
+        description="List of LLM-based agents in the system. Single-agent systems have one element."
     )
     orchestration_pattern: Optional[OrchestrationPattern] = Field(
         default=None,
@@ -145,6 +182,11 @@ class AgentArchitecture(BaseModel):
     autonomy_level: AutonomyLevelType = Field(
         description="Level(s) of autonomy exhibited by the system."  + make_type_annotations(AutonomyLevelType)
     )
+    human_integration: Optional[HumanIntegration] = Field(
+        default=None,
+        description="Human integration aspects of the system, if applicable."
+    )
+
     shared_memory: bool = Field(
         default=False,
         description="Whether agents share memory/knowledge with each other."
@@ -179,8 +221,8 @@ class AISystem(BaseModel):
     )
 
     # System architecture
-    agent_architecture: AgentArchitecture = Field(
-        description="Agent architecture and coordination patterns."
+    system_architecture: SystemArchitecture = Field(
+        description="Architecture of the LLM-based System."
     )
 
     # Validation and outcomes

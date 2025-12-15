@@ -182,7 +182,7 @@ from slr_data_model import (
 # Create a model with capabilities
 capabilities = ModelCapabilities(
     capability_acquisition_methods={CapabilityAcquisitionType.PROMPT_ENGINEERING},
-    supported_modalities={ModalityType.TEXT}
+    supported_modalities={ModalityType.Conversational}
 )
 
 model = GenAIModel(

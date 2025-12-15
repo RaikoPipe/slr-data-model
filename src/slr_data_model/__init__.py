@@ -7,7 +7,7 @@ including their architecture, capabilities, and validation methods.
 from .descriptive_enum import DescriptiveEnum
 from .ai_system import (
     AISystem,
-    AgentArchitecture,
+    SystemArchitecture,
     AIAgent,
     GenAIModel,
     ModelCapabilities,
@@ -35,7 +35,7 @@ from .domain import DomainType
 __all__ = [
     # Main system
     "AISystem",
-    "AgentArchitecture",
+    "SystemArchitecture",
     "AIAgent",
     "GenAIModel",
     "ModelCapabilities",

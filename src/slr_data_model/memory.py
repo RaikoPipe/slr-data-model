@@ -25,8 +25,15 @@ class RetrievalStrategyType(DescriptiveEnum):
     RERANKING = "reranking", "Ranks retrieved items based on relevance to the query."
     GRAPH_TRAVERSAL = "graph-traversal", "Navigates knowledge graphs to find related information."
 
+class PromptInjectionStrategyType(DescriptiveEnum):
+    """Strategies for injecting memory into prompts."""
+    PREPENDING = "prepending", "Adding memory content at the beginning of the prompt."
+    APPENDING = "appending", "Adding memory content at the end of the prompt."
+    IN_TEXT_INJECTION = "in-text-injection", "Inserting memory content within the body of the prompt."
+    DYNAMIC_INJECTION = "dynamic-injection", "Adapting memory injection based on context or query."
+
 class Memory(BaseModel):
-    """Memory system configuration for agent."""
+    """Memory architecture for agent."""
 
     memory_description: str = Field(description="Description of the memory system as reported in the paper.")
 
@@ -47,6 +54,11 @@ class Memory(BaseModel):
     retrieval_strategies: Set[RetrievalStrategyType] = Field(
         default_factory=set,
         description="Methods for retrieving information. Empty if no retrieval mechanism." + make_type_annotations(RetrievalStrategyType)
+    )
+
+    prompt_injection_strategy : Set[PromptInjectionStrategyType] = Field(
+        default_factory=set,
+        description="Techniques for injecting memory into prompts. Empty if no persistent memory system." + make_type_annotations(PromptInjectionStrategyType)
     )
 
     shared_across_agents: bool = Field(
