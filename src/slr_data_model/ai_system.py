@@ -214,10 +214,10 @@ class SystemArchitecture(BaseModel):
         description="Human integration aspects of the system, if applicable."
     )
 
-    shared_memory: bool = Field(
-        default=False,
-        description="Whether agents share memory/knowledge with each other."
-    )
+    # shared_memory: bool = Field(
+    #     default=False,
+    #     description="Whether agents share memory/knowledge with each other."
+    # )
 
     @field_validator("agents")
     def empty_list(cls, v, info):
