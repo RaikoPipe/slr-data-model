@@ -12,6 +12,7 @@ class MemoryType(DescriptiveEnum):
     KNOWLEDGE_GRAPH = "knowledge-graph", "Represents information as interconnected entities and relationships."
     EXTERNAL_DATABASE = "external-database", "Integrates with external databases for persistent storage."
     STATE_TRACKING = "state-tracking", "Maintains state information relevant to tasks or processes."
+    PARAMETRIC_MEMORY = "parametric-memory", "Utilizes model parameters to store learned information."
 
 class MemoryScopeType(DescriptiveEnum):
     """Temporal scope of memory."""
@@ -37,23 +38,23 @@ class Memory(BaseModel):
 
     memory_description: str = Field(description="Description of the memory system as reported in the paper.")
 
-    has_memory: bool = Field(
-        description="Whether agent uses any explicit memory system beyond base model"
-    )
+    # has_memory: bool = Field(
+    #     description="Whether agent uses any explicit memory system beyond base model"
+    # )
 
     memory_types: Set[MemoryType] = Field(
         default_factory=set,
         description="Types of memory storage used. Empty if no memory system." + make_type_annotations(MemoryType)
     )
 
-    memory_scopes: Set[MemoryScopeType] = Field(
-        default_factory=set,
-        description="Temporal scopes of memory usage. Empty if no memory system." + make_type_annotations(MemoryScopeType)
-    )
+    # memory_scopes: Set[MemoryScopeType] = Field(
+    #     default_factory=set,
+    #     description="Temporal scopes of memory usage. Empty if no memory system." + make_type_annotations(MemoryScopeType)
+    # )
 
     retrieval_strategies: Set[RetrievalStrategyType] = Field(
         default_factory=set,
-        description="Methods for retrieving information. Empty if no retrieval mechanism." + make_type_annotations(RetrievalStrategyType)
+        description="Methods for retrieving information. Empty if no retrieval mechanism/RAG." + make_type_annotations(RetrievalStrategyType)
     )
 
     prompt_injection_strategy : Set[PromptInjectionStrategyType] = Field(
@@ -61,7 +62,7 @@ class Memory(BaseModel):
         description="Techniques for injecting memory into prompts. Empty if no persistent memory system." + make_type_annotations(PromptInjectionStrategyType)
     )
 
-    shared_across_agents: bool = Field(
-        default=False,
-        description="Whether memory is shared between multiple agents"
-    )
+    # shared_across_agents: bool = Field(
+    #     default=False,
+    #     description="Whether memory is shared between multiple agents"
+    # )

@@ -34,26 +34,21 @@ class CapabilityAcquisitionType(DescriptiveEnum):
 class ReasoningCapabilitiesType(DescriptiveEnum):
     """Reasoning approaches used by the agent for decision-making and task execution."""
     # Fixed/deterministic approaches (AI Agent)
-    RULE_BASED = "rule-based", "If-then logic and decision trees with predefined rules"
-    DETERMINISTIC_WORKFLOW = "deterministic-workflow", "Fixed sequence of steps without dynamic adaptation"
-    PLANNING_GRAPH = "planning-graph", "Graph-based planning with predefined state transitions"
-
-    # Iterative/adaptive approaches (Agentic AI)
-    REACT = "ReAct", "Reasoning and Acting framework with iterative observation-thought-action cycles"
+    ITERATIVE_REASONING = "iterative-reasoning", "Reasoning and Acting framework with iterative observation-thought-action cycles"
     CHAIN_OF_THOUGHT = "chain-of-thought", "Step-by-step reasoning with intermediate thought processes"
     TREE_OF_THOUGHT = "tree-of-thought", "Explores multiple reasoning paths in a tree structure for complex problem-solving"
 
 class AgentRoleType(DescriptiveEnum):
     """Specialized role or function of an agent within the system."""
     MONOLITHIC = "monolithic", "Single agent handling all tasks without role specialization"
-    ORCHESTRATOR = "orchestrator", "Manages task distribution and coordinates other agents"
+    ORCHESTRATOR = "orchestrator", "Decomposes task, manages task distribution and coordinates other agents"
     CODER = "coder", "Generates, modifies, or debugs code"
     PLANNER = "planner", "Creates plans and breaks down complex tasks into subtasks"
     SUMMARIZER = "summarizer", "Condenses and summarizes information"
     RETRIEVER = "retriever", "Searches and retrieves relevant information from knowledge sources"
     OTHER = "other", "Specialized role not covered by standard categories"
 
-class TaskAlignmentType(DescriptiveEnum):
+class AgentCollaborationType(DescriptiveEnum):
     """Agent interaction paradigm defining how agents align or conflict in their objectives."""
     COOPERATION = "cooperation", "Agents align individual objectives with shared collective goals"
     COMPETITION = "competition", "Agents prioritize their own objectives which may conflict with others"
@@ -62,9 +57,11 @@ class TaskAlignmentType(DescriptiveEnum):
 class OrganizationalStructureType(DescriptiveEnum):
     """Organizational structure defining control and communication patterns between agents."""
     DISTRIBUTED = "distributed", "Agents coordinate as peers without central authority"
-    HIERARCHICAL = "hierarchical", "Manager agents overseeing worker agents"
+    CENTRALIZED = "centralized", "Single central agent controlling subordinate agents"
+    HIERARCHICAL = "hierarchical", "Multiple levels of hierarchical nesting with manager agents overseeing subordinate agents"
+    LINEAR = "linear", "Sequential chain of agents where each agent passes the task to the next."
 
-class BehaviourStrategyType(DescriptiveEnum):
-    """Strategy for determining agent behavior in multi-agent systems."""
-    RULE_BASED = "rule-based", "Agent behavior determined by predefined rules and conditions"
-    ROLE_BASED = "role-based", "Agent behavior and task assignment based on specialized roles"
+# class BehaviourStrategyType(DescriptiveEnum):
+#     """Strategy for determining agent behavior in multi-agent systems."""
+#     RULE_BASED = "rule-based", "Agent behavior determined by predefined rules and conditions"
+#     ROLE_BASED = "role-based", "Agent behavior and task assignment based on specialized roles"

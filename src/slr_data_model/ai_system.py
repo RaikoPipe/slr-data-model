@@ -5,8 +5,8 @@ from .descriptive_enum import DescriptiveEnum
 from .memory import Memory
 from .ai_system_types import (
     ParadigmType, ExternalToolsType, CapabilityAcquisitionType,
-    ReasoningCapabilitiesType, AgentRoleType, BehaviourStrategyType,
-    TaskAlignmentType, OrganizationalStructureType, ModalityType
+    ReasoningCapabilitiesType, AgentRoleType,
+    AgentCollaborationType, OrganizationalStructureType, ModalityType
 )
 from .validation import ValidationMethodType, ReportedOutcomes
 from .domain import DomainType
@@ -48,18 +48,15 @@ class ModelCapabilities(BaseModel):
         description="Input/output modalities the model supports (text, image, audio, video)." + make_type_annotations(ModalityType)
     )
 
-class InterAgentBehaviour(BaseModel):
-    """Multi-agent coordination patterns and collaboration strategies."""
-    inter_agent_behaviour_pattern: str = Field(description="Description of the inter-agent behaviour pattern as reported in the paper.")
+class MultiAgentCoordinationStrategy(BaseModel):
+    """Multi-agent coordination patterns and collaboration strategies, if present."""
+    multi_agent_coordination_strategy_description: str = Field(description="Short description of multi agent coordination strategy.")
 
-    task_alignment: TaskAlignmentType = Field(
-        description="How agents align individual or shared objectives." + make_type_annotations(TaskAlignmentType)
+    task_alignment: AgentCollaborationType = Field(
+        description="How agents align individual or shared objectives." + make_type_annotations(AgentCollaborationType)
     )
     organizational_structure: OrganizationalStructureType = Field(
         description="Organizational structure of agent interactions." + make_type_annotations(OrganizationalStructureType)
-    )
-    behaviour_strategy: BehaviourStrategyType = Field(
-        description="Strategy for task allocation" + make_type_annotations(BehaviourStrategyType)
     )
 
 class GenAIModel(BaseModel):
@@ -79,7 +76,7 @@ class GenAIModel(BaseModel):
 
 
 class TriggerType(DescriptiveEnum):
-    """Level of autonomy in agent decision-making and operation."""
+    """How the AI system is triggered."""
     HUMAN_TRIGGERED = "human-initiated", "System assists, but requires human triggering"
     EVENT_TRIGGERED = "system-initiated", "AI system is triggered in response to events without human input"
 
@@ -155,7 +152,7 @@ class FeedbackAndLearningType(DescriptiveEnum):
 class HumanIntegration(BaseModel):
     """Human integration aspects of the LLM-based system."""
     human_integration_description: str = Field(description="Overall description of human integration aspects as reported in the paper.")
-    human_oversight_mechanism: Set[str] = Field(
+    human_oversight_mechanism: Set[HumanOversightType] = Field(
         default_factory=set,
         description="Types of human oversight mechanisms integrated into the system." + make_type_annotations(HumanOversightType)
     )
@@ -169,31 +166,33 @@ class HumanIntegration(BaseModel):
     )
 
 class TaskExecutionType(DescriptiveEnum):
-    """How tasks flow through the system"""
-    single_step = "single-step", "One-shot generation, no iteration"
-    deterministic_workflow = "deterministic_workflow", "Fixed sequence of steps (FSM, pipeline)"
-    dynamic_decomposition = "dynamic-decomposition", "Runtime task breakdown with planning"
-    iterative_refinement = "iterative-refinement", "ReAct loops, CoT with backtracking"
+    """How a task is processed by the AI system."""
+    SINGLE_STEP = "single-step", "One-shot generation, no iteration"
+    PLANNING_GRAPH = "planning-graph", "Graph-based planning with predefined state transitions"
+    MULTI_AGENT_COLLABORATION = "multi-agent-collaboration", "Multiple agents working together on subtasks"
+    # DECOMPOSITION = "dynamic-decomposition", "Breaking down tasks into subtasks dynamically, often seen in collaborative multi-agent systems"
+    # iterative_refinement = "iterative-refinement", "ReAct loops, CoT with backtracking"
 
 class OrchestrationPattern(BaseModel):
     """Orchestration pattern for LLM-based AI systems."""
     orchestration_pattern_description: str = Field(description="Description of the orchestration pattern as reported in the paper.")
-    task_execution_pattern: str = Field(
-        description="How tasks flow through the system."
+    orchestration_pattern: TaskExecutionType = Field(
+        description="How AI agents are orchestrated."
     )
-    inter_agent_behaviour: Optional[InterAgentBehaviour] = Field(
+    multi_agent_coordination_strategy: Optional[MultiAgentCoordinationStrategy] = Field(
         default=None,
-        description="Collaboration mechanisms for multi-agent systems. Only define when there is dynamic decomposition."
+        description="Collaboration mechanisms for multi-agent systems."
     )
 
-    # @field_validator('orchestration_pattern')
-    # def validate_orchestration(cls, v, info):
-    #     agents = info.data.get('agents', [])
-    #     if len(agents) > 1 and v is None:
-    #         raise ValueError("Multi-agent system must specify orchestration pattern")
-    #     if len(agents) == 1 and v is not None:
-    #         raise ValueError("Single-agent system should not have orchestration pattern")
-    #     return v
+    @field_validator('multi_agent_coordination_strategy')
+    def validate_orchestration(cls, v, info):
+        agents = info.data.get('agents', [])
+        if len(agents) <= 1 and v == "multi-agent-collaboration":
+            raise ValueError("Single-agent system cannot have multi-agent collaboration orchestration pattern")
+        if info.data.get('orchestration_pattern') == "multi-agent-collaboration":
+            raise ValueError("Multi-agent system with multi-agent collaboration must specify coordination strategy")
+
+        return v
 
 
 class SystemArchitecture(BaseModel):
@@ -219,6 +218,13 @@ class SystemArchitecture(BaseModel):
         default=False,
         description="Whether agents share memory/knowledge with each other."
     )
+
+    @field_validator("agents")
+    def empty_list(cls, v, info):
+        if not v:
+            raise ValueError("System must have at least one agent")
+        return v
+
 
 class AISystem(BaseModel):
     """Complete AI system specification extracted from a paper."""

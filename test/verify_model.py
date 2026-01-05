@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 try:
     from slr_data_model import (
         AISystem,
-        AgentArchitecture,
+        SystemArchitecture,
         AIAgent,
         GenAIModel,
         ModelCapabilities,
@@ -70,7 +70,7 @@ try:
 
     agent = AIAgent(
         agent_role=AgentRoleType.CODER,
-        reasoning_capabilities={ReasoningCapabilitiesType.REACT, ReasoningCapabilitiesType.CHAIN_OF_THOUGHT},
+        reasoning_capabilities={ReasoningCapabilitiesType.ITERATIVE_REASONING, ReasoningCapabilitiesType.CHAIN_OF_THOUGHT},
         memory=memory,
         tools=tool_use,
         genai_model=genai_model,
@@ -78,7 +78,7 @@ try:
     )
     print("✓ AI agent created")
 
-    agent_architecture = AgentArchitecture(
+    agent_architecture = SystemArchitecture(
         agents=[agent],
         orchestration_pattern=None,
         autonomy_level={AutonomyLevel.SEMI_AUTONOMOUS},
@@ -120,7 +120,7 @@ try:
     assert ai_system.system_architecture.agents[0].agent_role == AgentRoleType.CODER
     print(f"  - Agent role: {ai_system.system_architecture.agents[0].agent_role.value}")
 
-    assert ReasoningCapabilitiesType.REACT in ai_system.system_architecture.agents[0].reasoning_capabilities
+    assert ReasoningCapabilitiesType.ITERATIVE_REASONING in ai_system.system_architecture.agents[0].reasoning_capabilities
     print(f"  - Reasoning capabilities: {[r.value for r in ai_system.system_architecture.agents[0].reasoning_capabilities]}")
 
     # Test serialization

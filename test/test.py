@@ -105,7 +105,7 @@ def test_multi_agent_with_rag_system():
     # Create multiple agents
     orchestrator = AIAgent(
         agent_role=AgentRoleType.ORCHESTRATOR,
-        reasoning_capabilities={ReasoningCapabilitiesType.REACT},
+        reasoning_capabilities={ReasoningCapabilitiesType.ITERATIVE_REASONING},
         memory=memory,
         tools=tools,
         genai_model=genai_model,
@@ -121,8 +121,8 @@ def test_multi_agent_with_rag_system():
         generated_workers=False
     )
 
-    orchestration = InterAgentBehaviour(
-        task_alignment=TaskAlignmentType.COMPETITION,
+    orchestration = MultiAgentCoordinationStrategy(
+        task_alignment=AgentCollaborationType.COMPETITION,
         organizational_structure=OrganizationalStructureType.HIERARCHICAL,
         behaviour_strategy=BehaviourStrategyType.MODEL_BASED
     )
@@ -176,8 +176,8 @@ def test_validation_single_agent_cannot_have_orchestration():
         genai_model=genai_model
     )
 
-    orchestration = InterAgentBehaviour(
-        task_alignment=TaskAlignmentType.COMPETITION,
+    orchestration = MultiAgentCoordinationStrategy(
+        task_alignment=AgentCollaborationType.COMPETITION,
         organizational_structure=OrganizationalStructureType.CENTRALIZED,
         behaviour_strategy=BehaviourStrategyType.RULE_BASED
     )

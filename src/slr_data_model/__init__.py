@@ -14,7 +14,7 @@ from .ai_system import (
     ToolUse,
     TriggerType,
     FinetuningDatasetType,
-    InterAgentBehaviour,
+    MultiAgentCoordinationStrategy,
 )
 from .memory import Memory, MemoryType, MemoryScopeType, RetrievalStrategyType
 from .ai_system_types import (
@@ -24,9 +24,8 @@ from .ai_system_types import (
     CapabilityAcquisitionType,
     ModalityType,
     ExternalToolsType,
-    TaskAlignmentType,
+    AgentCollaborationType,
     OrganizationalStructureType,
-    BehaviourStrategyType,
 )
 from .validation import ValidationMethodType, ReportedOutcomes
 from .domain import DomainType
@@ -42,7 +41,7 @@ __all__ = [
     "ToolUse",
     "TriggerType",
     "FinetuningDatasetType",
-    "InterAgentBehaviour",
+    "MultiAgentCoordinationStrategy",
     # Memory
     "Memory",
     "MemoryType",
@@ -55,9 +54,8 @@ __all__ = [
     "CapabilityAcquisitionType",
     "ModalityType",
     "ExternalToolsType",
-    "TaskAlignmentType",
+    "AgentCollaborationType",
     "OrganizationalStructureType",
-    "BehaviourStrategyType",
     # Validation
     "ValidationMethodType",
     "ReportedOutcomes",
