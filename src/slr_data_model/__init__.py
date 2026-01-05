@@ -4,25 +4,23 @@ AI System Data Model
 This module provides Pydantic models for representing AI systems,
 including their architecture, capabilities, and validation methods.
 """
+from .context_engineering import ContextEngineering
 from .descriptive_enum import DescriptiveEnum
 from .ai_system import (
     AISystem,
     SystemArchitecture,
     AIAgent,
     GenAIModel,
-    ModelCapabilities,
     ToolUse,
     TriggerType,
     FinetuningDatasetType,
     MultiAgentCoordinationStrategy,
     OrchestrationPattern
 )
-from .memory import Memory, MemoryType, MemoryScopeType, RetrievalStrategyType
+from .context_engineering import ContextEngineering, MemoryType, MemoryScopeType, RetrievalStrategyType, PromptEngineeringTechniquesType
 from .ai_system_types import (
     ParadigmType,
     AgentRoleType,
-    ReasoningCapabilitiesType,
-    CapabilityAcquisitionType,
     ModalityType,
     ExternalToolsType,
     AgentCollaborationType,
@@ -38,22 +36,21 @@ __all__ = [
     "SystemArchitecture",
     "AIAgent",
     "GenAIModel",
-    "ModelCapabilities",
     "ToolUse",
     "TriggerType",
     "FinetuningDatasetType",
     "MultiAgentCoordinationStrategy",
     "OrchestrationPattern",
-    # Memory
-    "Memory",
+    # Context Engineering
+    "ContextEngineering",
     "MemoryType",
     "MemoryScopeType",
     "RetrievalStrategyType",
+    "PromptEngineeringTechniquesType",
     # Types
     "ParadigmType",
     "AgentRoleType",
-    "ReasoningCapabilitiesType",
-    "CapabilityAcquisitionType",
+    "PromptEngineeringTechniquesType",
     "ModalityType",
     "ExternalToolsType",
     "AgentCollaborationType",

@@ -12,7 +12,7 @@ def test_minimal_single_agent_system():
         external_tools=set()
     )
 
-    memory = Memory(
+    memory = ContextEngineering(
         has_memory=False,
         memory_types=set(),
         memory_scopes=set(),
@@ -33,8 +33,8 @@ def test_minimal_single_agent_system():
 
     agent = AIAgent(
         agent_role=AgentRoleType.MONOLITHIC,
-        reasoning_capabilities={ReasoningCapabilitiesType.CHAIN_OF_THOUGHT},
-        memory=memory,
+        prompt_engineering_techniques={PromptEngineeringTechniquesType.CHAIN_OF_THOUGHT},
+        context_engineering=memory,
         tools=tool_use,
         genai_model=genai_model,
         generated_workers=False
@@ -76,7 +76,7 @@ def test_multi_agent_with_rag_system():
     """Test creating a multi-agent system with RAG."""
 
     # RAG-enabled memory
-    memory = Memory(
+    memory = ContextEngineering(
         has_memory=True,
         memory_types={MemoryType.VECTOR_DATABASE},
         memory_scopes={MemoryScopeType.LONG_TERM},
@@ -105,8 +105,8 @@ def test_multi_agent_with_rag_system():
     # Create multiple agents
     orchestrator = AIAgent(
         agent_role=AgentRoleType.ORCHESTRATOR,
-        reasoning_capabilities={ReasoningCapabilitiesType.ITERATIVE_REASONING},
-        memory=memory,
+        prompt_engineering_techniques={PromptEngineeringTechniquesType.ITERATIVE_REASONING},
+        context_engineering=memory,
         tools=tools,
         genai_model=genai_model,
         generated_workers=False
@@ -114,8 +114,8 @@ def test_multi_agent_with_rag_system():
 
     planner = AIAgent(
         agent_role=AgentRoleType.PLANNER,
-        reasoning_capabilities={ReasoningCapabilitiesType.CHAIN_OF_THOUGHT},
-        memory=memory,
+        prompt_engineering_techniques={PromptEngineeringTechniquesType.CHAIN_OF_THOUGHT},
+        context_engineering=memory,
         tools=tools,
         genai_model=genai_model,
         generated_workers=False
@@ -155,7 +155,7 @@ def test_validation_single_agent_cannot_have_orchestration():
     """Test that single-agent systems cannot have orchestration patterns."""
 
     tool_use = ToolUse(has_tools=False, external_tools=set())
-    memory = Memory(has_memory=False, memory_types=set(), memory_scopes=set(), retrieval_strategies=set())
+    memory = ContextEngineering(has_memory=False, memory_types=set(), memory_scopes=set(), retrieval_strategies=set())
 
     model_capabilities = ModelCapabilities(
         capability_acquisition_methods={CapabilityAcquisitionType.PROMPT_ENGINEERING},
@@ -170,8 +170,8 @@ def test_validation_single_agent_cannot_have_orchestration():
 
     agent = AIAgent(
         agent_role=AgentRoleType.MONOLITHIC,
-        reasoning_capabilities={ReasoningCapabilitiesType.RULE_BASED},
-        memory=memory,
+        prompt_engineering_techniques={PromptEngineeringTechniquesType.RULE_BASED},
+        context_engineering=memory,
         tools=tool_use,
         genai_model=genai_model
     )
@@ -196,7 +196,7 @@ def test_agent_must_have_reasoning_capability():
     """Test that agents must have at least one reasoning capability."""
 
     tool_use = ToolUse(has_tools=False, external_tools=set())
-    memory = Memory(has_memory=False, memory_types=set(), memory_scopes=set(), retrieval_strategies=set())
+    memory = ContextEngineering(has_memory=False, memory_types=set(), memory_scopes=set(), retrieval_strategies=set())
 
     model_capabilities = ModelCapabilities(
         capability_acquisition_methods={CapabilityAcquisitionType.PROMPT_ENGINEERING},
@@ -213,8 +213,8 @@ def test_agent_must_have_reasoning_capability():
     with pytest.raises(ValidationError, match="Agent must have at least one reasoning capability"):
         AIAgent(
             agent_role=AgentRoleType.MONOLITHIC,
-            reasoning_capabilities=set(),  # Empty set
-            memory=memory,
+            prompt_engineering_techniques=set(),  # Empty set
+            context_engineering=memory,
             tools=tool_use,
             genai_model=genai_model
         )

@@ -25,19 +25,6 @@ class ExternalToolsType(DescriptiveEnum):
     KNOWLEDGE_BASE = "knowledge-base", "Structured knowledge repositories"
     EXTERNAL_MODELS = "external-models", "Calls to other AI models or specialized algorithms"
 
-class CapabilityAcquisitionType(DescriptiveEnum):
-    """Method by which the model acquires task-specific capabilities."""
-    FINETUNING = "fine-tuning", "Model weights updated through supervised training on task-specific data"
-    PROMPT_ENGINEERING = "prompt-engineering", "Capabilities acquired through carefully designed prompts without weight updates"
-    IN_CONTEXT_LEARNING = "in-context-learning", "Learning from examples provided in the input context without weight updates"
-
-class ReasoningCapabilitiesType(DescriptiveEnum):
-    """Reasoning approaches used by the agent for decision-making and task execution."""
-    # Fixed/deterministic approaches (AI Agent)
-    ITERATIVE_REASONING = "iterative-reasoning", "Reasoning and Acting framework with iterative observation-thought-action cycles"
-    CHAIN_OF_THOUGHT = "chain-of-thought", "Step-by-step reasoning with intermediate thought processes"
-    TREE_OF_THOUGHT = "tree-of-thought", "Explores multiple reasoning paths in a tree structure for complex problem-solving"
-
 class AgentRoleType(DescriptiveEnum):
     """Specialized role or function of an agent within the system."""
     MONOLITHIC = "monolithic", "Single agent handling all tasks without role specialization"

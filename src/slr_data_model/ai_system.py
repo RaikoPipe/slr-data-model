@@ -2,10 +2,9 @@ from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional, Set
 
 from .descriptive_enum import DescriptiveEnum
-from .memory import Memory
+from .context_engineering import ContextEngineering
 from .ai_system_types import (
-    ParadigmType, ExternalToolsType, CapabilityAcquisitionType,
-    ReasoningCapabilitiesType, AgentRoleType,
+    ParadigmType, ExternalToolsType, AgentRoleType,
     AgentCollaborationType, OrganizationalStructureType, ModalityType
 )
 from .validation import ValidationMethodType, ReportedOutcomes
@@ -14,7 +13,7 @@ from .annotation_helper import make_type_annotations
 
 class ToolUse(BaseModel):
     """External tools and integrations available to the agent."""
-    tool_use_description: str = Field(description="Description of the function and purpose of tool use as reported in the paper.")
+    # tool_use_description: str = Field(description="Description of the function and purpose of tool use as reported in the paper.")
 
     has_tools: bool = Field(
         description="Whether the agent uses any external tools beyond the base LLM."
@@ -23,10 +22,10 @@ class ToolUse(BaseModel):
         default_factory=set,
         description="Types of external tools utilized. Empty set if no tools." + make_type_annotations(ExternalToolsType)
     )
-    choice_reasoning: Optional[str] = Field(
-        default=None,
-        description="Explanation of which tools are used and why, if applicable."
-    )
+    # choice_reasoning: Optional[str] = Field(
+    #     default=None,
+    #     description="Explanation of which tools are used and why, if applicable."
+    # )
 
 class FinetuningDatasetType(DescriptiveEnum):
     """Source and type of data used for model fine-tuning."""
@@ -35,18 +34,6 @@ class FinetuningDatasetType(DescriptiveEnum):
     REAL_WORLD = "real-world", "Data collected from real-world applications and user interactions."
     SYNTHETIC = "synthetic", "Artificially generated data designed to simulate specific scenarios or tasks."
 
-class ModelCapabilities(BaseModel):
-    """Capabilities and characteristics of the underlying generative AI model."""
-    model_capabilities_description: str = Field(description="Description of the model's capabilities as reported in the paper.")
-
-    capability_acquisition_methods: Set[CapabilityAcquisitionType] = Field(
-        default_factory=set,
-        description="Methods used to acquire task-specific capabilities (fine-tuning, prompt-engineering, or both)." + make_type_annotations(CapabilityAcquisitionType)
-    )
-    supported_modalities: Set[ModalityType] = Field(
-        default_factory=set,
-        description="Input/output modalities the model supports (text, image, audio, video)." + make_type_annotations(ModalityType)
-    )
 
 class MultiAgentCoordinationStrategy(BaseModel):
     """Multi-agent coordination patterns and collaboration strategies, if present."""
@@ -64,10 +51,12 @@ class GenAIModel(BaseModel):
     model_name: str = Field(
         description="Name or identifier of the base generative AI model (e.g., 'GPT-4', 'Claude-3', 'Llama-2')."
     )
-    model_capabilities: ModelCapabilities = Field(
-        description="Capabilities and modalities supported by the model."
+    supported_modalities: Set[ModalityType] = Field(
+        default_factory=set,
+        description="Input/output modalities the model supports (text, image, audio, video)." + make_type_annotations(ModalityType)
     )
-    finetuning_dataset_description: str = Field(description="Description of the dataset used for fine-tuning.")
+
+    finetuning_dataset_description: Optional[str] = Field(description="Description of the dataset used for fine-tuning, if applicable.")
 
     finetuning_datasets: Set[FinetuningDatasetType] = Field(
         default_factory=set,
@@ -100,10 +89,7 @@ class AIAgent(BaseModel):
     agent_role: AgentRoleType = Field(
         description="Specialized role of this agent (orchestrator, coder, planner, etc.)." + make_type_annotations(AgentRoleType)
     )
-    reasoning_capabilities: Set[ReasoningCapabilitiesType] = Field(
-        description="Reasoning approaches used (rule-based, ReAct, chain-of-thought, etc.). State at least one."+ make_type_annotations(ReasoningCapabilitiesType)
-    )
-    memory: Memory = Field(
+    context_engineering: ContextEngineering = Field(
         description="Memory configuration for this agent."
     )
     tools: ToolUse = Field(
@@ -116,16 +102,12 @@ class AIAgent(BaseModel):
         default=False,
         description="Whether multiple instances of this agent are spawned dynamically by the system."
     )
-    prompt_engineering_details: Optional[str] = Field(
-        default=None,
-        description="Description of prompt engineering approaches used (system prompts, few-shot examples, etc.)."
-    )
+    # prompt_engineering_details: Optional[str] = Field(
+    #     default=None,
+    #     description="Description of prompt engineering approaches used (system prompts, few-shot examples, etc.)."
+    # )
 
-    @field_validator('reasoning_capabilities')
-    def validate_reasoning(cls, v):
-        if not v:
-            raise ValueError("Agent must have at least one reasoning capability")
-        return v
+
 
 class HumanOversightType(DescriptiveEnum):
     """Types of human oversight mechanisms integrated into the system."""
@@ -233,17 +215,17 @@ class AISystem(BaseModel):
     application_domain: DomainType = Field(
         description='Primary field of application targeted by the paper.' + make_type_annotations(DomainType)
     )
-    application_domain_reasoning: str = Field(
-        description="Explanation of the chosen application domain."
-    )
+    # application_domain_reasoning: str = Field(
+    #     description="Explanation of the chosen application domain."
+    # )
 
     # Paradigm classification
     paradigm: ParadigmType = Field(
-        description="Overall system paradigm classification."  + make_type_annotations(ParadigmType)
+        description="Overall system paradigm classification." + make_type_annotations(ParadigmType)
     )
-    paradigm_reasoning: str = Field(
-        description="Justification for paradigm classification."
-    )
+    # paradigm_reasoning: str = Field(
+    #     description="Justification for paradigm classification."
+    # )
 
     # System architecture
     system_architecture: SystemArchitecture = Field(

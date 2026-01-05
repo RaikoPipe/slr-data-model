@@ -120,8 +120,8 @@ try:
     assert ai_system.system_architecture.agents[0].agent_role == AgentRoleType.CODER
     print(f"  - Agent role: {ai_system.system_architecture.agents[0].agent_role.value}")
 
-    assert ReasoningCapabilitiesType.ITERATIVE_REASONING in ai_system.system_architecture.agents[0].reasoning_capabilities
-    print(f"  - Reasoning capabilities: {[r.value for r in ai_system.system_architecture.agents[0].reasoning_capabilities]}")
+    assert ReasoningCapabilitiesType.ITERATIVE_REASONING in ai_system.system_architecture.agents[0].prompt_engineering_techniques
+    print(f"  - Reasoning capabilities: {[r.value for r in ai_system.system_architecture.agents[0].prompt_engineering_techniques]}")
 
     # Test serialization
     print("\nTesting serialization...")
