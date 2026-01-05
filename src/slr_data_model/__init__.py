@@ -15,6 +15,7 @@ from .ai_system import (
     TriggerType,
     FinetuningDatasetType,
     MultiAgentCoordinationStrategy,
+    OrchestrationPattern
 )
 from .memory import Memory, MemoryType, MemoryScopeType, RetrievalStrategyType
 from .ai_system_types import (
@@ -42,6 +43,7 @@ __all__ = [
     "TriggerType",
     "FinetuningDatasetType",
     "MultiAgentCoordinationStrategy",
+    "OrchestrationPattern",
     # Memory
     "Memory",
     "MemoryType",

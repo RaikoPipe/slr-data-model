@@ -62,7 +62,7 @@ def test_minimal_single_agent_system():
         paradigm_reasoning="Uses chain-of-thought reasoning",
         validation_methods={ValidationMethodType.CASE_STUDY},
         reported_outcomes=outcomes,
-        application_domains_reasoning="Focused on production logistics tasks",
+        application_domain_reasoning="Focused on production logistics tasks",
         primary_application_domain={DomainType.SIMULATION}
     )
 
@@ -139,7 +139,7 @@ def test_multi_agent_with_rag_system():
     system = AISystem(
         system_architecture=agent_architecture,
         primary_application_domain={DomainType.SIMULATION},
-        application_domains_reasoning="Reasoning",
+        application_domain_reasoning="Reasoning",
         paradigm=ParadigmType.AGENTIC_AI,
         paradigm_reasoning="Multi-agent with ReAct and dynamic tool use",
         validation_methods={ValidationMethodType.SIMULATION},

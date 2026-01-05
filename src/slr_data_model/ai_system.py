@@ -233,8 +233,8 @@ class AISystem(BaseModel):
     application_domain: DomainType = Field(
         description='Primary field of application targeted by the paper.' + make_type_annotations(DomainType)
     )
-    application_domains_reasoning: str = Field(
-        description="Explanation of the chosen application domains."
+    application_domain_reasoning: str = Field(
+        description="Explanation of the chosen application domain."
     )
 
     # Paradigm classification
