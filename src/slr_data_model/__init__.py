@@ -4,8 +4,8 @@ AI System Data Model
 This module provides Pydantic models for representing AI systems,
 including their architecture, capabilities, and validation methods.
 """
-from .context_engineering import ContextEngineering
 from .descriptive_enum import DescriptiveEnum
+from .context_engineering import ContextEngineering
 from .ai_system import (
     AISystem,
     SystemArchitecture,

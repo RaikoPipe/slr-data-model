@@ -56,12 +56,12 @@ class GenAIModel(BaseModel):
         description="Input/output modalities the model supports (text, image, audio, video)." + make_type_annotations(ModalityType)
     )
 
-    finetuning_dataset_description: Optional[str] = Field(description="Description of the dataset used for fine-tuning, if applicable.")
-
     finetuning_datasets: Set[FinetuningDatasetType] = Field(
         default_factory=set,
         description="Types of datasets used for fine-tuning. Empty if model is not fine-tuned." + make_type_annotations(FinetuningDatasetType)
     )
+
+    finetuning_dataset_description: Optional[str] = Field(description="Description of the dataset used for fine-tuning, if applicable.")
 
 
 class TriggerType(DescriptiveEnum):
