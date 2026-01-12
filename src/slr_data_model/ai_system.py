@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field, field_validator
-from typing import List, Optional, Set
-
+from typing import Optional
 from .descriptive_enum import DescriptiveEnum
 from .context_engineering import ContextEngineering
 from .ai_system_types import (
@@ -18,7 +17,7 @@ class ToolUse(BaseModel):
     has_tools: bool = Field(
         description="Whether the agent uses any external tools beyond the base LLM."
     )
-    external_tools: List[ExternalToolsType] = Field(
+    external_tools: list[ExternalToolsType] = Field(
         description="Types of external tools utilized. Empty set if no tools." + make_type_annotations(ExternalToolsType)
     )
     # choice_reasoning: Optional[str] = Field(
@@ -50,12 +49,12 @@ class GenAIModel(BaseModel):
     model_name: str = Field(
         description="Name or identifier of the base generative AI model (e.g., 'GPT-4', 'Claude-3', 'Llama-2')."
     )
-    supported_modalities: List[ModalityType] = Field(
-        default_factory=List,
+    supported_modalities: list[ModalityType] = Field(
+        default_factory=list,
         description="Input/output modalities the model supports (text, image, audio, video)." + make_type_annotations(ModalityType)
     )
 
-    finetuning_datasets: List[FinetuningDatasetType] = Field(
+    finetuning_datasets: list[FinetuningDatasetType] = Field(
         description="Types of datasets used for fine-tuning. Empty if model is not fine-tuned." + make_type_annotations(FinetuningDatasetType)
     )
 
@@ -132,13 +131,13 @@ class FeedbackAndLearningType(DescriptiveEnum):
 class HumanIntegration(BaseModel):
     """Human integration aspects of the LLM-based system."""
     human_integration_description: str = Field(description="Overall description of human integration aspects as reported in the paper.")
-    human_oversight_mechanism: List[HumanOversightType] = Field(
+    human_oversight_mechanism: list[HumanOversightType] = Field(
         description="Types of human oversight mechanisms integrated into the system." + make_type_annotations(HumanOversightType)
     )
-    interaction_modalities: List[ModalityType] = Field(
+    interaction_modalities: list[ModalityType] = Field(
         description="Modalities through which humans interact with the AI system." + make_type_annotations(InteractionModalityType)
     )
-    feedback_and_learning_methods: List[FeedbackAndLearningType] = Field(
+    feedback_and_learning_methods: list[FeedbackAndLearningType] = Field(
         description="Methods for incorporating human feedback into system learning and adaptation." + make_type_annotations(FeedbackAndLearningType)
     )
 
@@ -173,8 +172,9 @@ class OrchestrationPattern(BaseModel):
 
 class SystemArchitecture(BaseModel):
     """Overall architecture of the LLM-based system."""
-    agents: List[AIAgent] = Field(
-        description="List of LLM-based agents in the system. Single-agent systems have one element."
+    agents: list[AIAgent] = Field(
+        description="List of LLM-based agents in the system. Single-agent systems have one element.",
+
     )
     orchestration_pattern: Optional[OrchestrationPattern] = Field(
         description="Orchestration pattern of the AI system."
@@ -226,7 +226,7 @@ class AISystem(BaseModel):
     )
 
     # Validation and outcomes
-    validation_methods: List[ValidationMethodType] = Field(
+    validation_methods: list[ValidationMethodType] = Field(
         description="Methods used to validate system performance." + make_type_annotations(ValidationMethodType)
     )
     reported_outcomes: ReportedOutcomes = Field(

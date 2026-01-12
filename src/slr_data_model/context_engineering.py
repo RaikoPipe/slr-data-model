@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import List
 from wsgiref.validate import validator
 
 from . import DescriptiveEnum
@@ -55,19 +54,19 @@ class ContextEngineering(BaseModel):
     #     description="Whether agent uses any explicit memory system beyond base model"
     # )
 
-    memory_types: List[MemoryType] = Field(
+    memory_types: list[MemoryType] = Field(
         description="Types of memory storage used. Empty if no memory system." + make_type_annotations(MemoryType)
     )
 
-    prompt_engineering_techniques: List[PromptEngineeringTechniquesType] = Field(
+    prompt_engineering_techniques: list[PromptEngineeringTechniquesType] = Field(
         description="Reasoning approaches used (rule-based, ReAct, chain-of-thought, etc.). State at least one."+ make_type_annotations(PromptEngineeringTechniquesType)
     )
 
-    retrieval_strategies: List[RetrievalStrategyType] = Field(
+    retrieval_strategies: list[RetrievalStrategyType] = Field(
         description="Methods for retrieving information, when Retrieval Augmented Generation is used as a technique." + make_type_annotations(RetrievalStrategyType)
     )
 
-    prompt_injection_strategy : List[PromptInjectionStrategyType] = Field(
+    prompt_injection_strategy : list[PromptInjectionStrategyType] = Field(
         description="Techniques for injecting memory into prompts. Empty if no persistent memory system." + make_type_annotations(PromptInjectionStrategyType)
     )
 

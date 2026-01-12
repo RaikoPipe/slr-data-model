@@ -27,11 +27,9 @@ class ReportedOutcomes(BaseModel):
         default=None,
         description="System reliability, uptime, or error rate metrics."
     )
-    failure_modes: Set[str] = Field(
-        default_factory=set,
+    failure_modes: list[str] = Field(
         description="Identified failure modes or error conditions."
     )
-    limitations: Set[str] = Field(
-        default_factory=set,
+    limitations: list[str] = Field(
         description="Acknowledged limitations of the approach."
     )
