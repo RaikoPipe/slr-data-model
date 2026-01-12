@@ -42,7 +42,8 @@ class PromptEngineeringTechniquesType(DescriptiveEnum):
     CHAIN_OF_THOUGHT = "chain-of-thought", "Step-by-step reasoning with intermediate thought processes"
     TREE_OF_THOUGHT = "tree-of-thought", "Explores multiple reasoning paths in a tree structure for complex problem-solving"
     IN_CONTEXT_LEARNING = "in-context-learning", "Learning from examples provided in the input context without weight updates"
-    RETRIEVAL_AUGMENTED_GENERATION = "retrieval-augmented-generation", "Incorporating retrieved information into generation tasks for enhanced responses"
+    DECOMPOSITION = "dynamic-decomposition", "Breaking down tasks into subtasks dynamically, often seen in collaborative multi-agent systems"
+    RETRIEVAL_AUGMENTED_GENERATION = "retrieval-augmented-generation", "Retrieving external information using a knowledge base to inform generation tasks for enhanced responses."
 
 class ContextEngineering(BaseModel):
     """Memory architecture for agent."""
@@ -62,7 +63,7 @@ class ContextEngineering(BaseModel):
     )
 
     retrieval_strategies: List[RetrievalStrategyType] = Field(
-        description="Methods for retrieving information. Empty if no retrieval mechanism/RAG." + make_type_annotations(RetrievalStrategyType)
+        description="Methods for retrieving information. Must state at least one if prompt_engineering_technique includes Retrieval Augmented Generation." + make_type_annotations(RetrievalStrategyType)
     )
 
     prompt_injection_strategy : List[PromptInjectionStrategyType] = Field(
@@ -72,5 +73,5 @@ class ContextEngineering(BaseModel):
     @field_validator("retrieval_strategies")
     def validate_retrieval_strategies(cls, v, values):
         if (not v or len(v) == 0) and (PromptEngineeringTechniquesType.RETRIEVAL_AUGMENTED_GENERATION in values.data.get("prompt_engineering_techniques", [])):
-            raise ValueError("If RAG is used as a prompt engineering technique, at least one retrieval strategy must be specified.")
+            raise ValueError("If Retrieval Augmented Generation is used as a prompt engineering technique, at least one retrieval strategy must be specified.")
         return v

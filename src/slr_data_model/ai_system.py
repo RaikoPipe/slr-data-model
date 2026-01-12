@@ -147,7 +147,6 @@ class TaskExecutionType(DescriptiveEnum):
     SINGLE_STEP = "single-step", "One-shot generation, no iteration"
     PLANNING_GRAPH = "planning-graph", "Graph-based planning with predefined state transitions"
     MULTI_AGENT_COLLABORATION = "multi-agent-collaboration", "Multiple agents working together on subtasks"
-    # DECOMPOSITION = "dynamic-decomposition", "Breaking down tasks into subtasks dynamically, often seen in collaborative multi-agent systems"
     # iterative_refinement = "iterative-refinement", "ReAct loops, CoT with backtracking"
 
 class OrchestrationPattern(BaseModel):
@@ -220,7 +219,6 @@ class AISystem(BaseModel):
     paradigm: ParadigmType = Field(
         description="Overall system paradigm classification." + make_type_annotations(ParadigmType)
     )
-
 
     # System architecture
     system_architecture: SystemArchitecture = Field(

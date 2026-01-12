@@ -32,7 +32,7 @@ class AgentRoleType(DescriptiveEnum):
     CODER = "coder", "Generates, modifies, or debugs code"
     PLANNER = "planner", "Creates plans and breaks down complex tasks into subtasks"
     SUMMARIZER = "summarizer", "Condenses and summarizes information"
-    RETRIEVER = "retriever", "Searches and retrieves relevant information from knowledge sources"
+    RETRIEVER = "retriever", "Searches and retrieves relevant information from knowledge sources."
     OTHER = "other", "Specialized role not covered by standard categories"
 
 class AgentCollaborationType(DescriptiveEnum):
