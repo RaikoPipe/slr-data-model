@@ -18,8 +18,7 @@ class ToolUse(BaseModel):
     has_tools: bool = Field(
         description="Whether the agent uses any external tools beyond the base LLM."
     )
-    external_tools: Set[ExternalToolsType] = Field(
-        default_factory=set,
+    external_tools: List[ExternalToolsType] = Field(
         description="Types of external tools utilized. Empty set if no tools." + make_type_annotations(ExternalToolsType)
     )
     # choice_reasoning: Optional[str] = Field(
@@ -51,13 +50,12 @@ class GenAIModel(BaseModel):
     model_name: str = Field(
         description="Name or identifier of the base generative AI model (e.g., 'GPT-4', 'Claude-3', 'Llama-2')."
     )
-    supported_modalities: Set[ModalityType] = Field(
-        default_factory=set,
+    supported_modalities: List[ModalityType] = Field(
+        default_factory=List,
         description="Input/output modalities the model supports (text, image, audio, video)." + make_type_annotations(ModalityType)
     )
 
-    finetuning_datasets: Set[FinetuningDatasetType] = Field(
-        default_factory=set,
+    finetuning_datasets: List[FinetuningDatasetType] = Field(
         description="Types of datasets used for fine-tuning. Empty if model is not fine-tuned." + make_type_annotations(FinetuningDatasetType)
     )
 
@@ -84,9 +82,9 @@ class TriggerType(DescriptiveEnum):
 
 class AIAgent(BaseModel):
     """Individual agent within the system with specific role and capabilities."""
-    agent_description: Optional[str] = Field(description="Description of the agent's purpose and functionality as reported in the paper.")
+    description: Optional[str] = Field(description="Description of the agent's purpose and functionality as reported in the paper.")
 
-    agent_role: AgentRoleType = Field(
+    role: AgentRoleType = Field(
         description="Specialized role of this agent (orchestrator, coder, planner, etc.)." + make_type_annotations(AgentRoleType)
     )
     context_engineering: ContextEngineering = Field(
@@ -134,16 +132,13 @@ class FeedbackAndLearningType(DescriptiveEnum):
 class HumanIntegration(BaseModel):
     """Human integration aspects of the LLM-based system."""
     human_integration_description: str = Field(description="Overall description of human integration aspects as reported in the paper.")
-    human_oversight_mechanism: Set[HumanOversightType] = Field(
-        default_factory=set,
+    human_oversight_mechanism: List[HumanOversightType] = Field(
         description="Types of human oversight mechanisms integrated into the system." + make_type_annotations(HumanOversightType)
     )
-    interaction_modalities: Set[ModalityType] = Field(
-        default_factory=set,
+    interaction_modalities: List[ModalityType] = Field(
         description="Modalities through which humans interact with the AI system." + make_type_annotations(InteractionModalityType)
     )
-    feedback_and_learning_methods: Set[FeedbackAndLearningType] = Field(
-        default_factory=set,
+    feedback_and_learning_methods: List[FeedbackAndLearningType] = Field(
         description="Methods for incorporating human feedback into system learning and adaptation." + make_type_annotations(FeedbackAndLearningType)
     )
 
@@ -183,7 +178,6 @@ class SystemArchitecture(BaseModel):
         description="List of LLM-based agents in the system. Single-agent systems have one element."
     )
     orchestration_pattern: Optional[OrchestrationPattern] = Field(
-        default=None,
         description="Orchestration pattern of the AI system."
     )
 
@@ -192,7 +186,6 @@ class SystemArchitecture(BaseModel):
     )
 
     human_integration: Optional[HumanIntegration] = Field(
-        default=None,
         description="Human integration aspects of the system, if applicable."
     )
 
@@ -212,20 +205,22 @@ class AISystem(BaseModel):
     """Complete AI system specification extracted from a paper."""
 
     # domain application
-    application_domain: DomainType = Field(
-        description='Primary field of application targeted by the paper.' + make_type_annotations(DomainType)
-    )
     # application_domain_reasoning: str = Field(
     #     description="Explanation of the chosen application domain."
     # )
+    application_domain: DomainType = Field(
+        description='Primary field of application targeted by the paper.' + make_type_annotations(DomainType)
+    )
+
 
     # Paradigm classification
-    paradigm: ParadigmType = Field(
-        description="Overall system paradigm classification." + make_type_annotations(ParadigmType)
-    )
     # paradigm_reasoning: str = Field(
     #     description="Justification for paradigm classification."
     # )
+    paradigm: ParadigmType = Field(
+        description="Overall system paradigm classification." + make_type_annotations(ParadigmType)
+    )
+
 
     # System architecture
     system_architecture: SystemArchitecture = Field(
@@ -233,8 +228,7 @@ class AISystem(BaseModel):
     )
 
     # Validation and outcomes
-    validation_methods: Set[ValidationMethodType] = Field(
-        default_factory=set,
+    validation_methods: List[ValidationMethodType] = Field(
         description="Methods used to validate system performance." + make_type_annotations(ValidationMethodType)
     )
     reported_outcomes: ReportedOutcomes = Field(

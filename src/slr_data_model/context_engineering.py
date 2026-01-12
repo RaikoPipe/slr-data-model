@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Set
+from typing import List
 from wsgiref.validate import validator
 
 from . import DescriptiveEnum
@@ -53,27 +53,24 @@ class ContextEngineering(BaseModel):
     #     description="Whether agent uses any explicit memory system beyond base model"
     # )
 
-    memory_types: Set[MemoryType] = Field(
-        default_factory=set,
+    memory_types: List[MemoryType] = Field(
         description="Types of memory storage used. Empty if no memory system." + make_type_annotations(MemoryType)
     )
 
-    prompt_engineering_techniques: Set[PromptEngineeringTechniquesType] = Field(
+    prompt_engineering_techniques: List[PromptEngineeringTechniquesType] = Field(
         description="Reasoning approaches used (rule-based, ReAct, chain-of-thought, etc.). State at least one."+ make_type_annotations(PromptEngineeringTechniquesType)
     )
 
-    retrieval_strategies: Set[RetrievalStrategyType] = Field(
-        default_factory=set,
+    retrieval_strategies: List[RetrievalStrategyType] = Field(
         description="Methods for retrieving information. Empty if no retrieval mechanism/RAG." + make_type_annotations(RetrievalStrategyType)
     )
 
-    prompt_injection_strategy : Set[PromptInjectionStrategyType] = Field(
-        default_factory=set,
+    prompt_injection_strategy : List[PromptInjectionStrategyType] = Field(
         description="Techniques for injecting memory into prompts. Empty if no persistent memory system." + make_type_annotations(PromptInjectionStrategyType)
     )
 
     @field_validator("retrieval_strategies")
     def validate_retrieval_strategies(cls, v, values):
-        if (not v or len(v) == 0) and (PromptEngineeringTechniquesType.RETRIEVAL_AUGMENTED_GENERATION in values.get("prompt_engineering_techniques", set())):
+        if (not v or len(v) == 0) and (PromptEngineeringTechniquesType.RETRIEVAL_AUGMENTED_GENERATION in values.data.get("prompt_engineering_techniques", [])):
             raise ValueError("If RAG is used as a prompt engineering technique, at least one retrieval strategy must be specified.")
         return v
