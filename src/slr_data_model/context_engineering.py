@@ -27,6 +27,7 @@ class RetrievalStrategyType(DescriptiveEnum):
     QUERY_DECOMPOSITION = "query-decomposition", "Breaks down complex queries into simpler sub-queries for retrieval."
     RERANKING = "reranking", "Ranks retrieved items based on relevance to the query."
     GRAPH_TRAVERSAL = "graph-traversal", "Navigates knowledge graphs to find related information."
+    DATABASE_QUERYING = "database-querying", "Uses structured queries to retrieve information from databases."
 
 class PromptInjectionStrategyType(DescriptiveEnum):
     """Strategies for injecting memory into prompts."""
@@ -63,15 +64,15 @@ class ContextEngineering(BaseModel):
     )
 
     retrieval_strategies: List[RetrievalStrategyType] = Field(
-        description="Methods for retrieving information. Must state at least one if prompt_engineering_technique includes Retrieval Augmented Generation." + make_type_annotations(RetrievalStrategyType)
+        description="Methods for retrieving information, when Retrieval Augmented Generation is used as a technique." + make_type_annotations(RetrievalStrategyType)
     )
 
     prompt_injection_strategy : List[PromptInjectionStrategyType] = Field(
         description="Techniques for injecting memory into prompts. Empty if no persistent memory system." + make_type_annotations(PromptInjectionStrategyType)
     )
 
-    @field_validator("retrieval_strategies")
-    def validate_retrieval_strategies(cls, v, values):
-        if (not v or len(v) == 0) and (PromptEngineeringTechniquesType.RETRIEVAL_AUGMENTED_GENERATION in values.data.get("prompt_engineering_techniques", [])):
-            raise ValueError("If Retrieval Augmented Generation is used as a prompt engineering technique, at least one retrieval strategy must be specified.")
-        return v
+    # @field_validator("retrieval_strategies")
+    # def validate_retrieval_strategies(cls, v, values):
+    #     if (not v or len(v) == 0) and (PromptEngineeringTechniquesType.RETRIEVAL_AUGMENTED_GENERATION in values.data.get("prompt_engineering_techniques", [])):
+    #         raise ValueError("If Retrieval Augmented Generation is used as a prompt engineering technique, at least one retrieval strategy must be specified.")
+    #     return v
