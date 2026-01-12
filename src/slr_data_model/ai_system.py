@@ -156,18 +156,18 @@ class OrchestrationPattern(BaseModel):
     )
     multi_agent_coordination_strategy: Optional[MultiAgentCoordinationStrategy] = Field(
         default=None,
-        description="Collaboration mechanisms for multi-agent systems."
+        description="Collaboration mechanisms for multi-agent systems. State one if orchestration pattern is multi-agent collaboration."
     )
 
-    @field_validator('multi_agent_coordination_strategy')
-    def validate_orchestration(cls, v, info):
-        agents = info.data.get('agents', [])
-        if len(agents) <= 1 and v == "multi-agent-collaboration":
-            raise ValueError("Single-agent system cannot have multi-agent collaboration orchestration pattern")
-        if info.data.get('orchestration_pattern') == "multi-agent-collaboration":
-            raise ValueError("Multi-agent system with multi-agent collaboration must specify coordination strategy")
-
-        return v
+    # @field_validator('multi_agent_coordination_strategy')
+    # def validate_orchestration(cls, v, info):
+    #     agents = info.data.get('agents', [])
+    #     if len(agents) <= 1 and v == "multi-agent-collaboration":
+    #         raise ValueError("Single-agent system cannot have multi-agent collaboration orchestration pattern")
+    #     if info.data.get('orchestration_pattern') == "multi-agent-collaboration":
+    #         raise ValueError("Multi-agent system with multi-agent collaboration must specify coordination strategy")
+    #
+    #     return v
 
 
 class SystemArchitecture(BaseModel):
