@@ -173,7 +173,7 @@ class OrchestrationPattern(BaseModel):
 class SystemArchitecture(BaseModel):
     """Overall architecture of the LLM-based system."""
     agents: list[AIAgent] = Field(
-        description="List of LLM-based agents in the system. Single-agent systems have one element.",
+        description="List of LLM-based agents in the system. Single-agent systems have one element. Required field.",
 
     )
     orchestration_pattern: Optional[OrchestrationPattern] = Field(
@@ -185,7 +185,7 @@ class SystemArchitecture(BaseModel):
     )
 
     human_integration: Optional[HumanIntegration] = Field(
-        description="Human integration aspects of the system, if applicable."
+        description="Human integration aspects of the system."
     )
 
     # shared_memory: bool = Field(
