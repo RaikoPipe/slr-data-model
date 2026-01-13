@@ -184,7 +184,7 @@ class SystemArchitecture(BaseModel):
         description="Mechanism that initiates system."  + make_type_annotations(TriggerType)
     )
 
-    human_integration: Optional[HumanIntegration] = Field(
+    human_integration: HumanIntegration = Field(
         description="Human integration aspects of the system."
     )
 

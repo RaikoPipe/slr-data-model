@@ -15,16 +15,13 @@ class ValidationMethodType(DescriptiveEnum):
 
 class ReportedOutcomes(BaseModel):
     """Performance outcomes and limitations reported in the paper."""
-    decision_quality_improvement: Optional[str] = Field(
-        default=None,
+    decision_quality_improvement: str = Field(
         description="Reported improvements in decision quality or accuracy against traditional methods are ablation of context engineering techniques."
     )
-    response_time_impact: Optional[str] = Field(
-        default=None,
+    response_time_impact: str = Field(
         description="Impact on response time or processing speed."
     )
-    reliability_metrics: Optional[str] = Field(
-        default=None,
+    reliability_metrics: str = Field(
         description="System reliability, uptime, or error rate metrics."
     )
     failure_modes: list[str] = Field(
