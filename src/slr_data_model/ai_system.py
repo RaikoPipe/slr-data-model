@@ -151,7 +151,7 @@ class TaskExecutionType(DescriptiveEnum):
 class OrchestrationPattern(BaseModel):
     """Orchestration pattern for LLM-based AI systems."""
     orchestration_pattern_description: str = Field(description="Description of the orchestration pattern as reported in the paper.")
-    orchestration_pattern: TaskExecutionType = Field(
+    task_execution: TaskExecutionType = Field(
         description="How AI agents are orchestrated."
     )
     multi_agent_coordination_strategy: Optional[MultiAgentCoordinationStrategy] = Field(
@@ -176,7 +176,7 @@ class SystemArchitecture(BaseModel):
         description="List of LLM-based agents in the system. Single-agent systems have one element. Required field.",
 
     )
-    orchestration_pattern: Optional[OrchestrationPattern] = Field(
+    orchestration_pattern: OrchestrationPattern = Field(
         description="Orchestration pattern of the AI system."
     )
 

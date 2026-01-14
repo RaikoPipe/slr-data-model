@@ -15,7 +15,8 @@ from .ai_system import (
     TriggerType,
     FinetuningDatasetType,
     MultiAgentCoordinationStrategy,
-    OrchestrationPattern
+    OrchestrationPattern,
+    HumanIntegration,
 )
 from .context_engineering import ContextEngineering, MemoryType, MemoryScopeType, RetrievalStrategyType, PromptEngineeringTechniquesType
 from .ai_system_types import (
