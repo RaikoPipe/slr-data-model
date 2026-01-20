@@ -17,8 +17,12 @@ from .ai_system import (
     MultiAgentCoordinationStrategy,
     OrchestrationPattern,
     HumanIntegration,
+    HumanOversightType,
+    InteractionModalityType,
+    FeedbackAndLearningType,
+    TaskExecutionType,
 )
-from .context_engineering import ContextEngineering, MemoryType, MemoryScopeType, RetrievalStrategyType, PromptEngineeringTechniquesType
+from .context_engineering import ContextEngineering, MemoryType, MemoryScopeType, RetrievalStrategyType, PromptEngineeringTechniquesType, PromptInjectionStrategyType
 from .ai_system_types import (
     ParadigmType,
     AgentRoleType,
@@ -42,16 +46,21 @@ __all__ = [
     "FinetuningDatasetType",
     "MultiAgentCoordinationStrategy",
     "OrchestrationPattern",
+    "HumanIntegration",
+    "HumanOversightType",
+    "InteractionModalityType",
+    "FeedbackAndLearningType",
+    "TaskExecutionType",
     # Context Engineering
     "ContextEngineering",
     "MemoryType",
     "MemoryScopeType",
     "RetrievalStrategyType",
     "PromptEngineeringTechniquesType",
+    "PromptInjectionStrategyType",
     # Types
     "ParadigmType",
     "AgentRoleType",
-    "PromptEngineeringTechniquesType",
     "ModalityType",
     "ExternalToolsType",
     "AgentCollaborationType",
