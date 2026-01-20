@@ -17,6 +17,7 @@ class DomainType(DescriptiveEnum):
     INVENTORY_MANAGEMENT = "inventory_management" , ""#"inventory management/control"
     OPTIMIZATION = "optimization" , ""#"general optimization, optimization modeling, material flow optimization"
     SIMULATION = "simulation" , ""#"simulation modeling, discrete event, agent-based simulation, what-if analysis"
+    TRANSPORTATION_MANAGEMENT = "transportation_management" , ""#"transportation management, fleet management"
 
 
 
