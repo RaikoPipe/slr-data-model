@@ -13,6 +13,13 @@ class ValidationMethodType(DescriptiveEnum):
     FIELD_DEPLOYMENT = "field deployment", "Real-world deployment and observation of system performance."
     NONE = "none", "No validation method reported."
 
+class FailureAttributionType(DescriptiveEnum):
+    CONTEXT_INSUFFICIENCY = "context-insufficiency", "Missing or incomplete context"
+    CONTEXT_FORMATTING = "context-formatting", "Poorly structured context"
+    MODEL_CAPABILITY = "model-capability", "LLM reasoning or generation error"
+    TOOL_FAILURE = "tool-failure", "External tool or API failure"
+    UNATTRIBUTED = "unattributed", "Failure mode not analyzed"
+
 class ReportedOutcomes(BaseModel):
     """Performance outcomes and limitations reported in the paper."""
     decision_quality_improvement: list[str] = Field(
@@ -23,6 +30,10 @@ class ReportedOutcomes(BaseModel):
     )
     reliability_metrics: list[str] = Field(
         description="System reliability, uptime, or error rate metrics."
+    )
+    failure_attribution: list[FailureAttributionType] = Field(...)
+    ce_technique_effectiveness: dict[str, str] = Field(
+        description="Mapping of CE technique to reported effectiveness"
     )
     failure_modes: list[str] = Field(
         description="Identified failure modes or error conditions."
