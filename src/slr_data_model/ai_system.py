@@ -199,6 +199,21 @@ class SystemArchitecture(BaseModel):
             raise ValueError("System must have at least one agent")
         return v
 
+class ResearchMaturityType(DescriptiveEnum):
+    CONCEPTUAL = "conceptual", "Framework or architecture proposal only"
+    PROTOTYPE = "prototype", "Working implementation, lab evaluation"
+    PILOT = "pilot", "Limited real-world deployment"
+    PRODUCTION = "production", "Full operational deployment"
+
+class ResearchMethodologyType(DescriptiveEnum):
+    """Research methodology employed in the study."""
+    DESIGN_SCIENCE = "design-science", "Artifact creation with iterative evaluation cycles"
+    CASE_STUDY = "case-study", "In-depth analysis of specific implementation instances"
+    EXPERIMENT = "experiment", "Controlled experimental comparison with baselines"
+    ACTION_RESEARCH = "action-research", "Collaborative intervention in real organizational setting"
+    SIMULATION_STUDY = "simulation-study", "Evaluation using simulated environments or synthetic data"
+    PROOF_OF_CONCEPT = "proof-of-concept", "Feasibility demonstration without rigorous evaluation"
+    MIXED_METHODS = "mixed-methods", "Combination of qualitative and quantitative approaches"
 
 class AISystem(BaseModel):
     """Complete AI system specification extracted from a paper."""
@@ -207,22 +222,32 @@ class AISystem(BaseModel):
     # application_domain_reasoning: str = Field(
     #     description="Explanation of the chosen application domain."
     # )
-    application_domain: DomainType = Field(
-        description='Primary field of application targeted by the paper.' + make_type_annotations(DomainType)
-    )
 
-
-    # Paradigm classification
-    # paradigm_reasoning: str = Field(
-    #     description="Justification for paradigm classification."
-    # )
-    paradigm: ParadigmType = Field(
-        description="Overall system paradigm classification." + make_type_annotations(ParadigmType)
-    )
 
     # System architecture
     system_architecture: SystemArchitecture = Field(
         description="Architecture of the LLM-based System."
+    )
+
+    paradigm: ParadigmType = Field(
+        description="Overall system paradigm classification." + make_type_annotations(ParadigmType)
+    )
+
+    # meta
+    application_domain: DomainType = Field(
+        description='Primary field of application targeted by the paper.' + make_type_annotations(DomainType)
+    )
+
+    research_maturity: ResearchMaturityType = Field(
+        description="Maturity level of the research"
+    )
+
+    research_methodology: ResearchMethodologyType = Field(
+        description="Primary research methodology employed." + make_type_annotations(ResearchMethodologyType)
+    )
+
+    research_methodology_description: str = Field(
+        description="Short description of the conducted research methodology"
     )
 
     # Validation and outcomes
