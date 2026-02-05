@@ -173,6 +173,7 @@ class OrchestrationPattern(BaseModel):
 class SystemArchitecture(BaseModel):
     """Overall architecture of the LLM-based system."""
     agents: list[AIAgent] = Field(
+        min_length=1,
         description="List of LLM-based agents in the system. Single-agent systems have one element. Required field.",
 
     )
@@ -193,8 +194,8 @@ class SystemArchitecture(BaseModel):
     #     description="Whether agents share memory/knowledge with each other."
     # )
 
-    @field_validator("agents")
-    def empty_list(cls, v, info):
+    @field_validator("agents", mode="before")
+    def empty_list(cls, v, info, ):
         if not v:
             raise ValueError("System must have at least one agent")
         return v
