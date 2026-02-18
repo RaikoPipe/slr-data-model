@@ -227,9 +227,6 @@ class AISystem(BaseModel):
     """Complete AI system specification extracted from a paper."""
 
     # domain application
-    # application_domain_reasoning: str = Field(
-    #     description="Explanation of the chosen application domain."
-    # )
 
 
     # System architecture
@@ -240,6 +237,10 @@ class AISystem(BaseModel):
     # meta
     application_domain: DomainType = Field(
         description='Primary field of application targeted by the paper.' + make_type_annotations(DomainType)
+    )
+
+    application_domain_description: str = Field(
+        description="Short description of the addressed field by the paper."
     )
 
     problem_description : str = Field(
