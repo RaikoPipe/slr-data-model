@@ -101,7 +101,7 @@ try:
     ai_system = AISystem(
         application_domains={domain},
         application_domains_reasoning="General-purpose code generation across software development tasks",
-        paradigm=ParadigmType.AGENTIC_AI,
+        paradigm=ParadigmType.AUTONOMOUS_AGENTS,
         paradigm_reasoning="Uses ReAct reasoning with autonomous tool use and iterative problem-solving",
         agent_architecture=agent_architecture,
         validation_methods={ValidationMethod.BENCHMARK, ValidationMethod.CASE_STUDY},
@@ -111,7 +111,7 @@ try:
 
     # Verify key properties
     print("\nVerifying system properties...")
-    assert ai_system.paradigm == ParadigmType.AGENTIC_AI
+    assert ai_system.paradigm == ParadigmType.AUTONOMOUS_AGENTS
     print(f"  - Paradigm: {ai_system.paradigm.value}")
 
     assert len(ai_system.system_architecture.agents) == 1

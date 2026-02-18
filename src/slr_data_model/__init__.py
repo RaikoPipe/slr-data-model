@@ -15,7 +15,7 @@ from .ai_system import (
     TriggerType,
     FinetuningDatasetType,
     MultiAgentCoordinationStrategy,
-    OrchestrationPattern,
+    Orchestration,
     HumanIntegration,
 )
 from .context_engineering import ContextEngineering, MemoryType, MemoryScopeType, RetrievalStrategyType, PromptEngineeringTechniquesType
@@ -41,7 +41,7 @@ __all__ = [
     "TriggerType",
     "FinetuningDatasetType",
     "MultiAgentCoordinationStrategy",
-    "OrchestrationPattern",
+    "Orchestration",
     # Context Engineering
     "ContextEngineering",
     "MemoryType",

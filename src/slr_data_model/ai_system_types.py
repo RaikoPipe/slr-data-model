@@ -12,9 +12,9 @@ class ModalityType(DescriptiveEnum):
 
 class ParadigmType(DescriptiveEnum):
     """AI system paradigm classification based on autonomy and reasoning capabilities."""
-    GENERATIVE_AI = "generative-ai", "Simple LLM-based generation without autonomous decision-making or tool use"
-    AI_AGENT = "ai-agent", "System with fixed workflows and deterministic decision logic (rule-based, planning graphs)"
-    AGENTIC_AI = "agentic-ai", "Autonomous system with iterative reasoning (ReAct, CoT) and dynamic tool use"
+    GENERATIVE_AI = "generative-ai", "Simple natural language generation without autonomous decision-making or tool use"
+    ORCHESTRATED_AGENTS = "orchestrated-agents", "LLM-based system with rule-based orchestration"
+    AUTONOMOUS_AGENTS = "autonomous-agents", "Autonomous system with iterative planning and reasoning cycles (ReAct) and dynamic tool use"
 
 class ExternalToolsType(DescriptiveEnum):
     """External tools and interfaces available to the agent."""

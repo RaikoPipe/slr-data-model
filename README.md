@@ -128,7 +128,7 @@ system = AISystem(
     paper_id="example_paper_2024",
     system_name="Research Assistant System",
     system_description="An AI-powered research assistant for literature analysis",
-    paradigm=ParadigmType.AI_AGENT,
+    paradigm=ParadigmType.ORCHESTRATED_AGENTS,
     architecture=architecture,
     domain=[DomainType.EDUCATION],
     validation_method=ValidationMethodType.CASE_STUDY,
@@ -300,8 +300,8 @@ All enumerations in this package extend the `DescriptiveEnum` base class, which 
 from slr_data_model import ParadigmType
 
 # Access enum value and description
-paradigm = ParadigmType.AI_AGENT
-print(paradigm.value)        # "ai-agent"
+paradigm = ParadigmType.ORCHESTRATED_AGENTS
+print(paradigm.value)  # "ai-agent"
 print(paradigm.description)  # "System with fixed workflows and deterministic decision logic..."
 
 # List all options with descriptions

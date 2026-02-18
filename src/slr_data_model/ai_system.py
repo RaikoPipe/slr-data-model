@@ -84,7 +84,10 @@ class AIAgent(BaseModel):
     description: Optional[str] = Field(description="Description of the agent's purpose and functionality as reported in the paper.")
 
     role: AgentRoleType = Field(
-        description="Specialized role of this agent (orchestrator, coder, planner, etc.)." + make_type_annotations(AgentRoleType)
+        description="Specific role of this agent in the system." + make_type_annotations(AgentRoleType)
+    )
+    specialized_role: Optional[str] = Field(
+        description="Special role type not covered by available common agent role types."
     )
     context_engineering: ContextEngineering = Field(
         description="Memory configuration for this agent."
@@ -104,7 +107,11 @@ class AIAgent(BaseModel):
     #     description="Description of prompt engineering approaches used (system prompts, few-shot examples, etc.)."
     # )
 
-
+    @field_validator("role", mode="after")
+    def empty_list(cls, v, info, ):
+        if v == 'other' and not info['special_role_type']:
+            raise ValueError("Must specify special role type if role is set to other")
+        return v
 
 class HumanOversightType(DescriptiveEnum):
     """Types of human oversight mechanisms integrated into the system."""
@@ -141,17 +148,17 @@ class HumanIntegration(BaseModel):
         description="Methods for incorporating human feedback into system learning and adaptation." + make_type_annotations(FeedbackAndLearningType)
     )
 
-class TaskExecutionType(DescriptiveEnum):
-    """How a task is processed by the AI system."""
-    SINGLE_STEP = "single-step", "One-shot generation, no iteration"
-    PLANNING_GRAPH = "planning-graph", "Graph-based planning with predefined state transitions"
-    MULTI_AGENT_COLLABORATION = "multi-agent-collaboration", "Multiple agents working together on subtasks"
-    # iterative_refinement = "iterative-refinement", "ReAct loops, CoT with backtracking"
+class OrchestrationPatternType(DescriptiveEnum):
+    """How LLM agents are orchestrated in the system.."""
+    SINGLE_STEP = "single-step", "One-shot generation, no orchestration."
+    ORCHESTRATION_GRAPH = "orchestration-graph", "Agents are orchestrated through a rule-based graph"
+    MULTI_AGENT_COLLABORATION = "multi-agent-collaboration", "Multiple agents working together to solve a task"
+    REACT = "re-act", "Agents use Reasoning+Acting pattern in an iterative loop, usually integrating Chain of Thought and Tool Use"
 
-class OrchestrationPattern(BaseModel):
+class Orchestration(BaseModel):
     """Orchestration pattern for LLM-based AI systems."""
-    orchestration_pattern_description: str = Field(description="Description of the orchestration pattern as reported in the paper.")
-    task_execution: TaskExecutionType = Field(
+    orchestration_pattern_description: str = Field(description="Description of the orchestration patterns as reported in the paper.")
+    orchestration_pattern: list[OrchestrationPatternType] = Field(
         description="How AI agents are orchestrated."
     )
     multi_agent_coordination_strategy: Optional[MultiAgentCoordinationStrategy] = Field(
@@ -159,15 +166,15 @@ class OrchestrationPattern(BaseModel):
         description="Collaboration mechanisms for multi-agent systems. State one if orchestration pattern is multi-agent collaboration."
     )
 
-    # @field_validator('multi_agent_coordination_strategy')
-    # def validate_orchestration(cls, v, info):
-    #     agents = info.data.get('agents', [])
-    #     if len(agents) <= 1 and v == "multi-agent-collaboration":
-    #         raise ValueError("Single-agent system cannot have multi-agent collaboration orchestration pattern")
-    #     if info.data.get('orchestration_pattern') == "multi-agent-collaboration":
-    #         raise ValueError("Multi-agent system with multi-agent collaboration must specify coordination strategy")
-    #
-    #     return v
+    @field_validator('multi_agent_coordination_strategy')
+    def validate_orchestration(cls, v, info):
+        agents = info.data.get('agents', [])
+        if len(agents) <= 1 and v == "multi-agent-collaboration":
+            raise ValueError("Single-agent system cannot have multi-agent collaboration orchestration pattern")
+        if info.data.get('orchestration_pattern') == "multi-agent-collaboration":
+            raise ValueError("Multi-agent system with multi-agent collaboration must specify coordination strategy")
+
+        return v
 
 
 class SystemArchitecture(BaseModel):
@@ -177,8 +184,8 @@ class SystemArchitecture(BaseModel):
         description="List of LLM-based agents in the system. Single-agent systems have one element. Required field.",
 
     )
-    orchestration_pattern: OrchestrationPattern = Field(
-        description="Orchestration pattern of the AI system."
+    orchestration: Orchestration = Field(
+        description="Orchestration of the AI agent(s)."
     )
 
     trigger: TriggerType = Field(
@@ -230,13 +237,17 @@ class AISystem(BaseModel):
         description="Architecture of the LLM-based System."
     )
 
-    paradigm: ParadigmType = Field(
-        description="Overall system paradigm classification." + make_type_annotations(ParadigmType)
-    )
-
     # meta
     application_domain: DomainType = Field(
         description='Primary field of application targeted by the paper.' + make_type_annotations(DomainType)
+    )
+
+    problem_description : str = Field(
+        description="Short summary of the research problem and motivation of the paper"
+    )
+
+    proposed_solution : str = Field(
+        description="Short overview about the proposed solution to solve the research problem"
     )
 
     research_maturity: ResearchMaturityType = Field(
