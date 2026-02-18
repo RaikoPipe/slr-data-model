@@ -86,8 +86,8 @@ class AIAgent(BaseModel):
     role: AgentRoleType = Field(
         description="Specific role of this agent in the system." + make_type_annotations(AgentRoleType)
     )
-    specialized_role: Optional[str] = Field(
-        description="Special role type not covered by available common agent role types. Mandatory if role is set to 'other', will throw ValidationError otherwise."
+    specialized_role: str = Field(
+        description="Precise role type classification. Format answer like this: 'information_extractor'."
     )
     context_engineering: ContextEngineering = Field(
         description="Memory configuration for this agent."
@@ -107,11 +107,6 @@ class AIAgent(BaseModel):
     #     description="Description of prompt engineering approaches used (system prompts, few-shot examples, etc.)."
     # )
 
-    @field_validator("role", mode="after")
-    def empty_list(cls, v, info, ):
-        if v == 'other' and not info.data.get('special_role_type'):
-            raise ValueError("Must specify special role type if role is set to other")
-        return v
 
 class HumanOversightType(DescriptiveEnum):
     """Types of human oversight mechanisms integrated into the system."""
