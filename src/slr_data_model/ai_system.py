@@ -87,7 +87,7 @@ class AIAgent(BaseModel):
         description="Specific role of this agent in the system." + make_type_annotations(AgentRoleType)
     )
     specialized_role: Optional[str] = Field(
-        description="Special role type not covered by available common agent role types."
+        description="Special role type not covered by available common agent role types. Mandatory if role is set to 'other', will throw ValidationError otherwise."
     )
     context_engineering: ContextEngineering = Field(
         description="Memory configuration for this agent."
@@ -109,7 +109,7 @@ class AIAgent(BaseModel):
 
     @field_validator("role", mode="after")
     def empty_list(cls, v, info, ):
-        if v == 'other' and not info['special_role_type']:
+        if v == 'other' and not info.data.get('special_role_type'):
             raise ValueError("Must specify special role type if role is set to other")
         return v
 

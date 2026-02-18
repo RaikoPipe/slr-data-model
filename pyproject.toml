@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "slr-data-model"
-version = "0.3.8"
+version = "0.3.9"
 description = "Pydantic data models for representing AI systems in systematic literature reviews"
 readme = "README.md"
 requires-python = ">=3.8"

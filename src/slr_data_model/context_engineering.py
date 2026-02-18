@@ -66,9 +66,9 @@ class ContextEngineering(BaseModel):
         description="Methods for retrieving information, when Retrieval Augmented Generation is used as a technique." + make_type_annotations(RetrievalStrategyType)
     )
 
-    prompt_injection_strategy : list[PromptInjectionStrategyType] = Field(
-        description="Techniques for injecting memory into prompts. Empty if no persistent memory system." + make_type_annotations(PromptInjectionStrategyType)
-    )
+    # prompt_injection_strategy : list[PromptInjectionStrategyType] = Field(
+    #     description="Techniques for injecting memory into prompts. Empty if no persistent memory system." + make_type_annotations(PromptInjectionStrategyType)
+    # )
 
     # @field_validator("retrieval_strategies")
     # def validate_retrieval_strategies(cls, v, values):
