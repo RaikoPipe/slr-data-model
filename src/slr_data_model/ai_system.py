@@ -49,10 +49,6 @@ class GenAIModel(BaseModel):
     model_name: str = Field(
         description="Name or identifier of the base generative AI model (e.g., 'GPT-4', 'Claude-3', 'Llama-2')."
     )
-    supported_modalities: list[ModalityType] = Field(
-        default_factory=list,
-        description="Input/output modalities the model supports (text, image, audio, video)." + make_type_annotations(ModalityType)
-    )
 
     finetuning_datasets: list[FinetuningDatasetType] = Field(
         description="Types of datasets used for fine-tuning. Empty if model is not fine-tuned." + make_type_annotations(FinetuningDatasetType)
