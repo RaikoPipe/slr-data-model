@@ -5,7 +5,7 @@ from pydantic import Field
 
 class ModalityType(DescriptiveEnum):
     """Input/output modalities supported by the system."""
-    TEXT = "text", "Textual input and output"
+    TEXT = "conversational-text", "Textual input and output"
     IMAGE = "image", "Visual image processing"
     AUDIO = "audio", "Speech or sound processing"
     VIDEO = "video", "Video stream processing"
