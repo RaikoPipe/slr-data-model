@@ -9,6 +9,7 @@ class ModalityType(DescriptiveEnum):
     IMAGE = "image", "Visual image processing"
     AUDIO = "audio", "Speech or sound processing"
     VIDEO = "video", "Video stream processing"
+    DASHBOARD="dashboard-gui", "User Interface for visualizing information"
 
 class ParadigmType(DescriptiveEnum):
     """AI system paradigm classification based on autonomy and reasoning capabilities."""

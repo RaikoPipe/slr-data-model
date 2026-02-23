@@ -4,4 +4,4 @@ from rich import print
 
 parser = PydanticOutputParser(pydantic_object=SystemArchitecture)
 
-print(parser.get_format_instructions())
+print(AISystem.model_json_schema())
