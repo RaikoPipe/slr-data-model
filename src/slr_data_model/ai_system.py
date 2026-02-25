@@ -191,10 +191,6 @@ class SystemArchitecture(BaseModel):
         description="Human integration aspects of the system."
     )
 
-    integration_with_cps: CPSIntegrationType = Field(
-        description="Type of external system integration."
-    )
-
     @field_validator("agents", mode="before")
     def empty_list(cls, v, info, ):
         if not v:
@@ -251,6 +247,10 @@ class AISystem(BaseModel):
     # System architecture
     system_architecture: SystemArchitecture = Field(
         description="Architecture of the LLM-based System."
+    )
+
+    integration_with_cps: CPSIntegrationType = Field(
+        description="Type of external system integration."
     )
 
     # meta
