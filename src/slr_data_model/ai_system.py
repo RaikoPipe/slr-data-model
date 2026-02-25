@@ -167,6 +167,10 @@ class Orchestration(BaseModel):
 
         return v
 
+class CPSIntegrationType(DescriptiveEnum):
+    CYBER_PHYSICAL_SYSTEM = "CYBER-PHYSICAL-SYSTEM", "System integrates with cyber physical systems."
+    DIGITAL_TWIN = "DIGITAL-TWIN", "System integrates with digital twin systems."
+    IOT = "IOT", "System integrates with iot systems."
 
 class SystemArchitecture(BaseModel):
     """Overall architecture of the LLM-based system."""
@@ -187,10 +191,9 @@ class SystemArchitecture(BaseModel):
         description="Human integration aspects of the system."
     )
 
-    # shared_memory: bool = Field(
-    #     default=False,
-    #     description="Whether agents share memory/knowledge with each other."
-    # )
+    integration_with_cps: CPSIntegrationType = Field(
+        description="Type of external system integration."
+    )
 
     @field_validator("agents", mode="before")
     def empty_list(cls, v, info, ):
@@ -214,6 +217,31 @@ class ResearchMethodologyType(DescriptiveEnum):
     PROOF_OF_CONCEPT = "proof-of-concept", "Feasibility demonstration without rigorous evaluation"
     MIXED_METHODS = "mixed-methods", "Combination of qualitative and quantitative approaches"
 
+class EvaluationMetricType(DescriptiveEnum):
+    CLASSIFICATION = "classification", "Classification metrics are used, such as: accuracy, precision, recall, F1, AUC"
+    GENERATION_QUALITY = "generation-quality", "Generation quality metrics are used, such as: ROUGE (L/1/2), BLEU, BERTScore, METEOR, cosine similarity"
+    COMPUTATIONAL_EFFICIENCY = "computational-efficiency", "Computational efficiency metrics were tested such as: response time, latency, inference time, processing time."
+    RETRIEVAL_QUALITY = "retrieval-quality", "Information retrieval metric such as: MRR, NDCG, Hit Rate"
+    OPERATIONAL_KPI = "operational-kpi", "Domain specific metrics were tested"
+    HUMAN_EVALUATION = "human-evaluation", "Human evaluation metrics were tested, such as Likert Scales, User Satisfaction Scores, Expert ratings"
+    TASK_COMPLETION = "task-completion", "Task success was measures, which are typically binary, such as: success rate, detection rate, pass rate"
+    REGRESSION = "regression", "Regression metrics were tested, such as: MSE, MAE, RMSE, MAPE"
+
+class IndustryParadigmType(DescriptiveEnum):
+    INDUSTRY_4 = "industry-4.0", "Industry 4.0"
+    INDUSTRY_5 = "industry-5.0", "Industry 5.0"
+    NOT_SPECIFIED = "not-specified", "Not specified"
+
+class ScalabilityAssessmentType(DescriptiveEnum):
+    """Dimensions of scalability assessed or acknowledged as limitations in the study."""
+    DOMAIN_GENERALIZATION = "domain-generalization", "Transfer to other industrial domains, equipment types, or manufacturing processes beyond the validated scope."
+    DATA_SCALABILITY = "data-scalability", "Ability to handle larger datasets, broader knowledge bases, or increased number of fault types and entity classes."
+    COMPUTATIONAL_SCALABILITY = "computational-scalability", "Inference latency, hardware resource demands, or constraints on edge versus cloud deployment."
+    ORGANIZATIONAL_SCALABILITY = "organizational-scalability", "Multi-site, multi-plant, or enterprise-wide deployment across organizational boundaries."
+    AGENT_SCALABILITY = "agent-scalability", "Performance under increasing number of agents, concurrent tasks, or orchestration complexity."
+    NOT_ASSESSED = "not-assessed", "Scalability not discussed or evaluated in the study."
+
+
 class AISystem(BaseModel):
     """Complete AI system specification extracted from a paper."""
 
@@ -232,6 +260,10 @@ class AISystem(BaseModel):
 
     application_domain_description: str = Field(
         description="Short description of the addressed field by the paper."
+    )
+
+    industry_paradigm: IndustryParadigmType = Field(
+        description="Industry paradigm addressed by the paper."
     )
 
     problem_description : str = Field(
@@ -254,10 +286,22 @@ class AISystem(BaseModel):
         description="Short description of the conducted research methodology"
     )
 
-    # Validation and outcomes
+    # Validation, results, limitations
     validation_methods: list[ValidationMethodType] = Field(
         description="Methods used to validate system performance." + make_type_annotations(ValidationMethodType)
     )
+    baseline_methods: list[str] = Field(
+        description="What the system was compared against."
+    )
+    evaluation_metric_categories: list[EvaluationMetricType] = Field(
+        description="Metric categories used in evaluation."
+    )
     reported_outcomes: ReportedOutcomes = Field(
         description="Performance outcomes and limitations."
+    )
+    identified_research_gaps: list[str] = Field(
+        description="Explicit future work / gaps stated by authors."
+    )
+    scalability_assessment: ScalabilityAssessmentType = Field(
+        description="Scalability assessment of system performance."
     )

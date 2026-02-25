@@ -30,6 +30,8 @@ classifiers = [
 
 dependencies = [
     "pydantic>=2.0.0",
+    "langchain-core",
+    'rich'
 ]
 
 [project.optional-dependencies]
