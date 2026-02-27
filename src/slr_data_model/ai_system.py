@@ -168,9 +168,9 @@ class Orchestration(BaseModel):
         return v
 
 class CPSIntegrationType(DescriptiveEnum):
-    CYBER_PHYSICAL_SYSTEM = "CYBER-PHYSICAL-SYSTEM", "System integrates with cyber physical systems."
-    DIGITAL_TWIN = "DIGITAL-TWIN", "System integrates with digital twin systems."
-    IOT = "IOT", "System integrates with iot systems."
+    CYBER_PHYSICAL_SYSTEM = "cyber-physical-system", "System integrates with cyber physical systems."
+    DIGITAL_TWIN = "digital-twin", "System integrates with digital twin systems."
+    IOT = "iot", "System integrates with iot systems."
 
 class SystemArchitecture(BaseModel):
     """Overall architecture of the LLM-based system."""
