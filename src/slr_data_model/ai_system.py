@@ -6,9 +6,15 @@ from .ai_system_types import (
     ParadigmType, ExternalToolsType, AgentRoleType,
     AgentCollaborationType, OrganizationalStructureType, ModalityType
 )
-from .validation import ValidationMethodType, ReportedOutcomes
+from .validation import ValidationMethodType, EvaluationAndOutcomes
 from .domain import DomainType
 from .annotation_helper import make_type_annotations
+from .bibliographic import BibliographicMetadata
+from .strategic_planning import StrategicPlanningScope
+from .or_substrate import ORSubstrate
+from .gap_indicators import GapIndicators
+from .quality_appraisal import QualityAppraisal
+from .retrieval_traceability import RetrievalTraceability
 
 class ToolUse(BaseModel):
     """External tools and integrations available to the agent."""
@@ -33,6 +39,78 @@ class FinetuningDatasetType(DescriptiveEnum):
     SYNTHETIC = "synthetic", "Artificially generated data designed to simulate specific scenarios or tasks."
 
 
+class FinetuningMethodType(DescriptiveEnum):
+    """Fine-tuning method applied to the model."""
+    NONE = "none", "No fine-tuning applied"
+    PROMPT_ENGINEERING_ONLY = "prompt-engineering-only", "Prompt engineering only, no weight updates"
+    LORA = "LoRA", "Low-Rank Adaptation fine-tuning"
+    FULL_FINE_TUNING = "full-fine-tuning", "Full model fine-tuning"
+    OTHER = "other", "Other fine-tuning method"
+
+
+class ModelFamilyType(DescriptiveEnum):
+    """Model family classification."""
+    GPT = "GPT", "OpenAI GPT family"
+    CLAUDE = "Claude", "Anthropic Claude family"
+    GEMINI = "Gemini", "Google Gemini family"
+    LLAMA = "Llama", "Meta Llama family"
+    MISTRAL = "Mistral", "Mistral AI family"
+    QWEN = "Qwen", "Alibaba Qwen family"
+    DEEPSEEK = "DeepSeek", "DeepSeek family"
+    OTHER = "other", "Other model family"
+
+
+class OpenWeightType(DescriptiveEnum):
+    """Whether the model weights are openly available."""
+    YES = "Y", "Open-weight model"
+    NO = "N", "Proprietary model"
+    MIXED = "mixed", "System uses both open-weight and proprietary models"
+
+
+class ArchitecturalPatternType(DescriptiveEnum):
+    """Top-level architectural pattern classification per prereg."""
+    RAG = "RAG", "Retrieval-augmented generation"
+    MULTI_AGENT = "multi-agent", "Multi-agent system"
+    LLM_SOLVER = "LLM+solver", "LLM combined with mathematical solver"
+    LLM_DIGITAL_TWIN = "LLM+digital-twin", "LLM integrated with digital twin"
+    SINGLE_AGENT_PIPELINE = "single-agent-pipeline", "Single agent pipeline"
+    OTHER = "other", "Other architectural pattern"
+
+
+class AgenticArchitectureType(DescriptiveEnum):
+    """Agentic architecture classification."""
+    SINGLE_AGENT = "single-agent", "Single agent system"
+    MULTI_AGENT = "multi-agent", "Multi-agent system"
+    SUPERVISOR_AGENT = "supervisor-agent", "Supervisor-agent hierarchy"
+    PIPELINE = "pipeline", "Sequential pipeline of agents"
+    NONE = "none", "No agentic architecture"
+
+
+class IntegrationType(DescriptiveEnum):
+    """Integration types for the LLM system."""
+    RAG = "RAG", "Retrieval-augmented generation integration"
+    KG = "KG", "Knowledge graph integration"
+    SOLVER = "solver", "Mathematical solver integration"
+    DIGITAL_TWIN = "digital-twin", "Digital twin integration"
+    SIMULATION_PLATFORM = "simulation-platform", "Simulation platform integration"
+    NONE = "none", "No external integration"
+
+
+class ResearchType(DescriptiveEnum):
+    """Coarse research type classification."""
+    EMPIRICAL = "empirical", "Empirical study with primary data collection"
+    CONCEPTUAL = "conceptual", "Conceptual or vision paper"
+    DESIGN_SCIENCE = "design-science", "Design-science research with artifact creation"
+
+
+class ValidationStatusType(DescriptiveEnum):
+    """Validation status of the proposed system."""
+    IMPLEMENTED_VALIDATED = "implemented-validated", "Working system with quantitative evaluation"
+    PROTOTYPE = "prototype", "Working system, limited or no evaluation"
+    FRAMEWORK_ONLY = "framework-only", "Architecture described, no implementation"
+    CONCEPTUAL = "conceptual", "Position or vision paper"
+
+
 class MultiAgentCoordinationStrategy(BaseModel):
     """Multi-agent coordination patterns and collaboration strategies, if present."""
     multi_agent_coordination_strategy_description: str = Field(description="Short description of multi agent coordination strategy.")
@@ -47,14 +125,24 @@ class MultiAgentCoordinationStrategy(BaseModel):
 class GenAIModel(BaseModel):
     """Specification of the generative AI model used in the system."""
     model_name: str = Field(
-        description="Name or identifier of the base generative AI model (e.g., 'GPT-4', 'Claude-3', 'Llama-2')."
+        description="Name or identifier of the base generative AI model as reported (e.g., 'GPT-4o', 'Llama 3.1 70B')."
     )
-
+    model_family: ModelFamilyType = Field(
+        description="Model family classification." + make_type_annotations(ModelFamilyType)
+    )
+    open_weight: OpenWeightType = Field(
+        description="Whether the model weights are openly available." + make_type_annotations(OpenWeightType)
+    )
+    finetuning_method: FinetuningMethodType = Field(
+        description="Fine-tuning method applied." + make_type_annotations(FinetuningMethodType)
+    )
     finetuning_datasets: list[FinetuningDatasetType] = Field(
         description="Types of datasets used for fine-tuning. Empty if model is not fine-tuned." + make_type_annotations(FinetuningDatasetType)
     )
-
-    finetuning_dataset_description: Optional[str] = Field(description="Description of the dataset used for fine-tuning, if applicable.")
+    finetuning_dataset_description: Optional[str] = Field(
+        default=None,
+        description="Description of the dataset used for fine-tuning, if applicable."
+    )
 
 
 class TriggerType(DescriptiveEnum):
@@ -238,55 +326,81 @@ class ScalabilityAssessmentType(DescriptiveEnum):
     NOT_ASSESSED = "not-assessed", "Scalability not discussed or evaluated in the study."
 
 
-class AISystem(BaseModel):
-    """Complete AI system specification extracted from a paper."""
-
-    # domain application
-
-
-    # System architecture
+class LLMIntervention(BaseModel):
+    """LLM/AI intervention details extracted from the source."""
     system_architecture: SystemArchitecture = Field(
         description="Architecture of the LLM-based System."
     )
+    architectural_pattern: list[ArchitecturalPatternType] = Field(
+        description="Top-level architectural pattern(s)." + make_type_annotations(ArchitecturalPatternType)
+    )
+    agentic_architecture: AgenticArchitectureType = Field(
+        description="Agentic architecture classification." + make_type_annotations(AgenticArchitectureType)
+    )
+    integrations: list[IntegrationType] = Field(
+        description="All integration types applicable to the system." + make_type_annotations(IntegrationType)
+    )
 
+
+class StudyCharacterization(BaseModel):
+    """Study characterization fields."""
+    research_type: ResearchType = Field(
+        description="Coarse research type classification." + make_type_annotations(ResearchType)
+    )
+    validation_status: ValidationStatusType = Field(
+        description="Validation status of the proposed system." + make_type_annotations(ValidationStatusType)
+    )
+    industry_sector: Optional[str] = Field(
+        default=None,
+        description="Industry sector as reported. NR if absent."
+    )
+    case_study_domain: Optional[str] = Field(
+        default=None,
+        description="Case study domain as reported. NR if absent."
+    )
+    stated_research_questions: Optional[str] = Field(
+        default=None,
+        description="Verbatim or close paraphrase of the paper's RQs. NR if none stated."
+    )
+
+
+class AISystem(BaseModel):
+    """Complete AI system specification extracted from a paper.
+
+    Retained for backward compatibility. Contains the system-level
+    characterization fields that are not part of the prereg extraction
+    schema but may be useful for deeper analysis.
+    """
+    system_architecture: SystemArchitecture = Field(
+        description="Architecture of the LLM-based System."
+    )
     integration_with_cps: CPSIntegrationType = Field(
         description="Type of external system integration."
     )
-
-    # meta
     application_domain: DomainType = Field(
         description='Primary field of application targeted by the paper.' + make_type_annotations(DomainType)
     )
-
     application_domain_description: str = Field(
         description="Short description of the addressed field by the paper."
     )
-
     industry_paradigm: IndustryParadigmType = Field(
         description="Industry paradigm addressed by the paper."
     )
-
-    problem_description : str = Field(
+    problem_description: str = Field(
         description="Short summary of the research problem and motivation of the paper"
     )
-
-    proposed_solution : str = Field(
+    proposed_solution: str = Field(
         description="Short overview about the proposed solution to solve the research problem"
     )
-
     research_maturity: ResearchMaturityType = Field(
         description="Maturity level of the research"
     )
-
     research_methodology: ResearchMethodologyType = Field(
         description="Primary research methodology employed." + make_type_annotations(ResearchMethodologyType)
     )
-
     research_methodology_description: str = Field(
         description="Short description of the conducted research methodology"
     )
-
-    # Validation, results, limitations
     validation_methods: list[ValidationMethodType] = Field(
         description="Methods used to validate system performance." + make_type_annotations(ValidationMethodType)
     )
@@ -296,12 +410,46 @@ class AISystem(BaseModel):
     evaluation_metric_categories: list[EvaluationMetricType] = Field(
         description="Metric categories used in evaluation."
     )
-    reported_outcomes: ReportedOutcomes = Field(
-        description="Performance outcomes and limitations."
+    reported_outcomes: EvaluationAndOutcomes = Field(
+        description="Evaluation outcomes and limitations."
     )
     identified_research_gaps: list[str] = Field(
         description="Explicit future work / gaps stated by authors."
     )
     scalability_assessment: ScalabilityAssessmentType = Field(
         description="Scalability assessment of system performance."
+    )
+
+
+class StudyExtraction(BaseModel):
+    """Top-level study extraction record aligned with the OSF preregistration.
+
+    Composes all prereg-required field groups into a single study-level record.
+    """
+    bibliographic_metadata: BibliographicMetadata = Field(
+        description="Bibliographic metadata."
+    )
+    study_characterization: StudyCharacterization = Field(
+        description="Study characterization fields."
+    )
+    strategic_planning_scope: StrategicPlanningScope = Field(
+        description="Strategic planning scope."
+    )
+    llm_intervention: LLMIntervention = Field(
+        description="LLM/AI intervention details."
+    )
+    or_substrate: ORSubstrate = Field(
+        description="OR/optimization substrate characteristics."
+    )
+    evaluation_and_outcomes: EvaluationAndOutcomes = Field(
+        description="Evaluation methods and reported outcomes."
+    )
+    gap_indicators: GapIndicators = Field(
+        description="Gap indicator fields for RQ3 analysis."
+    )
+    quality_appraisal: QualityAppraisal = Field(
+        description="Quality appraisal scores."
+    )
+    retrieval_traceability: RetrievalTraceability = Field(
+        description="Retrieval traceability."
     )
