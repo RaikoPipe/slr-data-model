@@ -1,70 +1,22 @@
 """
-AI System Data Model
+SLR Data Model — v3.0 Extraction Schema
 
-This module provides Pydantic models for representing AI systems,
-including their architecture, capabilities, and validation methods.
-Aligned with the OSF preregistration extraction schema.
+Pydantic models for LLM-based decision support for the strategic planning
+horizon in manufacturing and logistics (SLR extraction schema, v3.0).
+
+Tiers:
+- Bibliographic metadata (LLM-extracted, R1 spot-checks 10%)
+- Descriptive fields (LLM pre-fill, R1 verifies 100%)
+- Interpretive fields (R1 manual, dual-verified by R2)
 """
 from .descriptive_enum import DescriptiveEnum
-from .context_engineering import ContextEngineering
-from .ai_system import (
-    AISystem,
-    StudyExtraction,
-    StudyCharacterization,
-    LLMIntervention,
-    SystemArchitecture,
-    AIAgent,
-    GenAIModel,
-    ToolUse,
-    TriggerType,
-    FinetuningDatasetType,
-    FinetuningMethodType,
-    ModelFamilyType,
-    OpenWeightType,
-    ArchitecturalPatternType,
-    AgenticArchitectureType,
-    IntegrationType,
-    ResearchType,
-    ValidationStatusType,
-    MultiAgentCoordinationStrategy,
-    Orchestration,
-    HumanIntegration,
-    HumanOversightType,
-    OrchestrationPatternType,
-    CPSIntegrationType,
-    ResearchMaturityType,
-    ResearchMethodologyType,
-    EvaluationMetricType,
-    IndustryParadigmType,
-    ScalabilityAssessmentType,
-    FeedbackAndLearningType,
-    InteractionModalityType,
-)
-from .context_engineering import (
-    ContextEngineering,
-    MemoryType,
-    MemoryScopeType,
-    RetrievalStrategyType,
-    PromptEngineeringTechniquesType,
-)
-from .ai_system_types import (
-    ParadigmType,
-    AgentRoleType,
-    ModalityType,
-    ExternalToolsType,
-    AgentCollaborationType,
-    OrganizationalStructureType,
-)
-from .validation import (
-    ValidationMethodType,
-    EvaluationAndOutcomes,
-    ReportedOutcomes,
-    StudyDesignType,
-    ComparatorType,
-    FailureAttributionType,
-)
-from .domain import DomainType
+from .annotation_helper import make_type_annotations
+
+# Tier 1: Bibliographic metadata
 from .bibliographic import BibliographicMetadata, VenueType
+
+# Tier 2: Descriptive fields
+from .study_characterization import StudyCharacterization, ResearchType, ValidationStatusType
 from .strategic_planning import (
     StrategicPlanningScope,
     SubdomainType,
@@ -72,40 +24,70 @@ from .strategic_planning import (
     PlanningHorizonTier,
     TheoreticalFrameworkType,
 )
+from .llm_intervention import (
+    LLMIntervention,
+    ModelFamilyType,
+    OpenWeightType,
+    FineTuningType,
+    ArchitecturalPatternType,
+    AgenticArchitectureType,
+    IntegrationType,
+)
 from .or_substrate import ORSubstrate, FormalizationLevel
+from .evaluation import (
+    EvaluationAndOutcomes,
+    ReportedMetric,
+    ComparatorType,
+    StudyDesignType,
+)
+
+# Tier 3: Interpretive fields
 from .gap_indicators import (
     GapIndicators,
     HITLType,
     DomainKnowledgeType,
     EvaluationFrameworkType,
 )
-from .quality_appraisal import (
-    QualityAppraisal,
-    StudyTypeCategory,
-    QAScore,
-    VenueTier,
-    ExtractionProvenance,
-)
-from .retrieval_traceability import RetrievalTraceability, SourceDatabase
+from .quality_appraisal import QualityAppraisal
 
+# Metadata (§7, §8)
+from .provenance import ExtractionMetaData, ProvenanceTag, VerificationStatus
+
+# Top-level record
+from .study_extraction import StudyExtraction
 
 __all__ = [
-    # Top-level extraction model (OSF prereg aligned)
+    # Top-level extraction model
     "StudyExtraction",
-    "StudyCharacterization",
-    "LLMIntervention",
     # Bibliographic
     "BibliographicMetadata",
     "VenueType",
+    # Study characterization
+    "StudyCharacterization",
+    "ResearchType",
+    "ValidationStatusType",
     # Strategic planning
     "StrategicPlanningScope",
     "SubdomainType",
     "PlanningTaskType",
     "PlanningHorizonTier",
     "TheoreticalFrameworkType",
+    # LLM intervention
+    "LLMIntervention",
+    "ModelFamilyType",
+    "OpenWeightType",
+    "FineTuningType",
+    "ArchitecturalPatternType",
+    "AgenticArchitectureType",
+    "IntegrationType",
     # OR substrate
     "ORSubstrate",
     "FormalizationLevel",
+    # Evaluation
+    "EvaluationAndOutcomes",
+    "ReportedMetric",
+    "ComparatorType",
+    "StudyDesignType",
     # Gap indicators
     "GapIndicators",
     "HITLType",
@@ -113,64 +95,11 @@ __all__ = [
     "EvaluationFrameworkType",
     # Quality appraisal
     "QualityAppraisal",
-    "StudyTypeCategory",
-    "QAScore",
-    "VenueTier",
-    "ExtractionProvenance",
-    # Retrieval traceability
-    "RetrievalTraceability",
-    "SourceDatabase",
-    # AI system (legacy + extended)
-    "AISystem",
-    "SystemArchitecture",
-    "AIAgent",
-    "GenAIModel",
-    "ToolUse",
-    "TriggerType",
-    "FinetuningDatasetType",
-    "FinetuningMethodType",
-    "ModelFamilyType",
-    "OpenWeightType",
-    "ArchitecturalPatternType",
-    "AgenticArchitectureType",
-    "IntegrationType",
-    "ResearchType",
-    "ValidationStatusType",
-    "MultiAgentCoordinationStrategy",
-    "Orchestration",
-    "HumanIntegration",
-    "HumanOversightType",
-    "OrchestrationPatternType",
-    "CPSIntegrationType",
-    "ResearchMaturityType",
-    "ResearchMethodologyType",
-    "EvaluationMetricType",
-    "IndustryParadigmType",
-    "ScalabilityAssessmentType",
-    "FeedbackAndLearningType",
-    "InteractionModalityType",
-    # Context Engineering
-    "ContextEngineering",
-    "MemoryType",
-    "MemoryScopeType",
-    "RetrievalStrategyType",
-    "PromptEngineeringTechniquesType",
-    # Types
-    "ParadigmType",
-    "AgentRoleType",
-    "ModalityType",
-    "ExternalToolsType",
-    "AgentCollaborationType",
-    "OrganizationalStructureType",
-    # Validation
-    "ValidationMethodType",
-    "EvaluationAndOutcomes",
-    "ReportedOutcomes",
-    "StudyDesignType",
-    "ComparatorType",
-    "FailureAttributionType",
-    # Domain
-    "DomainType",
+    # Provenance
+    "ExtractionMetaData",
+    "ProvenanceTag",
+    "VerificationStatus",
     # Base
     "DescriptiveEnum",
+    "make_type_annotations",
 ]

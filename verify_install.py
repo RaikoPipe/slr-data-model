@@ -13,6 +13,7 @@ Or in development mode:
 
 import sys
 
+
 def main():
     print("=" * 60)
     print("SLR Data Model - Installation Verification")
@@ -32,70 +33,75 @@ def main():
     print("\n2. Testing main class imports...")
     try:
         from slr_data_model import (
-            AISystem,
-            AIAgent,
-            GenAIModel,
-            AgentArchitecture,
-            AutonomyLevel,
-            ParadigmType,
-            ModalityType,
-            Memory,
-            MemoryType,
-            ValidationMethod,
-            DomainType,
+            StudyExtraction,
+            BibliographicMetadata,
+            VenueType,
+            StudyCharacterization,
+            ResearchType,
+            ValidationStatusType,
+            StrategicPlanningScope,
+            SubdomainType,
+            PlanningTaskType,
+            PlanningHorizonTier,
+            TheoreticalFrameworkType,
+            LLMIntervention,
+            ModelFamilyType,
+            OpenWeightType,
+            FineTuningType,
+            ArchitecturalPatternType,
+            AgenticArchitectureType,
+            IntegrationType,
+            ORSubstrate,
+            FormalizationLevel,
+            EvaluationAndOutcomes,
+            ReportedMetric,
+            ComparatorType,
+            StudyDesignType,
+            GapIndicators,
+            HITLType,
+            DomainKnowledgeType,
+            EvaluationFrameworkType,
+            QualityAppraisal,
+            ExtractionMetaData,
+            ProvenanceTag,
+            VerificationStatus,
+            DescriptiveEnum,
         )
         print("   ✓ All main classes imported successfully")
-        classes = [
-            'AISystem', 'AIAgent', 'GenAIModel', 'AgentArchitecture',
-            'AutonomyLevel', 'ParadigmType', 'ModalityType',
-            'Memory', 'MemoryType', 'ValidationMethod', 'DomainType'
-        ]
-        print(f"   Classes available: {', '.join(classes)}")
     except ImportError as e:
         print(f"   ✗ Failed to import classes: {e}")
-        print("\n   Note: Make sure pydantic is installed:")
-        print("   pip install pydantic>=2.0.0")
         return False
 
-    # Test 3: Check package metadata
-    print("\n3. Checking package metadata...")
+    # Test 3: Schema generation
+    print("\n3. Testing JSON schema generation...")
     try:
-        import importlib.metadata
-        metadata = importlib.metadata.metadata('slr-data-model')
-        print(f"   ✓ Package name: {metadata['Name']}")
-        print(f"   ✓ Version: {metadata['Version']}")
-        print(f"   ✓ Summary: {metadata['Summary']}")
-    except Exception as e:
-        print(f"   ⚠ Could not read metadata: {e}")
-
-    # Test 4: Verify module structure
-    print("\n4. Verifying module structure...")
-    try:
-        expected_modules = [
-            'slr_data_model.ai_system',
-            'slr_data_model.ai_system_types',
-            'slr_data_model.memory',
-            'slr_data_model.validation',
-            'slr_data_model.domain',
-            'slr_data_model.descriptive_enum',
+        schema = StudyExtraction.model_json_schema()
+        required = [
+            "study_id",
+            "bibliographic_metadata",
+            "study_characterization",
+            "strategic_planning_scope",
+            "llm_intervention",
+            "or_substrate",
+            "evaluation_and_outcomes",
+            "gap_indicators",
+            "quality_appraisal",
+            "extraction_metadata",
         ]
-        for module in expected_modules:
-            __import__(module)
-        print(f"   ✓ All {len(expected_modules)} submodules found")
-    except ImportError as e:
-        print(f"   ✗ Module structure incomplete: {e}")
+        missing = [k for k in required if k not in schema.get("properties", {})]
+        if missing:
+            print(f"   ✗ Schema missing properties: {missing}")
+            return False
+        print("   ✓ JSON schema generated with all field groups")
+    except Exception as e:
+        print(f"   ✗ Schema generation failed: {e}")
         return False
 
     print("\n" + "=" * 60)
-    print("✅ ALL CHECKS PASSED!")
+    print("✅ Installation verified successfully!")
     print("=" * 60)
-    print("\nThe package is properly installed and ready to use.")
-    print("\nExample usage:")
-    print("  from slr_data_model import AISystem, ParadigmType")
-    print("  # ... create your AI system models ...")
-    print("\nFor more examples, see: README.md")
     return True
 
+
 if __name__ == "__main__":
-    success = main()
-    sys.exit(0 if success else 1)
+    sys.exit(0 if main() else 1)

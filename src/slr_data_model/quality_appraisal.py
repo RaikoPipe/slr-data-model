@@ -1,60 +1,53 @@
-from pydantic import BaseModel, Field
-from .descriptive_enum import DescriptiveEnum
+from typing import Annotated
+
+from pydantic import BaseModel, Field, model_validator
+
 from .annotation_helper import make_type_annotations
 
 
-class StudyTypeCategory(DescriptiveEnum):
-    """Study-type categories for conditional quality appraisal."""
-    A = "A", "Empirical: primary data collection with a defined evaluation protocol"
-    B = "B", "Prototype/Design Science: implemented system demonstrated on illustrative cases without controlled evaluation"
-    C = "C", "Conceptual/Framework only: architectures, taxonomies, or frameworks without implementation or empirical evaluation"
-
-
-class QAScore(DescriptiveEnum):
-    """Quality appraisal item score."""
-    YES = "Yes", "Criterion fully met"
-    PARTIALLY = "Partially", "Criterion partially met"
-    NO = "No", "Criterion not met"
-
-
-class VenueTier(DescriptiveEnum):
-    """Venue quality tier for quality appraisal."""
-    Q1_Q2_JOURNAL = "Q1-Q2-journal", "Scimago or JCR Q1-Q2 journal at time of publication"
-    Q3_Q4_CONFERENCE = "Q3-Q4-conference", "Q3-Q4 journal or peer-reviewed conference proceedings"
-    PREPRINT = "preprint", "Tier 1 preprint with institutional affiliation, no peer review"
-
-
-class ExtractionProvenance(DescriptiveEnum):
-    """Provenance tag for extracted fields."""
-    HUMAN = "H", "Human extracted"
-    LLM_VERIFIED = "L-V", "LLM extracted, human verified"
-    LLM_CORRECTED = "L-C", "LLM extracted, human corrected"
-    DUAL = "D", "Dual-reviewer extraction"
+QADimensionScore = Annotated[int, Field(ge=1, le=3)]
 
 
 class QualityAppraisal(BaseModel):
-    """Quality appraisal per the OSF prereg 4-item checklist."""
-    study_type_category: StudyTypeCategory = Field(
-        description="Study-type category determining conditional Q2 interpretation." + make_type_annotations(StudyTypeCategory)
+    """Three-dimension quality appraisal rubric per §3.9.
+
+    Each dimension scored 1-3 independently before summing. Composite range: 3-9.
+    Sources scoring <= 4 are dual-verified by R2.
+    """
+    methodological_transparency: QADimensionScore = Field(
+        description="Methodological transparency: 1 = method description insufficient to replicate; "
+                    "2 = key steps described but gaps remain; 3 = fully replicable."
     )
-    q1_methodological_transparency: QAScore = Field(
-        description="Q1: Is the method described with sufficient detail for independent replication?" + make_type_annotations(QAScore)
+    methodological_transparency_rationale: str = Field(
+        description="Free-text justification for the methodological transparency score, citing the source."
     )
-    q2_empirical_grounding: QAScore = Field(
-        description="Q2: Empirical or demonstration grounding. Interpreted conditionally by study type: "
-                    "A: metrics defined and results reported with context; "
-                    "B: artifact demonstrated on a case exercising core claims; "
-                    "C: argumentation internally consistent and traceable." + make_type_annotations(QAScore)
+    empirical_grounding: QADimensionScore = Field(
+        description="Empirical grounding: 1 = conceptual or framework-only; "
+                    "2 = prototype or limited evaluation; 3 = implemented + quantitative evaluation."
     )
-    q3_validity_limitation: QAScore = Field(
-        description="Q3: Are boundaries of the contribution explicitly discussed (failure modes, scalability, external validity, domain assumptions)?" + make_type_annotations(QAScore)
+    empirical_grounding_rationale: str = Field(
+        description="Free-text justification for the empirical grounding score, citing the source."
     )
-    q4_positioning: QAScore = Field(
-        description="Q4: Is the contribution compared against existing solutions with explicit differentiation?" + make_type_annotations(QAScore)
+    venue_tier_dimension: QADimensionScore = Field(
+        description="Venue tier dimension: 1 = preprint; 2 = Q3-Q4 journal or conference; 3 = Q1-Q2 journal."
     )
-    venue_tier: VenueTier = Field(
-        description="Venue quality tier." + make_type_annotations(VenueTier)
+    venue_tier_rationale: str = Field(
+        description="Free-text justification for the venue tier score (venue name and Scimago quartile)."
     )
-    extraction_provenance: ExtractionProvenance = Field(
-        description="Provenance of the extraction." + make_type_annotations(ExtractionProvenance)
+    composite_score: int = Field(
+        default=0,
+        description="Sum of the three dimension scores. Range 3-9. Auto-computed, do not supply.",
+        exclude=True,
     )
+
+    @model_validator(mode="after")
+    def compute_composite(self):
+        """Composite score must equal the sum of the three independently scored dimensions."""
+        computed = self.methodological_transparency + self.empirical_grounding + self.venue_tier_dimension
+        object.__setattr__(self, "composite_score", computed)
+        return self
+
+    @property
+    def needs_dual_verification(self) -> bool:
+        """Sources scoring <= 4 are dual-verified by R2 per §3.9."""
+        return self.composite_score <= 4
