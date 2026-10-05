@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from .annotation_helper import make_type_annotations
 from .descriptive_enum import DescriptiveEnum
@@ -39,10 +39,11 @@ class PlanningTaskType(DescriptiveEnum):
 
 
 class PlanningHorizonTier(DescriptiveEnum):
-    """Planning horizon classification per §3.3."""
-    STRATEGIC = "strategic", "Strategic planning horizon"
-    UPPER_TACTICAL = "upper-tactical", "Upper-tactical planning horizon"
-    AMBIGUOUS = "ambiguous", "Ambiguous or unspecified planning horizon"
+    """Planning horizon tiers addressed per §3.3 (multi-valued; NA is exclusive)."""
+    NA = "NA", "No planning horizon addressed"
+    STRATEGIC = "Strategic", "Strategic planning horizon (system configuration: what exists)"
+    TACTICAL = "Tactical", "Tactical planning horizon (mid-term allocation of existing resources)"
+    OPERATIONAL = "Operational", "Operational planning horizon (short-term scheduling and control)"
 
 
 class TheoreticalFrameworkType(DescriptiveEnum):
@@ -76,12 +77,14 @@ class StrategicPlanningScope(BaseModel):
     time_horizon_explicitly_stated: bool = Field(
         description="Whether the paper explicitly states a time horizon."
     )
-    planning_horizon_tier: PlanningHorizonTier = Field(
-        description="Classification of the planning horizon." + make_type_annotations(PlanningHorizonTier)
+    planning_horizon_tiers: list[PlanningHorizonTier] = Field(
+        min_length=1,
+        description="All planning horizon tiers the paper addresses, pick all applicable; 'NA' only if no tier is addressed."
+        + make_type_annotations(PlanningHorizonTier)
     )
     planning_horizon_rationale: Optional[str] = Field(
         default=None,
-        description="Free-text reasoning for the horizon classification; quote the paper's horizon statement. Required context when 'ambiguous'."
+        description="Free-text reasoning for the tier classification; quote the paper's horizon statement(s) per tier."
     )
     system_configuring_decision_stated: bool = Field(
         description="Whether the paper explicitly frames the decision as system-configuring (determining what exists, not how existing resources are used)."
@@ -93,7 +96,30 @@ class StrategicPlanningScope(BaseModel):
     theoretical_framework_cited: list[TheoreticalFrameworkType] = Field(
         description="Theoretical framework(s) cited for strategic planning scope." + make_type_annotations(TheoreticalFrameworkType)
     )
+    theoretical_framework_rationale: Optional[str] = Field(
+        default=None,
+        description="Free-text reasoning why no theoretical framework applies. Required if 'none' was selected, otherwise null."
+    )
     other_theoretical_framework_specification: Optional[str] = Field(
         default=None,
-        description="Free-text specification of the framework if 'other' was selected."
+        description="Free-text name and citation of the specific framework(s) utilized, not restricted to a controlled vocabulary. Required if 'other' was selected, otherwise null."
     )
+
+    @model_validator(mode="after")
+    def validate_conditional_fields(self):
+        """Exclusive NA/none values and conditionally required free-text fields."""
+        if len(self.planning_horizon_tiers) > 1 and PlanningHorizonTier.NA in self.planning_horizon_tiers:
+            raise ValueError("planning_horizon_tiers: 'NA' cannot be combined with other values")
+        frameworks = self.theoretical_framework_cited
+        if len(frameworks) > 1 and TheoreticalFrameworkType.NONE in frameworks:
+            raise ValueError("theoretical_framework_cited: 'none' cannot be combined with other values")
+        for value, field_name in (
+            (TheoreticalFrameworkType.NONE, "theoretical_framework_rationale"),
+            (TheoreticalFrameworkType.OTHER, "other_theoretical_framework_specification"),
+        ):
+            filled = bool((getattr(self, field_name) or "").strip())
+            if value in frameworks and not filled:
+                raise ValueError(f"{field_name} is required when '{value.value}' is selected")
+            if value not in frameworks and filled:
+                raise ValueError(f"{field_name} must be null unless '{value.value}' is selected")
+        return self

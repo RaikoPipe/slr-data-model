@@ -95,7 +95,7 @@ record = StudyExtraction(
         subdomain=[SubdomainType.FACTORY_PLANNING],
         planning_task_type=[PlanningTaskType.FACTORY_LAYOUT_PLANNING],
         time_horizon_explicitly_stated=True,
-        planning_horizon_tier=PlanningHorizonTier.STRATEGIC,
+        planning_horizon_tiers=[PlanningHorizonTier.STRATEGIC],
         system_configuring_decision_stated=True,
         theoretical_framework_cited=[TheoreticalFrameworkType.VDI_5200],
     ),

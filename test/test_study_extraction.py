@@ -76,7 +76,7 @@ def make_strategic_scope(**overrides):
         subdomain_mapping_rationale="Task mapped per Appendix A decision tree.",
         planning_task_type=[PlanningTaskType.FACTORY_LAYOUT_PLANNING, PlanningTaskType.CAPACITY_DIMENSIONING],
         time_horizon_explicitly_stated=True,
-        planning_horizon_tier=PlanningHorizonTier.STRATEGIC,
+        planning_horizon_tiers=[PlanningHorizonTier.STRATEGIC],
         planning_horizon_rationale="Paper states a 5-year planning horizon.",
         system_configuring_decision_stated=True,
         system_configuring_decision_description="Determines workshop layout and machine capacities.",
@@ -180,10 +180,10 @@ def make_study_extraction(**overrides):
                 "quality_appraisal.composite_score": ProvenanceTag.DUAL,
             },
             verification={
-                "strategic_planning_scope.planning_horizon_tier": VerificationStatus.VERIFIED,
+                "strategic_planning_scope.planning_horizon_tiers": VerificationStatus.VERIFIED,
             },
             llm_raw={
-                "strategic_planning_scope.planning_horizon_tier": "tactical",
+                "strategic_planning_scope.planning_horizon_tiers": "Tactical",
             },
             notes={
                 "strategic_planning_scope.subdomain": "Spans tactical and strategic tasks; strategic task explicitly addressed (§6).",
@@ -199,7 +199,7 @@ class TestStudyExtraction:
         record = make_study_extraction()
         assert record.study_id == "S001"
         assert record.bibliographic_metadata.venue_type == VenueType.JOURNAL_Q1
-        assert record.strategic_planning_scope.planning_horizon_tier == PlanningHorizonTier.STRATEGIC
+        assert record.strategic_planning_scope.planning_horizon_tiers == [PlanningHorizonTier.STRATEGIC]
         assert record.llm_intervention.models == ["GPT-4o"]
         assert record.or_substrate.solver_type == "Gurobi"
         assert record.evaluation_and_outcomes.reported_metrics[0].page_section_reference == "p. 8, Table 3"
@@ -314,6 +314,39 @@ class TestStudyExtraction:
             other_planning_task_specification="Generation of investment decision memos",
         )
         assert scope.other_planning_task_specification == "Generation of investment decision memos"
+
+    def test_strategic_scope_horizon_tiers(self):
+        scope = make_strategic_scope(
+            planning_horizon_tiers=[PlanningHorizonTier.STRATEGIC, PlanningHorizonTier.TACTICAL]
+        )
+        assert scope.planning_horizon_tiers == [PlanningHorizonTier.STRATEGIC, PlanningHorizonTier.TACTICAL]
+        with pytest.raises(ValidationError, match="'NA' cannot be combined"):
+            make_strategic_scope(planning_horizon_tiers=[PlanningHorizonTier.NA, PlanningHorizonTier.STRATEGIC])
+        with pytest.raises(ValidationError):
+            make_strategic_scope(planning_horizon_tiers=[])
+
+    def test_strategic_scope_framework_conditional_fields(self):
+        none = TheoreticalFrameworkType.NONE
+        other = TheoreticalFrameworkType.OTHER
+        assert make_strategic_scope(
+            theoretical_framework_cited=[none],
+            theoretical_framework_rationale="No planning framework referenced.",
+        ).theoretical_framework_rationale
+        assert make_strategic_scope(
+            theoretical_framework_cited=[other],
+            other_theoretical_framework_specification="Resource-Based View (Barney 1991)",
+        ).other_theoretical_framework_specification
+        with pytest.raises(ValidationError, match="theoretical_framework_rationale is required"):
+            make_strategic_scope(theoretical_framework_cited=[none])
+        with pytest.raises(ValidationError, match="other_theoretical_framework_specification is required"):
+            make_strategic_scope(theoretical_framework_cited=[other])
+        with pytest.raises(ValidationError, match="must be null"):
+            make_strategic_scope(theoretical_framework_rationale="stray")
+        with pytest.raises(ValidationError, match="'none' cannot be combined"):
+            make_strategic_scope(
+                theoretical_framework_cited=[none, TheoreticalFrameworkType.VDI_5200],
+                theoretical_framework_rationale="x",
+            )
 
     def test_bibliographic_defaults_optional_fields(self):
         bib = make_bibliographic(funding_description=None)
