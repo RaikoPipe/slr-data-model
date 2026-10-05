@@ -23,7 +23,7 @@ class ExtractionMetaData(BaseModel):
     """Provenance and verification metadata (§7, §8).
 
     All maps are keyed by field path relative to the study record
-    (e.g., 'strategic_planning_scope.planning_horizon_tier').
+    (e.g., 'strategic_planning_scope.planning_horizon_tiers').
     """
     provenance: dict[str, ProvenanceTag] = Field(
         default_factory=dict,
