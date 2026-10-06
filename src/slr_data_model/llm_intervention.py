@@ -69,21 +69,28 @@ class LLMIntervention(BaseModel):
         description="Free-text description of the role the LLM/agent system plays in the planning task: inputs, outputs, and decision support function as reported."
     )
     models: list[str] = Field(
-        description="Exact model name(s) + version as reported (e.g., 'GPT-4o', 'Llama 3.1 70B')."
+        description="Exact name(s) + version (e.g., 'GPT-4o', 'Llama 3.1 70B') of only those LLMs deployed and evaluated "
+        "with the paper's own method. Do not list models that are merely discussed, cited or used outside the method "
+        "(e.g., related work, external baselines); record those in models_rationale."
+    )
+    models_rationale: Optional[str] = Field(
+        default=None,
+        description="Free-text reasoning for the models selection; list other LLMs discussed in the paper but not "
+        "deployed and evaluated with the paper's method, and in what role they appear (e.g., related work, baseline)."
     )
     model_usage_context: Optional[str] = Field(
         default=None,
         description="Free-text elaboration of which model is used for what, when multiple models are reported."
     )
     model_family: list[ModelFamilyType] = Field(
-        description="Model family classification(s)." + make_type_annotations(ModelFamilyType)
+        description="Model family classification(s) of the models listed in 'models'." + make_type_annotations(ModelFamilyType)
     )
     other_model_family_specification: Optional[str] = Field(
         default=None,
         description="Free-text specification of the model family if 'other' was selected."
     )
     open_weight: OpenWeightType = Field(
-        description="Whether the model weights are openly available." + make_type_annotations(OpenWeightType)
+        description="Whether the weights of the models listed in 'models' are openly available." + make_type_annotations(OpenWeightType)
     )
     open_weight_rationale: Optional[str] = Field(
         default=None,
