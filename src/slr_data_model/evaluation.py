@@ -1,8 +1,8 @@
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
-from .annotation_helper import make_type_annotations
+from .annotation_helper import make_type_annotations, reasoning_field
 from .descriptive_enum import DescriptiveEnum
 
 
@@ -48,27 +48,43 @@ class EvaluationAndOutcomes(BaseModel):
     validation_method: list[str] = Field(
         description="Validation method(s) as reported (e.g., benchmark comparison, user study, ablation). NR if absent."
     )
+    validation_method_reasoning: str = reasoning_field()
     dataset_or_benchmark: Optional[str] = Field(
         default=None,
         description="Dataset or benchmark name and size as reported. NR if absent."
     )
+    dataset_or_benchmark_reasoning: str = reasoning_field()
     comparator: list[ComparatorType] = Field(
         description="Type(s) of comparator used." + make_type_annotations(ComparatorType)
     )
+    comparator_reasoning: str = reasoning_field()
     reported_metrics: list[ReportedMetric] = Field(
-        description="All quantitative metric values with units, context, and page reference. Empty list only if truly absent (use NR note in extraction_metadata)."
+        description="All quantitative metric values with units, context, and page reference. Empty list only if truly absent (explain in reported_metrics_reasoning)."
+    )
+    reported_metrics_reasoning: str = reasoning_field(
+        description="Reasoning for reported_metrics; state NR with the search performed if no quantitative values are reported. "
     )
     study_design: StudyDesignType = Field(
         description="Study design classification." + make_type_annotations(StudyDesignType)
     )
+    study_design_reasoning: str = reasoning_field()
     sample_size: Optional[str] = Field(
         default=None,
         description="Number of test cases, users, or records as reported. NR if absent."
     )
+    sample_size_reasoning: str = reasoning_field()
     reported_limitations: list[str] = Field(
         description="1-3 sentence paraphrase of author-stated limitations. NR if absent."
     )
+    reported_limitations_reasoning: str = reasoning_field()
     outcome_summary: Optional[str] = Field(
         default=None,
         description="Free-text narrative summary of the main results beyond isolated metrics, as reported."
     )
+
+    @model_validator(mode="after")
+    def validate_exclusive_none(self):
+        """'none' is mutually exclusive with other comparator values."""
+        if len(self.comparator) > 1 and ComparatorType.NONE in self.comparator:
+            raise ValueError("comparator: 'none' cannot be combined with other values")
+        return self

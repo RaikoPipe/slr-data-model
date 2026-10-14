@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, model_validator
 
-from .annotation_helper import make_type_annotations
+from .annotation_helper import make_type_annotations, reasoning_field
 from .descriptive_enum import DescriptiveEnum
 
 
@@ -31,13 +31,17 @@ class EvaluationFrameworkType(DescriptiveEnum):
 
 
 class GapIndicators(BaseModel):
-    """Gap indicator fields."""
+    """Gap indicator fields (LLM; interpretive; R1 + R2 verify 100%)."""
     hitl_pattern_present: bool = Field(
         description="Whether a human-in-the-loop pattern is present."
     )
+    hitl_pattern_present_reasoning: str = reasoning_field(interpretive=True)
     hitl_type: Optional[HITLType] = Field(
         default=None,
         description="Type of HITL pattern, required if hitl_pattern_present is true." + make_type_annotations(HITLType)
+    )
+    hitl_type_reasoning: Optional[str] = reasoning_field(
+        interpretive=True, default=None, description="Required if hitl_type is set, otherwise null. "
     )
     hitl_description: Optional[str] = Field(
         default=None,
@@ -50,10 +54,14 @@ class GapIndicators(BaseModel):
     domain_knowledge_formalization_present: bool = Field(
         description="Whether domain knowledge formalization is present."
     )
+    domain_knowledge_formalization_present_reasoning: str = reasoning_field(interpretive=True)
     domain_knowledge_type: Optional[DomainKnowledgeType] = Field(
         default=None,
         description="Type of domain knowledge formalization, required if domain_knowledge_formalization_present is true."
         + make_type_annotations(DomainKnowledgeType)
+    )
+    domain_knowledge_type_reasoning: Optional[str] = reasoning_field(
+        interpretive=True, default=None, description="Required if domain_knowledge_type is set, otherwise null. "
     )
     domain_knowledge_description: Optional[str] = Field(
         default=None,
@@ -66,10 +74,14 @@ class GapIndicators(BaseModel):
     evaluation_framework_used: bool = Field(
         description="Whether an evaluation framework is used."
     )
+    evaluation_framework_used_reasoning: str = reasoning_field(interpretive=True)
     evaluation_framework_type: Optional[EvaluationFrameworkType] = Field(
         default=None,
         description="Type of evaluation framework, required if evaluation_framework_used is true."
         + make_type_annotations(EvaluationFrameworkType)
+    )
+    evaluation_framework_type_reasoning: Optional[str] = reasoning_field(
+        interpretive=True, default=None, description="Required if evaluation_framework_type is set, otherwise null. "
     )
     evaluation_framework_description: Optional[str] = Field(
         default=None,
@@ -82,17 +94,16 @@ class GapIndicators(BaseModel):
 
     @model_validator(mode="after")
     def validate_conditional_types(self):
-        """Type fields are required iff the corresponding *_present flag is true."""
-        if self.hitl_pattern_present and self.hitl_type is None:
-            raise ValueError("hitl_type is required when hitl_pattern_present is true")
-        if not self.hitl_pattern_present and self.hitl_type is not None:
-            raise ValueError("hitl_type must be null when hitl_pattern_present is false")
-        if self.domain_knowledge_formalization_present and self.domain_knowledge_type is None:
-            raise ValueError("domain_knowledge_type is required when domain_knowledge_formalization_present is true")
-        if not self.domain_knowledge_formalization_present and self.domain_knowledge_type is not None:
-            raise ValueError("domain_knowledge_type must be null when domain_knowledge_formalization_present is false")
-        if self.evaluation_framework_used and self.evaluation_framework_type is None:
-            raise ValueError("evaluation_framework_type is required when evaluation_framework_used is true")
-        if not self.evaluation_framework_used and self.evaluation_framework_type is not None:
-            raise ValueError("evaluation_framework_type must be null when evaluation_framework_used is false")
+        """Type fields and their reasoning are required iff the corresponding flag is true."""
+        for flag, type_field in (
+            ("hitl_pattern_present", "hitl_type"),
+            ("domain_knowledge_formalization_present", "domain_knowledge_type"),
+            ("evaluation_framework_used", "evaluation_framework_type"),
+        ):
+            for field_name in (type_field, f"{type_field}_reasoning"):
+                set_ = getattr(self, field_name) is not None
+                if getattr(self, flag) and not set_:
+                    raise ValueError(f"{field_name} is required when {flag} is true")
+                if not getattr(self, flag) and set_:
+                    raise ValueError(f"{field_name} must be null when {flag} is false")
         return self
