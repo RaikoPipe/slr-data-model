@@ -7,18 +7,18 @@ from .descriptive_enum import DescriptiveEnum
 
 
 class VenueType(DescriptiveEnum):
-    """Publication venue classification per §3.1 (Scimago quartiles at time of publication)."""
-    JOURNAL_Q1 = "journal-q1", "Scimago Q1 journal at time of publication"
-    JOURNAL_Q2 = "journal-q2", "Scimago Q2 journal at time of publication"
-    JOURNAL_Q3 = "journal-q3", "Scimago Q3 journal at time of publication"
-    JOURNAL_Q4 = "journal-q4", "Scimago Q4 journal at time of publication"
+    """Publication venue classification per §3.1 (Scimago quartile, current-year lookup)."""
+    JOURNAL_Q1 = "journal-q1", "Scimago Q1 journal (current-year lookup)"
+    JOURNAL_Q2 = "journal-q2", "Scimago Q2 journal (current-year lookup)"
+    JOURNAL_Q3 = "journal-q3", "Scimago Q3 journal (current-year lookup)"
+    JOURNAL_Q4 = "journal-q4", "Scimago Q4 journal (current-year lookup)"
     CONFERENCE_PROCEEDINGS = "conference-proceedings", "Peer-reviewed conference proceedings"
     TIER_1_PREPRINT = "tier-1-preprint", "Tier 1 preprint with confirmed institutional affiliation"
     GREY_LITERATURE = "grey-literature", "Grey literature source"
 
 
 class BibliographicMetadata(BaseModel):
-    """Bibliographic metadata extracted from the source header/footer (Metadata-extraction directly from corpus dataset)."""
+    """Bibliographic metadata (§3.1): imported from search-stage records, gaps filled by R1; not LLM-extracted, so no _reasoning columns."""
     doi: Optional[str] = Field(
         default=None,
         description="Digital Object Identifier as reported. NR if absent."

@@ -1,4 +1,4 @@
-"""Tests for the v3.0 extraction schema data model."""
+"""Tests for the v5.0 extraction schema data model."""
 import pytest
 from pydantic import ValidationError
 
@@ -32,10 +32,18 @@ from src.slr_data_model import (
     DomainKnowledgeType,
     EvaluationFrameworkType,
     QualityAppraisal,
+    AppraisalAnswer,
+    StudyTypeCategory,
+    RetrievalTraceability,
+    RetrievalSource,
     ExtractionMetaData,
     ProvenanceTag,
+    ReviewerRole,
     VerificationStatus,
+    FieldVerdict,
 )
+
+R = "p. 3, §2"  # placeholder reasoning + locator
 
 
 def make_bibliographic(**overrides):
@@ -65,6 +73,9 @@ def make_characterization(**overrides):
         industry_sector="automotive",
         case_study_domain="factory layout redesign",
         stated_research_questions="RQ1: How can LLMs support layout planning?",
+        industry_sector_reasoning=R,
+        case_study_domain_reasoning=R,
+        stated_research_questions_reasoning=R,
     )
     defaults.update(overrides)
     return StudyCharacterization(**defaults)
@@ -81,6 +92,10 @@ def make_strategic_scope(**overrides):
         system_configuring_decision_stated=True,
         system_configuring_decision_description="Determines workshop layout and machine capacities.",
         theoretical_framework_cited=[TheoreticalFrameworkType.VDI_5200],
+        planning_task_type_reasoning=R,
+        time_horizon_explicitly_stated_reasoning=R,
+        system_configuring_decision_stated_reasoning=R,
+        theoretical_framework_cited_reasoning=R,
     )
     defaults.update(overrides)
     return StrategicPlanningScope(**defaults)
@@ -96,6 +111,13 @@ def make_llm_intervention(**overrides):
         architectural_pattern=[ArchitecturalPatternType.LLM_SOLVER],
         agentic_architecture=AgenticArchitectureType.SINGLE_AGENT,
         integrations=[IntegrationType.SOLVER],
+        models_rationale="No other LLMs discussed.",
+        model_family_reasoning=R,
+        open_weight_rationale=R,
+        fine_tuning_reasoning=R,
+        architectural_pattern_reasoning=R,
+        agentic_architecture_reasoning=R,
+        integrations_reasoning=R,
     )
     defaults.update(overrides)
     return LLMIntervention(**defaults)
@@ -107,6 +129,9 @@ def make_or_substrate(**overrides):
         formalization_level=FormalizationLevel.MATURE_MILP,
         solver_type="Gurobi",
         optimization_description="MILP minimizing material flow distance over layout alternatives.",
+        optimization_tradition_present_reasoning=R,
+        formalization_level_reasoning=R,
+        solver_type_reasoning=R,
     )
     defaults.update(overrides)
     return ORSubstrate(**defaults)
@@ -130,6 +155,13 @@ def make_evaluation(**overrides):
         sample_size="12 test cases",
         reported_limitations=["Single LLM evaluated; results may not generalize to other models."],
         outcome_summary="LLM-assisted planning reduced time by 12-15% with equal layout quality.",
+        validation_method_reasoning=R,
+        dataset_or_benchmark_reasoning=R,
+        comparator_reasoning=R,
+        reported_metrics_reasoning=R,
+        study_design_reasoning=R,
+        sample_size_reasoning=R,
+        reported_limitations_reasoning=R,
     )
     defaults.update(overrides)
     return EvaluationAndOutcomes(**defaults)
@@ -145,6 +177,12 @@ def make_gap_indicators(**overrides):
         domain_knowledge_description="VDI 5200 phase model encoded as structured prompts.",
         evaluation_framework_used=True,
         evaluation_framework_type=EvaluationFrameworkType.BENCHMARK,
+        hitl_pattern_present_reasoning=R,
+        hitl_type_reasoning=R,
+        domain_knowledge_formalization_present_reasoning=R,
+        domain_knowledge_type_reasoning=R,
+        evaluation_framework_used_reasoning=R,
+        evaluation_framework_type_reasoning=R,
     )
     defaults.update(overrides)
     return GapIndicators(**defaults)
@@ -152,12 +190,14 @@ def make_gap_indicators(**overrides):
 
 def make_quality_appraisal(**overrides):
     defaults = dict(
-        methodological_transparency=3,
-        methodological_transparency_rationale="Prompts, model version, and evaluation protocol fully reported.",
-        empirical_grounding=3,
-        empirical_grounding_rationale="Implemented system with quantitative benchmark evaluation.",
-        venue_tier_dimension=3,
-        venue_tier_rationale="Q1 journal (Scimago 2024).",
+        q1_methodological_transparency=AppraisalAnswer.YES,
+        q1_methodological_transparency_reasoning="Prompts, model version, and evaluation protocol fully reported.",
+        q2_empirical_or_demonstration_grounding=AppraisalAnswer.YES,
+        q2_empirical_or_demonstration_grounding_reasoning="Metrics defined, comparator and sample size reported.",
+        q3_validity_and_limitation_discussion=AppraisalAnswer.PARTIALLY,
+        q3_validity_and_limitation_discussion_reasoning="Scalability discussed, external validity not.",
+        q4_positioning_against_prior_work=AppraisalAnswer.YES,
+        q4_positioning_against_prior_work_reasoning="Explicit comparison table vs. prior work.",
     )
     defaults.update(overrides)
     return QualityAppraisal(**defaults)
@@ -172,21 +212,19 @@ def make_study_extraction(**overrides):
         llm_intervention=make_llm_intervention(),
         or_substrate=make_or_substrate(),
         evaluation_and_outcomes=make_evaluation(),
+        retrieval_traceability=RetrievalTraceability(source=RetrievalSource.SCOPUS, source_reasoning="Scopus record ID 123."),
         gap_indicators=make_gap_indicators(),
         quality_appraisal=make_quality_appraisal(),
         extraction_metadata=ExtractionMetaData(
             provenance={
-                "bibliographic_metadata.title": ProvenanceTag.LLM_VERIFIED,
-                "quality_appraisal.composite_score": ProvenanceTag.DUAL,
+                "bibliographic_metadata.title": ProvenanceTag.METADATA,
+                "quality_appraisal.q1_methodological_transparency": ProvenanceTag.LLM_VERIFIED,
             },
             verification={
-                "strategic_planning_scope.planning_horizon_tiers": VerificationStatus.VERIFIED,
-            },
-            llm_raw={
-                "strategic_planning_scope.planning_horizon_tiers": "Tactical",
-            },
-            notes={
-                "strategic_planning_scope.subdomain": "Spans tactical and strategic tasks; strategic task explicitly addressed (§6).",
+                "quality_appraisal.q1_methodological_transparency": [
+                    FieldVerdict(reviewer=ReviewerRole.R1, status=VerificationStatus.VERIFIED),
+                    FieldVerdict(reviewer=ReviewerRole.R2, status=VerificationStatus.VERIFIED),
+                ],
             },
         ),
     )
@@ -211,25 +249,57 @@ class TestStudyExtraction:
         recreated = StudyExtraction.model_validate_json(json_str)
         assert recreated == record
 
-    def test_quality_appraisal_composite_computed(self):
-        qa = make_quality_appraisal()
-        assert qa.composite_score == 9
-        assert qa.needs_dual_verification is False
+    def test_quality_appraisal_low_quality_flag(self):
+        assert make_quality_appraisal().low_quality_flag is False
+        no = AppraisalAnswer.NO
+        assert make_quality_appraisal(q1_methodological_transparency=no).low_quality_flag is False
+        assert make_quality_appraisal(
+            q1_methodological_transparency=no, q4_positioning_against_prior_work=no
+        ).low_quality_flag is True
 
-    def test_quality_appraisal_bounds_enforced(self):
-        with pytest.raises(ValidationError):
-            make_quality_appraisal(methodological_transparency=0)
-        with pytest.raises(ValidationError):
-            make_quality_appraisal(venue_tier_dimension=4)
+    def test_study_type_category_derived_from_validation_status(self):
+        assert make_study_extraction().study_type_category == StudyTypeCategory.A
+        for status, category in (
+            (ValidationStatusType.PROTOTYPE, StudyTypeCategory.B),
+            (ValidationStatusType.FRAMEWORK_ONLY, StudyTypeCategory.C),
+            (ValidationStatusType.CONCEPTUAL, StudyTypeCategory.C),
+        ):
+            record = make_study_extraction(study_characterization=make_characterization(validation_status=status))
+            assert record.study_type_category == category
+        dumped = make_study_extraction().model_dump(mode="json")
+        assert dumped["study_type_category"] == "A"
+        assert dumped["quality_appraisal"]["low_quality_flag"] is False
 
-    def test_quality_appraisal_dual_verification_threshold(self):
-        qa = make_quality_appraisal(
-            methodological_transparency=1,
-            empirical_grounding=2,
-            venue_tier_dimension=1,
-        )
-        assert qa.composite_score == 4
-        assert qa.needs_dual_verification is True
+    def test_derived_fields_not_in_llm_schema(self):
+        schema = StudyExtraction.model_json_schema()
+        assert "study_type_category" not in schema["properties"]
+        assert "low_quality_flag" not in schema["$defs"]["QualityAppraisal"]["properties"]
+
+    def test_reasoning_fields_required(self):
+        with pytest.raises(ValidationError, match="industry_sector_reasoning"):
+            make_characterization(industry_sector_reasoning=None)
+        with pytest.raises(ValidationError, match="q2_empirical_or_demonstration_grounding_reasoning"):
+            make_quality_appraisal(q2_empirical_or_demonstration_grounding_reasoning=None)
+
+    def test_gap_indicators_type_reasoning_conditional(self):
+        with pytest.raises(ValidationError, match="hitl_type_reasoning is required"):
+            make_gap_indicators(hitl_type_reasoning=None)
+        with pytest.raises(ValidationError, match="hitl_type_reasoning must be null"):
+            make_gap_indicators(hitl_pattern_present=False, hitl_type=None)
+
+    def test_retrieval_traceability_anchor_papers(self):
+        snowball = RetrievalSource.SNOWBALLING
+        assert RetrievalTraceability(
+            source=snowball, source_reasoning=R, anchor_papers=["10.1000/anchor"]
+        ).anchor_papers == ["10.1000/anchor"]
+        with pytest.raises(ValidationError, match="anchor_papers is required"):
+            RetrievalTraceability(source=snowball, source_reasoning=R)
+        with pytest.raises(ValidationError, match="anchor_papers must be empty"):
+            RetrievalTraceability(source=RetrievalSource.WOS, source_reasoning=R, anchor_papers=["x"])
+
+    def test_comparator_none_exclusive(self):
+        with pytest.raises(ValidationError, match="'none' cannot be combined"):
+            make_evaluation(comparator=[ComparatorType.NONE, ComparatorType.HUMAN_PLANNER])
 
     def test_gap_indicators_type_required_when_present(self):
         with pytest.raises(ValidationError, match="hitl_type is required"):
@@ -237,7 +307,7 @@ class TestStudyExtraction:
 
     def test_gap_indicators_type_forbidden_when_absent(self):
         with pytest.raises(ValidationError, match="must be null"):
-            make_gap_indicators(hitl_pattern_present=False, hitl_type=HITLType.APPROVAL_GATE)
+            make_gap_indicators(hitl_pattern_present=False, hitl_type_reasoning=None)
 
     def test_gap_indicators_domain_knowledge_conditional(self):
         with pytest.raises(ValidationError, match="domain_knowledge_type is required"):
@@ -245,6 +315,7 @@ class TestStudyExtraction:
         assert make_gap_indicators(
             domain_knowledge_formalization_present=False,
             domain_knowledge_type=None,
+            domain_knowledge_type_reasoning=None,
         ).domain_knowledge_type is None
 
     def test_integrations_none_exclusive(self):
@@ -295,18 +366,32 @@ class TestStudyExtraction:
         assert "bibliographic_metadata" in props
         assert "gap_indicators" in props
         assert "extraction_metadata" in props
-        # retrieval traceability omitted
-        assert "retrieval_traceability" not in props
+        assert "retrieval_traceability" in props
 
     def test_extraction_metadata_maps(self):
+        field = "evaluation_and_outcomes.sample_size"
         meta = ExtractionMetaData(
-            provenance={"evaluation_and_outcomes.sample_size": ProvenanceTag.LLM_CORRECTED},
-            verification={"evaluation_and_outcomes.sample_size": VerificationStatus.CORRECTED},
-            llm_raw={"evaluation_and_outcomes.sample_size": "N=10"},
-            notes={"evaluation_and_outcomes.sample_size": "Paper reports 12 cases; LLM said 10."},
+            provenance={field: ProvenanceTag.LLM_CORRECTED},
+            verification={field: [FieldVerdict(
+                reviewer=ReviewerRole.R1,
+                status=VerificationStatus.CORRECTED,
+                corrected_value="12 test cases",
+                reasoning="Paper reports 12 cases (p. 8); LLM said 10.",
+            )]},
+            llm_raw={field: "N=10"},
         )
-        assert meta.provenance["evaluation_and_outcomes.sample_size"] == ProvenanceTag.LLM_CORRECTED
-        assert meta.llm_raw["evaluation_and_outcomes.sample_size"] == "N=10"
+        assert meta.provenance[field] == ProvenanceTag.LLM_CORRECTED
+        assert meta.llm_raw[field] == "N=10"
+        assert meta.verified_by == {field: "R1"}
+        assert make_study_extraction().extraction_metadata.verified_by == {
+            "quality_appraisal.q1_methodological_transparency": "R1;R2"
+        }
+
+    def test_field_verdict_corrected_value_conditional(self):
+        with pytest.raises(ValidationError, match="corrected_value is required"):
+            FieldVerdict(reviewer=ReviewerRole.R2, status=VerificationStatus.CORRECTED)
+        with pytest.raises(ValidationError, match="corrected_value must be null"):
+            FieldVerdict(reviewer=ReviewerRole.R2, status=VerificationStatus.VERIFIED, corrected_value="x")
 
     def test_strategic_scope_other_task_specification(self):
         scope = make_strategic_scope(

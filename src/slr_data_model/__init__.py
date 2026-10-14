@@ -1,16 +1,16 @@
 """
-SLR Data Model — v3.0 Extraction Schema
+SLR Data Model — v5.0 Extraction Schema
 
 Pydantic models for LLM-based decision support for the strategic planning
-horizon in manufacturing and logistics (SLR extraction schema, v3.0).
+horizon in manufacturing and logistics (SLR extraction schema, v5.0).
 
 Tiers:
-- Bibliographic metadata (LLM-extracted, R1 spot-checks 10%)
+- Bibliographic metadata (imported from search-stage records, R1 spot-checks 10%)
 - Descriptive fields (LLM pre-fill, R1 verifies 100%)
-- Interpretive fields (R1 manual, dual-verified by R2)
+- Interpretive fields (LLM-extracted, R1 + R2 each verify 100%, blind)
 """
 from .descriptive_enum import DescriptiveEnum
-from .annotation_helper import make_type_annotations
+from .annotation_helper import make_type_annotations, reasoning_field
 
 # Tier 1: Bibliographic metadata
 from .bibliographic import BibliographicMetadata, VenueType
@@ -40,6 +40,7 @@ from .evaluation import (
     ComparatorType,
     StudyDesignType,
 )
+from .retrieval import RetrievalTraceability, RetrievalSource
 
 # Tier 3: Interpretive fields
 from .gap_indicators import (
@@ -48,10 +49,15 @@ from .gap_indicators import (
     DomainKnowledgeType,
     EvaluationFrameworkType,
 )
-from .quality_appraisal import QualityAppraisal
+from .quality_appraisal import (
+    QualityAppraisal,
+    AppraisalAnswer,
+    StudyTypeCategory,
+    CATEGORY_BY_VALIDATION_STATUS,
+)
 
 # Metadata (§7, §8)
-from .provenance import ExtractionMetaData, ProvenanceTag, VerificationStatus
+from .provenance import ExtractionMetaData, ProvenanceTag, ReviewerRole, VerificationStatus, FieldVerdict
 
 # Top-level record
 from .study_extraction import StudyExtraction
@@ -88,6 +94,9 @@ __all__ = [
     "ReportedMetric",
     "ComparatorType",
     "StudyDesignType",
+    # Retrieval traceability
+    "RetrievalTraceability",
+    "RetrievalSource",
     # Gap indicators
     "GapIndicators",
     "HITLType",
@@ -95,11 +104,17 @@ __all__ = [
     "EvaluationFrameworkType",
     # Quality appraisal
     "QualityAppraisal",
+    "AppraisalAnswer",
+    "StudyTypeCategory",
+    "CATEGORY_BY_VALIDATION_STATUS",
     # Provenance
     "ExtractionMetaData",
     "ProvenanceTag",
+    "ReviewerRole",
     "VerificationStatus",
+    "FieldVerdict",
     # Base
     "DescriptiveEnum",
     "make_type_annotations",
+    "reasoning_field",
 ]

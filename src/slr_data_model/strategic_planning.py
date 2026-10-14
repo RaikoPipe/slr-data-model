@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, model_validator
 
-from .annotation_helper import make_type_annotations
+from .annotation_helper import make_type_annotations, reasoning_field
 from .descriptive_enum import DescriptiveEnum
 
 
@@ -63,9 +63,8 @@ class StrategicPlanningScope(BaseModel):
         description="Strategic planning subdomain(s) addressed. If not stated explicitly, map by task description using Appendix A."
         + make_type_annotations(SubdomainType)
     )
-    subdomain_mapping_rationale: Optional[str] = Field(
-        default=None,
-        description="Free-text explanation of how tasks were mapped to subdomain(s) per Appendix A; document tactical/strategic boundary cases (§6)."
+    subdomain_mapping_rationale: str = reasoning_field(
+        description="Reasoning for subdomain: how tasks were mapped per Appendix A; document tactical/strategic boundary cases (§6). "
     )
     planning_task_type: list[PlanningTaskType] = Field(
         description="Specific planning task(s) addressed, pick all applicable." + make_type_annotations(PlanningTaskType)
@@ -74,21 +73,23 @@ class StrategicPlanningScope(BaseModel):
         default=None,
         description="Free-text specification of the planning task if 'other' was selected."
     )
+    planning_task_type_reasoning: str = reasoning_field()
     time_horizon_explicitly_stated: bool = Field(
         description="Whether the paper explicitly states a time horizon."
     )
+    time_horizon_explicitly_stated_reasoning: str = reasoning_field()
     planning_horizon_tiers: list[PlanningHorizonTier] = Field(
         min_length=1,
         description="All planning horizon tiers the paper addresses, pick all applicable; 'NA' only if no tier is addressed."
         + make_type_annotations(PlanningHorizonTier)
     )
-    planning_horizon_rationale: Optional[str] = Field(
-        default=None,
-        description="Free-text reasoning for the tier classification; quote the paper's horizon statement(s) per tier."
+    planning_horizon_rationale: str = reasoning_field(
+        description="Reasoning for planning_horizon_tiers; quote the paper's horizon statement(s) per tier. "
     )
     system_configuring_decision_stated: bool = Field(
         description="Whether the paper explicitly frames the decision as system-configuring (determining what exists, not how existing resources are used)."
     )
+    system_configuring_decision_stated_reasoning: str = reasoning_field()
     system_configuring_decision_description: Optional[str] = Field(
         default=None,
         description="Free-text description of what the system-configuring decision determines (entities created, capacities set, locations chosen), as reported."
@@ -96,6 +97,7 @@ class StrategicPlanningScope(BaseModel):
     theoretical_framework_cited: list[TheoreticalFrameworkType] = Field(
         description="Theoretical framework(s) cited for strategic planning scope." + make_type_annotations(TheoreticalFrameworkType)
     )
+    theoretical_framework_cited_reasoning: str = reasoning_field()
     theoretical_framework_rationale: Optional[str] = Field(
         default=None,
         description="Free-text reasoning why no theoretical framework applies. Required if 'none' was selected, otherwise null."

@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, model_validator
 
-from .annotation_helper import make_type_annotations
+from .annotation_helper import make_type_annotations, reasoning_field
 from .descriptive_enum import DescriptiveEnum
 
 
@@ -73,10 +73,9 @@ class LLMIntervention(BaseModel):
         "with the paper's own method. Do not list models that are merely discussed, cited or used outside the method "
         "(e.g., related work, external baselines); record those in models_rationale."
     )
-    models_rationale: Optional[str] = Field(
-        default=None,
-        description="Free-text reasoning for the models selection; list other LLMs discussed in the paper but not "
-        "deployed and evaluated with the paper's method, and in what role they appear (e.g., related work, baseline)."
+    models_rationale: str = reasoning_field(
+        description="Reasoning for models; list other LLMs discussed in the paper but not deployed and evaluated "
+        "with the paper's method, and in what role they appear (e.g., related work, baseline). "
     )
     model_usage_context: Optional[str] = Field(
         default=None,
@@ -85,6 +84,7 @@ class LLMIntervention(BaseModel):
     model_family: list[ModelFamilyType] = Field(
         description="Model family classification(s) of the models listed in 'models'." + make_type_annotations(ModelFamilyType)
     )
+    model_family_reasoning: str = reasoning_field()
     other_model_family_specification: Optional[str] = Field(
         default=None,
         description="Free-text specification of the model family if 'other' was selected."
@@ -92,13 +92,13 @@ class LLMIntervention(BaseModel):
     open_weight: OpenWeightType = Field(
         description="Whether the weights of the models listed in 'models' are openly available." + make_type_annotations(OpenWeightType)
     )
-    open_weight_rationale: Optional[str] = Field(
-        default=None,
-        description="Free-text justification, required context when 'mixed' (which models are open-weight, which proprietary)."
+    open_weight_rationale: str = reasoning_field(
+        description="Reasoning for open_weight; when 'mixed', state which models are open-weight and which proprietary. "
     )
     fine_tuning: FineTuningType = Field(
         description="Fine-tuning method applied." + make_type_annotations(FineTuningType)
     )
+    fine_tuning_reasoning: str = reasoning_field()
     fine_tuning_description: Optional[str] = Field(
         default=None,
         description="Free-text details of fine-tuning data and procedure as reported, if applicable."
@@ -114,18 +114,19 @@ class LLMIntervention(BaseModel):
         default=None,
         description="Free-text specification of the pattern if 'other' was selected."
     )
+    architectural_pattern_reasoning: str = reasoning_field()
     agentic_architecture: AgenticArchitectureType = Field(
         description="Agentic architecture classification." + make_type_annotations(AgenticArchitectureType)
     )
+    agentic_architecture_reasoning: str = reasoning_field()
     integrations: list[IntegrationType] = Field(
         description="All integration types applicable to the system." + make_type_annotations(IntegrationType)
     )
+    integrations_reasoning: str = reasoning_field()
 
     @model_validator(mode="after")
     def validate_exclusive_none(self):
-        """'none' is mutually exclusive with other enum values in multi-valued fields."""
-        for field_name in ("model_family", "architectural_pattern", "integrations"):
-            values = getattr(self, field_name)
-            if len(values) > 1 and any(v.name == "NONE" for v in values):
-                raise ValueError(f"{field_name}: 'none' cannot be combined with other values")
+        """'none' is mutually exclusive with other integration values."""
+        if len(self.integrations) > 1 and IntegrationType.NONE in self.integrations:
+            raise ValueError("integrations: 'none' cannot be combined with other values")
         return self
