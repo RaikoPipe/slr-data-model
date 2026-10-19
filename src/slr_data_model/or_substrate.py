@@ -43,19 +43,25 @@ class OptimizationParadigm(DescriptiveEnum):
 class LLMORRole(DescriptiveEnum):
     """Role of the LLM relative to the optimizer (B5), the main question of the LLM-for-OR literature.
 
-    Recent LLM4OR surveys group the field into automatic modelling, auxiliary optimization and direct solving,
-    or into roles such as optimizer / predictor / extractor / designer (v0.8.0 review, B5). Exemplars:
-    formulator - NL4Opt (Ramamonjison et al., NeurIPS 2022 competition), OptiMUS (AhmadiTeshnizi, Gao & Udell,
-    ICML 2024); direct-optimizer - OPRO (Yang et al., "Large Language Models as Optimizers", ICLR 2024);
-    heuristic-designer - FunSearch (Romera-Paredes et al., Nature 2024), EoH (Liu et al., ICML 2024);
-    result-interpreter - OptiGuide (Li et al. 2023, "Large Language Models for Supply Chain Optimization",
-    arXiv:2307.03875).
+    Roles are synthesised from the LLM4OR surveys (Wang & Li: automatic modeling / auxiliary optimization /
+    direct solving; Xiu et al.: model formulation, designers, solution verification; Zhang et al. 2025:
+    modeling, stand-alone optimizer, high-level algorithm generation; Liu et al.: LLMaO / LLMaD) plus exemplar
+    systems. solver-orchestrator and result-interpreter are top-level categories in none of these surveys;
+    they are added because they are common in planning decision support. Further exemplars: NL4Opt
+    (Ramamonjison et al., NeurIPS 2022 competition), OptiMUS (AhmadiTeshnizi, Gao & Udell, ICML 2024),
+    FunSearch (Romera-Paredes et al., Nature 2024), EoH (Liu et al., ICML 2024).
     """
+    # Wang & Li (automatic modeling); Xiu et al. (model formulation); Zhang et al. 2025 (modeling)
     FORMULATOR = "formulator", "Translates natural language into an optimization model or solver code"
+    # Liu et al. (LLMaO); Zhang et al. 2025 (stand-alone optimizer); OPRO (Yang et al., ICLR 2024)
     DIRECT_OPTIMIZER = "direct-optimizer", "LLM itself proposes and iteratively improves solutions (OPRO-style)"
+    # Liu et al. (LLMaD); Zhang et al. 2025 (high-level algorithm generation); Xiu et al. (designers)
     HEURISTIC_DESIGNER = "heuristic-designer", "LLM designs or evolves algorithms/heuristics that are then run"
+    # OR-Toolformer; partly Wang & Li (auxiliary optimization). Not a top-level category in any survey.
     SOLVER_ORCHESTRATOR = "solver-orchestrator", "LLM calls a solver as a tool and handles inputs/outputs"
+    # OptiGuide (Li et al. 2023, arXiv:2307.03875). Not a top-level category in any survey.
     RESULT_INTERPRETER = "result-interpreter", "LLM explains solutions or answers what-if questions on them (OptiGuide-style)"
+    # Xiu et al. (solution verification)
     VERIFIER = "verifier", "LLM checks models or solutions for errors, feasibility or plausibility"
     NONE = "none", "No optimizer in the method, or the LLM does not interact with it"
 
