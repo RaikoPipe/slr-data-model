@@ -26,38 +26,31 @@ class OpenWeightType(DescriptiveEnum):
 
 
 class FineTuningType(DescriptiveEnum):
-    """Fine-tuning method applied per §3.4."""
-    NONE = "none", "No fine-tuning applied"
-    PROMPT_ENGINEERING_ONLY = "prompt-engineering-only", "Prompt engineering only, no weight updates"
+    """Fine-tuning method applied per §3.4 (weight updates only; prompting techniques are not coded here)."""
+    NONE = "none", "No weight updates (prompting, in-context examples, RAG only)"
     LORA = "LoRA", "Low-Rank Adaptation fine-tuning"
     FULL_FINE_TUNING = "full-fine-tuning", "Full model fine-tuning"
     OTHER = "other", "Other fine-tuning method (specify)"
 
 
-class ArchitecturalPatternType(DescriptiveEnum):
-    """Top-level architectural pattern classification (§5)."""
-    RAG = "RAG", "Retrieval-augmented generation"
-    MULTI_AGENT = "multi-agent", "Multi-agent system"
-    LLM_SOLVER = "LLM+solver", "LLM combined with mathematical solver"
-    LLM_DIGITAL_TWIN = "LLM+digital-twin", "LLM integrated with digital twin"
-    SINGLE_AGENT_PIPELINE = "single-agent-pipeline", "Single agent pipeline"
-    OTHER = "other", "Other architectural pattern (specify)"
-
-
 class AgenticArchitectureType(DescriptiveEnum):
     """Agentic architecture classification per §3.4."""
-    SINGLE_AGENT = "single-agent", "Single agent system"
-    MULTI_AGENT = "multi-agent", "Multi-agent system"
-    SUPERVISOR_AGENT = "supervisor-agent", "Supervisor-agent hierarchy"
-    PIPELINE = "pipeline", "Sequential pipeline of agents"
-    NONE = "none", "No agentic architecture"
+    SINGLE_AGENT = "single-agent", "One agent that loops over reasoning/tool use (e.g., ReAct)"
+    MULTI_AGENT = "multi-agent", "Several peer agents interacting without a controlling agent"
+    SUPERVISOR_AGENT = "supervisor-agent", "A supervisor agent routes work to sub-agents (hierarchy)"
+    PIPELINE = "pipeline", (
+        "Fixed, developer-defined sequence of several specialised LLM roles (incl. evaluator/repair loops), "
+        "even if the authors call them 'agents'"
+    )
+    NONE = "none", "LLM used as a single function (e.g., translator, generator) inside conventional software"
 
 
 class IntegrationType(DescriptiveEnum):
     """Integration types for the LLM system per §3.4 (list all applicable)."""
     RAG = "RAG", "Retrieval-augmented generation integration"
     KG = "KG", "Knowledge graph integration"
-    SOLVER = "solver", "Mathematical solver integration"
+    SOLVER = "solver", "Mathematical optimization/OR solver (MILP, CP, heuristics), incl. tools wrapping one"
+    ML_MODEL = "ML-model", "Non-LLM predictive or explanatory ML model (regression, GNN, SHAP, forecasting)"
     DIGITAL_TWIN = "digital-twin", "Digital twin integration"
     SIMULATION_PLATFORM = "simulation-platform", "Simulation platform integration"
     NONE = "none", "No external integration"
@@ -107,20 +100,16 @@ class LLMIntervention(BaseModel):
         default=None,
         description="Free-text specification of the fine-tuning method if 'other' was selected."
     )
-    architectural_pattern: list[ArchitecturalPatternType] = Field(
-        description="Top-level architectural pattern(s)." + make_type_annotations(ArchitecturalPatternType)
-    )
-    other_architectural_pattern_specification: Optional[str] = Field(
-        default=None,
-        description="Free-text specification of the pattern if 'other' was selected."
-    )
-    architectural_pattern_reasoning: str = reasoning_field()
     agentic_architecture: AgenticArchitectureType = Field(
-        description="Agentic architecture classification." + make_type_annotations(AgenticArchitectureType)
+        description="Agentic architecture of the paper's own method. An 'agent' is an LLM component that decides "
+        "its next action or tool call at run time; a step whose position in the flow is fixed by the developer is "
+        "not an agent, whatever the authors call it. If several apply, code the outermost control structure."
+        + make_type_annotations(AgenticArchitectureType)
     )
     agentic_architecture_reasoning: str = reasoning_field()
     integrations: list[IntegrationType] = Field(
-        description="All integration types applicable to the system." + make_type_annotations(IntegrationType)
+        description="All external (non-LLM) components the LLM system calls or retrieves from, pick all applicable. "
+        "Code only components of the paper's own method, not future work." + make_type_annotations(IntegrationType)
     )
     integrations_reasoning: str = reasoning_field()
 

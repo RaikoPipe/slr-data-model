@@ -41,7 +41,7 @@ class PlanningTaskType(DescriptiveEnum):
 class PlanningHorizonTier(DescriptiveEnum):
     """Planning horizon tiers addressed per §3.3 (multi-valued; NA is exclusive)."""
     NA = "NA", "No planning horizon addressed"
-    STRATEGIC = "Strategic", "Strategic planning horizon (system configuration: what exists)"
+    STRATEGIC = "Strategic", "Strategic planning horizon (system configuration: what exists); set iff system_configuring_decision"
     TACTICAL = "Tactical", "Tactical planning horizon (mid-term allocation of existing resources)"
     OPERATIONAL = "Operational", "Operational planning horizon (short-term scheduling and control)"
 
@@ -53,8 +53,11 @@ class TheoreticalFrameworkType(DescriptiveEnum):
     LANZA_ET_AL_2019 = "Lanza-et-al-2019", "Global production network design (Lanza et al., CIRP Annals 2019)"
     WIENDAHL_NYHUIS = "Wiendahl-Nyhuis", "Wiendahl-Nyhuis factory planning framework"
     MELO_NICKEL_SALDANHA_DA_GAMA_2009 = "Melo-Nickel-Saldanha-da-Gama-2009", "Strategic logistics/distribution network design framework (Melo, Nickel, Saldanha-da-Gama 2009)"
-    OTHER = "other", "Other theoretical framework (specify)"
-    NONE = "none", "No theoretical framework cited"
+    OTHER = "other", (
+        "Another planning-domain framework or reference model (e.g., Systematic Layout Planning) that structures "
+        "the paper's planning scope (specify)"
+    )
+    NONE = "none", "No planning-domain framework used to structure the scope"
 
 
 class StrategicPlanningScope(BaseModel):
@@ -67,7 +70,9 @@ class StrategicPlanningScope(BaseModel):
         description="Reasoning for subdomain: how tasks were mapped per Appendix A; document tactical/strategic boundary cases (§6). "
     )
     planning_task_type: list[PlanningTaskType] = Field(
-        description="Specific planning task(s) addressed, pick all applicable." + make_type_annotations(PlanningTaskType)
+        description="Specific planning task(s) the paper's method performs, pick all applicable. Add 'other' next to "
+        "listed values only if a core task of the method is not covered by them; do not add it for side aspects."
+        + make_type_annotations(PlanningTaskType)
     )
     other_planning_task_specification: Optional[str] = Field(
         default=None,
@@ -80,22 +85,36 @@ class StrategicPlanningScope(BaseModel):
     time_horizon_explicitly_stated_reasoning: str = reasoning_field()
     planning_horizon_tiers: list[PlanningHorizonTier] = Field(
         min_length=1,
-        description="All planning horizon tiers the paper addresses, pick all applicable; 'NA' only if no tier is addressed."
+        description="All planning horizon tiers for which the paper's method produces or supports a decision, "
+        "pick all applicable; tiers only mentioned as context do not count. 'NA' only if no tier is addressed. "
+        "Strategic is selected iff system_configuring_decision is true."
         + make_type_annotations(PlanningHorizonTier)
     )
     planning_horizon_rationale: str = reasoning_field(
         description="Reasoning for planning_horizon_tiers; quote the paper's horizon statement(s) per tier. "
     )
-    system_configuring_decision_stated: bool = Field(
-        description="Whether the paper explicitly frames the decision as system-configuring (determining what exists, not how existing resources are used)."
+    system_configuring_decision: bool = Field(
+        description="True if a decision the method supports determines what exists in the system (sites, lines, "
+        "equipment, network links created or removed; capacities set), as opposed to how existing resources are "
+        "used. Judged from the decision itself, regardless of the authors' wording."
     )
-    system_configuring_decision_stated_reasoning: str = reasoning_field()
+    system_configuring_decision_reasoning: str = reasoning_field(interpretive=True)
+    system_configuring_decision_stated: bool = Field(
+        description="True only if the authors themselves frame the decision as configuring or designing the system "
+        "(what exists); a verbatim quote is required in the reasoning. Default False if no such statement exists. "
+        "Can only be true if system_configuring_decision is true."
+    )
+    system_configuring_decision_stated_reasoning: str = reasoning_field(
+        description="Verbatim quote of the authors' framing with locator, or 'no statement found'. "
+    )
     system_configuring_decision_description: Optional[str] = Field(
         default=None,
-        description="Free-text description of what the system-configuring decision determines (entities created, capacities set, locations chosen), as reported."
+        description="Free-text description, if system_configuring_decision is true, of what the decision determines (entities created, capacities set, locations chosen), as reported."
     )
     theoretical_framework_cited: list[TheoreticalFrameworkType] = Field(
-        description="Theoretical framework(s) cited for strategic planning scope." + make_type_annotations(TheoreticalFrameworkType)
+        description="Planning-domain framework(s) the paper uses to structure its planning scope. General methods "
+        "(MCDM, game theory, V&V principles, prompting techniques) and frameworks only cited as background do "
+        "not count; then code 'none'." + make_type_annotations(TheoreticalFrameworkType)
     )
     theoretical_framework_cited_reasoning: str = reasoning_field()
     theoretical_framework_rationale: Optional[str] = Field(
@@ -112,6 +131,10 @@ class StrategicPlanningScope(BaseModel):
         """Exclusive NA/none values and conditionally required free-text fields."""
         if len(self.planning_horizon_tiers) > 1 and PlanningHorizonTier.NA in self.planning_horizon_tiers:
             raise ValueError("planning_horizon_tiers: 'NA' cannot be combined with other values")
+        if self.system_configuring_decision != (PlanningHorizonTier.STRATEGIC in self.planning_horizon_tiers):
+            raise ValueError("planning_horizon_tiers must include 'Strategic' iff system_configuring_decision is true")
+        if self.system_configuring_decision_stated and not self.system_configuring_decision:
+            raise ValueError("system_configuring_decision_stated requires system_configuring_decision")
         frameworks = self.theoretical_framework_cited
         if len(frameworks) > 1 and TheoreticalFrameworkType.NONE in frameworks:
             raise ValueError("theoretical_framework_cited: 'none' cannot be combined with other values")

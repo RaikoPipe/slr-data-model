@@ -18,7 +18,6 @@ from src.slr_data_model import (
     ModelFamilyType,
     OpenWeightType,
     FineTuningType,
-    ArchitecturalPatternType,
     AgenticArchitectureType,
     IntegrationType,
     ORSubstrate,
@@ -89,11 +88,13 @@ def make_strategic_scope(**overrides):
         time_horizon_explicitly_stated=True,
         planning_horizon_tiers=[PlanningHorizonTier.STRATEGIC],
         planning_horizon_rationale="Paper states a 5-year planning horizon.",
+        system_configuring_decision=True,
         system_configuring_decision_stated=True,
         system_configuring_decision_description="Determines workshop layout and machine capacities.",
         theoretical_framework_cited=[TheoreticalFrameworkType.VDI_5200],
         planning_task_type_reasoning=R,
         time_horizon_explicitly_stated_reasoning=R,
+        system_configuring_decision_reasoning=R,
         system_configuring_decision_stated_reasoning=R,
         theoretical_framework_cited_reasoning=R,
     )
@@ -107,15 +108,13 @@ def make_llm_intervention(**overrides):
         models=["GPT-4o"],
         model_family=[ModelFamilyType.GPT],
         open_weight=OpenWeightType.NO,
-        fine_tuning=FineTuningType.PROMPT_ENGINEERING_ONLY,
-        architectural_pattern=[ArchitecturalPatternType.LLM_SOLVER],
+        fine_tuning=FineTuningType.NONE,
         agentic_architecture=AgenticArchitectureType.SINGLE_AGENT,
         integrations=[IntegrationType.SOLVER],
         models_rationale="No other LLMs discussed.",
         model_family_reasoning=R,
         open_weight_rationale=R,
         fine_tuning_reasoning=R,
-        architectural_pattern_reasoning=R,
         agentic_architecture_reasoning=R,
         integrations_reasoning=R,
     )
@@ -151,7 +150,8 @@ def make_evaluation(**overrides):
                 page_section_reference="p. 8, Table 3",
             )
         ],
-        study_design=StudyDesignType.BENCHMARK,
+        study_design=[StudyDesignType.BENCHMARK],
+        independent_evaluation=False,
         sample_size="12 test cases",
         reported_limitations=["Single LLM evaluated; results may not generalize to other models."],
         outcome_summary="LLM-assisted planning reduced time by 12-15% with equal layout quality.",
@@ -160,6 +160,7 @@ def make_evaluation(**overrides):
         comparator_reasoning=R,
         reported_metrics_reasoning=R,
         study_design_reasoning=R,
+        independent_evaluation_reasoning=R,
         sample_size_reasoning=R,
         reported_limitations_reasoning=R,
     )
@@ -170,13 +171,13 @@ def make_evaluation(**overrides):
 def make_gap_indicators(**overrides):
     defaults = dict(
         hitl_pattern_present=True,
-        hitl_type=HITLType.APPROVAL_GATE,
+        hitl_type=[HITLType.APPROVAL_GATE],
         hitl_description="Planner approves generated layout before solver runs.",
         domain_knowledge_formalization_present=True,
-        domain_knowledge_type=DomainKnowledgeType.STANDARDS_ENCODING,
+        domain_knowledge_type=[DomainKnowledgeType.STANDARDS_ENCODING],
         domain_knowledge_description="VDI 5200 phase model encoded as structured prompts.",
         evaluation_framework_used=True,
-        evaluation_framework_type=EvaluationFrameworkType.BENCHMARK,
+        evaluation_framework_type=[EvaluationFrameworkType.BENCHMARK],
         hitl_pattern_present_reasoning=R,
         hitl_type_reasoning=R,
         domain_knowledge_formalization_present_reasoning=R,
@@ -241,7 +242,7 @@ class TestStudyExtraction:
         assert record.llm_intervention.models == ["GPT-4o"]
         assert record.or_substrate.solver_type == "Gurobi"
         assert record.evaluation_and_outcomes.reported_metrics[0].page_section_reference == "p. 8, Table 3"
-        assert record.gap_indicators.hitl_type == HITLType.APPROVAL_GATE
+        assert record.gap_indicators.hitl_type == [HITLType.APPROVAL_GATE]
 
     def test_json_roundtrip(self):
         record = make_study_extraction()
@@ -322,15 +323,32 @@ class TestStudyExtraction:
         with pytest.raises(ValidationError, match="'none' cannot be combined"):
             make_llm_intervention(integrations=[IntegrationType.SOLVER, IntegrationType.NONE])
 
-    def test_architectural_pattern_list_valid(self):
-        # §5 pattern vocabulary has no 'none' member; multi-pattern selection is allowed.
-        intervention = make_llm_intervention(
-            architectural_pattern=[
-                ArchitecturalPatternType.RAG,
-                ArchitecturalPatternType.LLM_SOLVER,
-            ]
+    def test_gap_indicator_types_multi_select(self):
+        gi = make_gap_indicators(
+            hitl_type=[HITLType.APPROVAL_GATE, HITLType.WHAT_IF_INTERFACE],
+            evaluation_framework_type=[EvaluationFrameworkType.CUSTOM_TEST_SET, EvaluationFrameworkType.RUBRIC],
         )
-        assert len(intervention.architectural_pattern) == 2
+        assert len(gi.hitl_type) == 2 and len(gi.evaluation_framework_type) == 2
+        with pytest.raises(ValidationError, match="hitl_type is required"):
+            make_gap_indicators(hitl_type=[])
+
+    def test_study_design_multi_select(self):
+        ev = make_evaluation(study_design=[StudyDesignType.MULTI_CASE, StudyDesignType.USER_STUDY])
+        assert len(ev.study_design) == 2
+        with pytest.raises(ValidationError):
+            make_evaluation(study_design=[])
+
+    def test_system_configuring_decision_drives_strategic_tier(self):
+        tactical = [PlanningHorizonTier.TACTICAL]
+        with pytest.raises(ValidationError, match="iff system_configuring_decision"):
+            make_strategic_scope(system_configuring_decision=False, system_configuring_decision_stated=False)
+        with pytest.raises(ValidationError, match="iff system_configuring_decision"):
+            make_strategic_scope(planning_horizon_tiers=tactical)
+        with pytest.raises(ValidationError, match="requires system_configuring_decision"):
+            make_strategic_scope(system_configuring_decision=False, planning_horizon_tiers=tactical)
+        assert not make_strategic_scope(
+            system_configuring_decision=False, system_configuring_decision_stated=False, planning_horizon_tiers=tactical
+        ).system_configuring_decision
 
     def test_model_family_multiple_valid(self):
         # model_family has no 'none' member; multiple families for multiple models.

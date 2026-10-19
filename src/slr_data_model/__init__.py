@@ -29,7 +29,6 @@ from .llm_intervention import (
     ModelFamilyType,
     OpenWeightType,
     FineTuningType,
-    ArchitecturalPatternType,
     AgenticArchitectureType,
     IntegrationType,
 )
@@ -83,7 +82,6 @@ __all__ = [
     "ModelFamilyType",
     "OpenWeightType",
     "FineTuningType",
-    "ArchitecturalPatternType",
     "AgenticArchitectureType",
     "IntegrationType",
     # OR substrate

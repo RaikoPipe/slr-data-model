@@ -14,7 +14,6 @@ from .llm_intervention import (
     ModelFamilyType,
     OpenWeightType,
     FineTuningType,
-    ArchitecturalPatternType,
     AgenticArchitectureType,
     IntegrationType,
 )

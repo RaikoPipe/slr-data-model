@@ -11,7 +11,7 @@ This package provides the structured-JSON schema for the extraction pipeline: ra
 - **Bibliographic metadata** (imported from search-stage records; R1 spot-checks 10%): DOI, title, authors, affiliations, country, year, venue, venue type, language, funding
 - **Study characterization** (descriptive, LLM pre-fill, R1 verifies 100%; validation status is interpretive): research type, validation status, sector, RQs
 - **Strategic planning scope**: subdomain, planning tasks (§5 vocabulary), horizon tier, system-configuring decision, theoretical framework
-- **LLM/AI intervention**: models, family, open-weight status, fine-tuning, architectural pattern, agentic architecture, integrations
+- **LLM/AI intervention**: models, family, open-weight status, fine-tuning, agentic architecture, integrations
 - **OR/optimization substrate**: tradition, formalization level, solver
 - **Evaluation and outcomes**: validation method, dataset, comparator, structured reported metrics (with page/section reference), study design, sample size, limitations
 - **Retrieval traceability** (§3.7): source (Scopus / WoS / OpenAlex / snowballing), anchor paper(s)
@@ -54,7 +54,6 @@ from slr_data_model import (
     ModelFamilyType,
     OpenWeightType,
     FineTuningType,
-    ArchitecturalPatternType,
     AgenticArchitectureType,
     IntegrationType,
     ORSubstrate,
@@ -112,6 +111,8 @@ record = StudyExtraction(
         time_horizon_explicitly_stated_reasoning="p. 3: '5-year horizon'.",
         planning_horizon_tiers=[PlanningHorizonTier.STRATEGIC],
         planning_horizon_rationale="p. 3: '5-year horizon'.",
+        system_configuring_decision=True,
+        system_configuring_decision_reasoning="p. 3: 'selects machines and sets capacities'.",
         system_configuring_decision_stated=True,
         system_configuring_decision_stated_reasoning="p. 3, §2.",
         theoretical_framework_cited=[TheoreticalFrameworkType.VDI_5200],
@@ -122,15 +123,13 @@ record = StudyExtraction(
         models=["GPT-4o"],
         model_family=[ModelFamilyType.GPT],
         open_weight=OpenWeightType.NO,
-        fine_tuning=FineTuningType.PROMPT_ENGINEERING_ONLY,
-        architectural_pattern=[ArchitecturalPatternType.LLM_SOLVER],
+        fine_tuning=FineTuningType.NONE,
         agentic_architecture=AgenticArchitectureType.SINGLE_AGENT,
         integrations=[IntegrationType.SOLVER],
         models_rationale="No other LLMs discussed.",
         model_family_reasoning="p. 5.",
         open_weight_rationale="GPT-4o is proprietary.",
         fine_tuning_reasoning="p. 5, §3.2.",
-        architectural_pattern_reasoning="p. 4, Fig. 2.",
         agentic_architecture_reasoning="p. 4, Fig. 2.",
         integrations_reasoning="p. 4, Fig. 2.",
     ),
@@ -152,7 +151,8 @@ record = StudyExtraction(
             context="vs. human planner baseline across 12 cases",
             page_section_reference="p. 8, Table 3",
         )],
-        study_design=StudyDesignType.BENCHMARK,
+        study_design=[StudyDesignType.BENCHMARK],
+        independent_evaluation=False,
         sample_size="12 test cases",
         reported_limitations=["Single LLM evaluated."],
         validation_method_reasoning="p. 8, §5.",
@@ -160,6 +160,7 @@ record = StudyExtraction(
         comparator_reasoning="p. 8, Table 3.",
         reported_metrics_reasoning="p. 8, Table 3.",
         study_design_reasoning="p. 8, §5.",
+        independent_evaluation_reasoning="Authors ran all tests (p. 8).",
         sample_size_reasoning="p. 8, §5.",
         reported_limitations_reasoning="p. 10, §6.",
     ),
@@ -170,7 +171,7 @@ record = StudyExtraction(
     gap_indicators=GapIndicators(
         hitl_pattern_present=True,
         hitl_pattern_present_reasoning="p. 4: 'the planner approves each layout'.",
-        hitl_type=HITLType.APPROVAL_GATE,
+        hitl_type=[HITLType.APPROVAL_GATE],
         hitl_type_reasoning="p. 4: 'the planner approves each layout'.",
         domain_knowledge_formalization_present=False,
         domain_knowledge_formalization_present_reasoning="No ontology/KG/standards encoding found (full-text search).",
@@ -270,7 +271,7 @@ pytest
 
 ## Version
 
-Current version: 0.7.0
+Current version: 0.8.0
 
 ## License
 

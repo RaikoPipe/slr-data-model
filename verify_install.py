@@ -48,7 +48,6 @@ def main():
             ModelFamilyType,
             OpenWeightType,
             FineTuningType,
-            ArchitecturalPatternType,
             AgenticArchitectureType,
             IntegrationType,
             ORSubstrate,

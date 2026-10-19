@@ -8,9 +8,17 @@ from .descriptive_enum import DescriptiveEnum
 
 class HITLType(DescriptiveEnum):
     """Types of human-in-the-loop patterns per §3.8."""
-    APPROVAL_GATE = "approval-gate", "Human approval gate before action execution"
-    WHAT_IF_INTERFACE = "what-if-interface", "What-if or scenario analysis interface for human exploration"
-    ESCALATION_PROTOCOL = "escalation-protocol", "Escalation protocol to human on uncertainty"
+    APPROVAL_GATE = "approval-gate", (
+        "Workflow-initiated: a human must check and accept or repair output before the workflow proceeds"
+    )
+    WHAT_IF_INTERFACE = "what-if-interface", "Human-initiated: human poses scenarios or changes inputs to explore outcomes"
+    ESCALATION_PROTOCOL = "escalation-protocol", (
+        "System-initiated: the system detects uncertainty, failure or missing information and asks the human"
+    )
+    ITERATIVE_FEEDBACK = "iterative-feedback", (
+        "Human judges each iteration's output and gives guidance that steers the next iteration"
+    )
+    HUMAN_OVERRIDE = "human-override", "Human edits or vetoes the agents' intermediate decisions or plans"
     OTHER = "other", "Other HITL pattern (specify)"
 
 
@@ -19,26 +27,37 @@ class DomainKnowledgeType(DescriptiveEnum):
     ONTOLOGY = "ontology", "Formal ontology for domain knowledge"
     KNOWLEDGE_GRAPH = "knowledge-graph", "Knowledge graph representation"
     STANDARDS_ENCODING = "standards-encoding", "Encoding of domain standards (e.g., VDI, ISO)"
+    STRUCTURED_SCHEMA = "structured-schema", "Metamodel or schema (e.g., JSON) for domain entities and constraints"
+    RELATIONAL_DATABASE = "relational-database", "Relational database or taxonomy of domain entities and attributes"
+    CODE_TEMPLATE = "code-template", "Code or model template encoding domain structure (e.g., simulation blueprint)"
+    MATHEMATICAL_MODEL = "mathematical-model", "Optimization or simulation model encoding domain structure and rules"
     OTHER = "other", "Other domain knowledge formalization (specify)"
 
 
 class EvaluationFrameworkType(DescriptiveEnum):
     """Types of evaluation frameworks per §3.8."""
-    BENCHMARK = "benchmark", "Standardized benchmark for evaluation"
-    RUBRIC = "rubric", "Evaluation rubric or scoring guide"
-    DOMAIN_SPECIFIC_METRIC = "domain-specific-metric", "Domain-specific evaluation metric"
+    BENCHMARK = "benchmark", "Public, standardised benchmark reused from prior work"
+    CUSTOM_TEST_SET = "custom-test-set", "Test items or cases built by the authors for this paper"
+    EXPERT_GROUND_TRUTH = "expert-ground-truth", "Outputs compared with expert or practitioner decisions"
+    RUBRIC = "rubric", "Graded scoring scale or criteria (incl. Likert ratings, ordinal suitability levels)"
+    DOMAIN_SPECIFIC_METRIC = "domain-specific-metric", (
+        "Metric defined by the planning domain (e.g., throughput, space utilisation, cost); not generic accuracy/F1"
+    )
     OTHER = "other", "Other evaluation framework (specify)"
 
 
 class GapIndicators(BaseModel):
     """Gap indicator fields (LLM; interpretive; R1 + R2 verify 100%)."""
     hitl_pattern_present: bool = Field(
-        description="Whether a human-in-the-loop pattern is present."
+        description="True if a human acts on intermediate or final LLM output inside the method's workflow "
+        "(reviews, approves, edits, answers a system request, steers exploration). Only issuing the initial "
+        "query or reading the final answer does not count."
     )
     hitl_pattern_present_reasoning: str = reasoning_field(interpretive=True)
-    hitl_type: Optional[HITLType] = Field(
+    hitl_type: Optional[list[HITLType]] = Field(
         default=None,
-        description="Type of HITL pattern, required if hitl_pattern_present is true." + make_type_annotations(HITLType)
+        description="All HITL patterns present, required if hitl_pattern_present is true. Classify by who "
+        "triggers the human step (workflow, human, system) and when." + make_type_annotations(HITLType)
     )
     hitl_type_reasoning: Optional[str] = reasoning_field(
         interpretive=True, default=None, description="Required if hitl_type is set, otherwise null. "
@@ -49,15 +68,16 @@ class GapIndicators(BaseModel):
     )
     hitl_type_other_specification: Optional[str] = Field(
         default=None,
-        description="Free-text specification if hitl_type is 'other'."
+        description="Free-text specification if 'other' is in hitl_type."
     )
     domain_knowledge_formalization_present: bool = Field(
-        description="Whether domain knowledge formalization is present."
+        description="True if domain knowledge is encoded in an explicit, reusable, machine-readable structure "
+        "that the system uses. Free-text prompts, few-shot examples or unstructured RAG corpora alone do not count."
     )
     domain_knowledge_formalization_present_reasoning: str = reasoning_field(interpretive=True)
-    domain_knowledge_type: Optional[DomainKnowledgeType] = Field(
+    domain_knowledge_type: Optional[list[DomainKnowledgeType]] = Field(
         default=None,
-        description="Type of domain knowledge formalization, required if domain_knowledge_formalization_present is true."
+        description="All types of domain knowledge formalization present, required if domain_knowledge_formalization_present is true."
         + make_type_annotations(DomainKnowledgeType)
     )
     domain_knowledge_type_reasoning: Optional[str] = reasoning_field(
@@ -69,15 +89,19 @@ class GapIndicators(BaseModel):
     )
     domain_knowledge_type_other_specification: Optional[str] = Field(
         default=None,
-        description="Free-text specification if domain_knowledge_type is 'other'."
+        description="Free-text specification if 'other' is in domain_knowledge_type."
     )
     evaluation_framework_used: bool = Field(
-        description="Whether an evaluation framework is used."
+        description="True if the paper describes an explicit, repeatable evaluation protocol: defined test items "
+        "or cases, defined metrics or scoring criteria, and a stated procedure. A single walkthrough, anecdotes, "
+        "or metrics without a stated procedure do not count."
     )
     evaluation_framework_used_reasoning: str = reasoning_field(interpretive=True)
-    evaluation_framework_type: Optional[EvaluationFrameworkType] = Field(
+    evaluation_framework_type: Optional[list[EvaluationFrameworkType]] = Field(
         default=None,
-        description="Type of evaluation framework, required if evaluation_framework_used is true."
+        description="All framework elements used, required if evaluation_framework_used is true. Code both the "
+        "test instrument (benchmark, custom test set, expert ground truth) and the scoring (rubric, "
+        "domain-specific metric)."
         + make_type_annotations(EvaluationFrameworkType)
     )
     evaluation_framework_type_reasoning: Optional[str] = reasoning_field(
@@ -89,7 +113,7 @@ class GapIndicators(BaseModel):
     )
     evaluation_framework_type_other_specification: Optional[str] = Field(
         default=None,
-        description="Free-text specification if evaluation_framework_type is 'other'."
+        description="Free-text specification if 'other' is in evaluation_framework_type."
     )
 
     @model_validator(mode="after")
@@ -101,7 +125,7 @@ class GapIndicators(BaseModel):
             ("evaluation_framework_used", "evaluation_framework_type"),
         ):
             for field_name in (type_field, f"{type_field}_reasoning"):
-                set_ = getattr(self, field_name) is not None
+                set_ = getattr(self, field_name) not in (None, [])
                 if getattr(self, flag) and not set_:
                     raise ValueError(f"{field_name} is required when {flag} is true")
                 if not getattr(self, flag) and set_:
