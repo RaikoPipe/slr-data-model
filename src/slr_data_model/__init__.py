@@ -1,5 +1,5 @@
 """
-SLR Data Model — v5.0 Extraction Schema
+SLR Data Model — v5.0 Extraction Schema (schema version 0.9.0)
 
 Pydantic models for LLM-based decision support for the strategic planning
 horizon in manufacturing and logistics (SLR extraction schema, v5.0).
@@ -11,6 +11,7 @@ Tiers:
 """
 from .descriptive_enum import DescriptiveEnum
 from .annotation_helper import make_type_annotations, reasoning_field
+from .common import NR, NotReported, ReportedStr, UniqueList, YesNoUnclear
 
 # Tier 1: Bibliographic metadata
 from .bibliographic import BibliographicMetadata, VenueType
@@ -23,22 +24,30 @@ from .strategic_planning import (
     PlanningTaskType,
     PlanningHorizonTier,
     TheoreticalFrameworkType,
+    SCPProcess,
+    VDI5200Phase,
+    TASK_SUBDOMAINS,
 )
 from .llm_intervention import (
     LLMIntervention,
     ModelFamilyType,
     OpenWeightType,
     FineTuningType,
-    ArchitecturalPatternType,
     AgenticArchitectureType,
     IntegrationType,
+    DeploymentType,
+    ModalityType,
+    PromptingTechnique,
+    WorkflowPattern,
+    AgentMemory,
 )
-from .or_substrate import ORSubstrate, FormalizationLevel
+from .or_substrate import ORSubstrate, FormalizationLevel, OptimizationParadigm, LLMORRole
 from .evaluation import (
     EvaluationAndOutcomes,
     ReportedMetric,
     ComparatorType,
     StudyDesignType,
+    EvaluationParadigm,
 )
 from .retrieval import RetrievalTraceability, RetrievalSource
 
@@ -48,9 +57,15 @@ from .gap_indicators import (
     HITLType,
     DomainKnowledgeType,
     EvaluationFrameworkType,
+    KGModel,
+    KGConstruction,
+    KGUsage,
+    AutomationStage,
+    DecisionAutonomy,
 )
 from .quality_appraisal import (
     QualityAppraisal,
+    PromptDisclosure,
     AppraisalAnswer,
     StudyTypeCategory,
     CATEGORY_BY_VALIDATION_STATUS,
@@ -60,11 +75,13 @@ from .quality_appraisal import (
 from .provenance import ExtractionMetaData, ProvenanceTag, ReviewerRole, VerificationStatus, FieldVerdict
 
 # Top-level record
-from .study_extraction import StudyExtraction
+from .study_extraction import StudyExtraction, SCHEMA_VERSION, strict_json_schema
 
 __all__ = [
     # Top-level extraction model
     "StudyExtraction",
+    "SCHEMA_VERSION",
+    "strict_json_schema",
     # Bibliographic
     "BibliographicMetadata",
     "VenueType",
@@ -78,22 +95,32 @@ __all__ = [
     "PlanningTaskType",
     "PlanningHorizonTier",
     "TheoreticalFrameworkType",
+    "SCPProcess",
+    "VDI5200Phase",
+    "TASK_SUBDOMAINS",
     # LLM intervention
     "LLMIntervention",
     "ModelFamilyType",
     "OpenWeightType",
     "FineTuningType",
-    "ArchitecturalPatternType",
     "AgenticArchitectureType",
     "IntegrationType",
+    "DeploymentType",
+    "ModalityType",
+    "PromptingTechnique",
+    "WorkflowPattern",
+    "AgentMemory",
     # OR substrate
     "ORSubstrate",
     "FormalizationLevel",
+    "OptimizationParadigm",
+    "LLMORRole",
     # Evaluation
     "EvaluationAndOutcomes",
     "ReportedMetric",
     "ComparatorType",
     "StudyDesignType",
+    "EvaluationParadigm",
     # Retrieval traceability
     "RetrievalTraceability",
     "RetrievalSource",
@@ -102,8 +129,14 @@ __all__ = [
     "HITLType",
     "DomainKnowledgeType",
     "EvaluationFrameworkType",
+    "KGModel",
+    "KGConstruction",
+    "KGUsage",
+    "AutomationStage",
+    "DecisionAutonomy",
     # Quality appraisal
     "QualityAppraisal",
+    "PromptDisclosure",
     "AppraisalAnswer",
     "StudyTypeCategory",
     "CATEGORY_BY_VALIDATION_STATUS",
@@ -117,4 +150,9 @@ __all__ = [
     "DescriptiveEnum",
     "make_type_annotations",
     "reasoning_field",
+    "NR",
+    "NotReported",
+    "ReportedStr",
+    "UniqueList",
+    "YesNoUnclear",
 ]

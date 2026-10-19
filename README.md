@@ -9,17 +9,19 @@ This package provides the structured-JSON schema for the extraction pipeline: ra
 ### Field groups (one `StudyExtraction` per study)
 
 - **Bibliographic metadata** (imported from search-stage records; R1 spot-checks 10%): DOI, title, authors, affiliations, country, year, venue, venue type, language, funding
-- **Study characterization** (descriptive, LLM pre-fill, R1 verifies 100%; validation status is interpretive): research type, validation status, sector, RQs
-- **Strategic planning scope**: subdomain, planning tasks (§5 vocabulary), horizon tier, system-configuring decision, theoretical framework
-- **LLM/AI intervention**: models, family, open-weight status, fine-tuning, architectural pattern, agentic architecture, integrations
-- **OR/optimization substrate**: tradition, formalization level, solver
-- **Evaluation and outcomes**: validation method, dataset, comparator, structured reported metrics (with page/section reference), study design, sample size, limitations
+- **Study characterization** (descriptive, LLM pre-fill, R1 verifies 100%; validation status is interpretive): research type (Wieringa et al. 2006 facet), validation status, sector, RQs
+- **Strategic planning scope**: subdomain, planning tasks (§5 vocabulary), SCP-matrix process, VDI 5200 phase, stated horizon, reviewer-judged and author-claimed horizon tier, system-configuring decision, theoretical framework
+- **LLM/AI intervention**: models, family, open-weight status, size, deployment, modality, fine-tuning, prompting techniques, agentic architecture, workflow patterns, agent capabilities, integrations
+- **OR/optimization substrate**: tradition, ordinal formalization level, optimization paradigm, LLM role relative to the optimizer, solver
+- **Evaluation and outcomes**: study design, FEDS evaluation paradigm (artificial/naturalistic), dataset, comparator, structured reported metrics (with page/section reference), sample size, LLM-specific evaluation properties (repeated runs, LLM-as-judge, efficiency metrics, statistical testing), limitations
 - **Retrieval traceability** (§3.7): source (Scopus / WoS / OpenAlex / snowballing), anchor paper(s)
-- **Gap indicators** (interpretive, LLM-extracted, R1 + R2 verify 100%): HITL pattern, domain knowledge formalization, evaluation framework
-- **Quality appraisal** (§3.9): Q1–Q4 scored `Yes` / `Partially` / `No`; study-type category (A/B/C) derived from validation status; low-quality flag (≥ 2 × `No`) auto-computed; no composite score
+- **Gap indicators** (interpretive, LLM-extracted, R1 + R2 verify 100%): HITL pattern, automation stage and decision autonomy, domain knowledge formalization (with KG model / construction / usage and encoded standards), evaluation framework
+- **Quality appraisal** (§3.9): Q1–Q4 scored `Yes` / `Partially` / `No`; non-scored LLM reproducibility block (model version, prompts, decoding parameters, code, data, run date); study-type category (A/B/C) derived from validation status; low-quality flag (≥ 2 × `No`) auto-computed; no composite score
 - **Extraction metadata** (§7/§8): per-field provenance tags (M / H / L-V / L-C / D), per-verifier verdicts (blind R1 + R2 for interpretive fields), derived `verified_by`, original LLM values (`llm_raw`)
 
-Every extracted value field has a sibling `<field>_reasoning` column (§4: justification + evidence locator; interpretive fields add a verbatim anchor). Existing `*_rationale` fields serve the same role.
+Every extracted value field has a sibling `<field>_reasoning` column (§4: justification + evidence locator; interpretive fields add a verbatim anchor). Existing `*_rationale` fields serve the same role. Blocks of closely related flags share one reasoning column (`agent_capabilities_reasoning`, `llm_evaluation_properties_reasoning`, `kg_reasoning`, `reproducibility_reasoning`).
+
+Not reported is always the sentinel `NR` (`from slr_data_model import NR`): free-text fields default to `NR` and normalise `None`, `""`, `"n/a"` to it; free-text lists use the empty list; interpretive yes/no fields use `YesNoUnclear` (`Y` / `N` / `unclear`).
 
 ## Installation
 
@@ -39,41 +41,18 @@ pip install -e ".[dev]"
 
 ```python
 from slr_data_model import (
-    StudyExtraction,
-    BibliographicMetadata,
-    VenueType,
-    StudyCharacterization,
-    ResearchType,
-    ValidationStatusType,
-    StrategicPlanningScope,
-    SubdomainType,
-    PlanningTaskType,
-    PlanningHorizonTier,
-    TheoreticalFrameworkType,
-    LLMIntervention,
-    ModelFamilyType,
-    OpenWeightType,
-    FineTuningType,
-    ArchitecturalPatternType,
-    AgenticArchitectureType,
-    IntegrationType,
-    ORSubstrate,
-    FormalizationLevel,
-    EvaluationAndOutcomes,
-    ReportedMetric,
-    ComparatorType,
-    StudyDesignType,
-    GapIndicators,
-    HITLType,
-    RetrievalTraceability,
-    RetrievalSource,
-    QualityAppraisal,
-    AppraisalAnswer,
-    ExtractionMetaData,
-    ProvenanceTag,
-    ReviewerRole,
-    VerificationStatus,
-    FieldVerdict,
+    StudyExtraction, BibliographicMetadata, VenueType,
+    StudyCharacterization, ResearchType, ValidationStatusType,
+    StrategicPlanningScope, SubdomainType, PlanningTaskType, PlanningHorizonTier, TheoreticalFrameworkType,
+    SCPProcess, VDI5200Phase, YesNoUnclear,
+    LLMIntervention, ModelFamilyType, OpenWeightType, DeploymentType, ModalityType, FineTuningType,
+    PromptingTechnique, AgenticArchitectureType, WorkflowPattern, AgentMemory, IntegrationType,
+    ORSubstrate, FormalizationLevel, OptimizationParadigm, LLMORRole,
+    EvaluationAndOutcomes, EvaluationParadigm, ReportedMetric, ComparatorType, StudyDesignType,
+    GapIndicators, HITLType, AutomationStage, DecisionAutonomy,
+    RetrievalTraceability, RetrievalSource,
+    QualityAppraisal, AppraisalAnswer, PromptDisclosure,
+    ExtractionMetaData, ProvenanceTag, ReviewerRole, VerificationStatus, FieldVerdict,
 )
 
 record = StudyExtraction(
@@ -88,12 +67,11 @@ record = StudyExtraction(
         venue="Production Engineering",
         venue_type=VenueType.JOURNAL_Q1,
         language="English",
-        funding_source="NR",
         self_authored_flag=False,
     ),
     study_characterization=StudyCharacterization(
-        research_type=ResearchType.DESIGN_SCIENCE,
-        research_type_rationale="Artifact built and evaluated (p. 2, §1).",
+        research_type=ResearchType.VALIDATION_RESEARCH,
+        research_type_rationale="New method evaluated on 12 lab cases (p. 2, §1).",
         validation_status=ValidationStatusType.IMPLEMENTED_VALIDATED,
         validation_status_rationale="Benchmark on 12 cases with defined metrics (p. 8): 'we evaluate on 12 cases'.",
         industry_sector="automotive",
@@ -108,10 +86,19 @@ record = StudyExtraction(
         subdomain_mapping_rationale="Stated explicitly (p. 1).",
         planning_task_type=[PlanningTaskType.FACTORY_LAYOUT_PLANNING],
         planning_task_type_reasoning="p. 3, §2.",
-        time_horizon_explicitly_stated=True,
+        scp_process=[SCPProcess.PRODUCTION],
+        scp_process_reasoning="Plant layout decision (p. 3).",
+        vdi5200_phase=[VDI5200Phase.CONCEPT_PLANNING],
+        vdi5200_phase_reasoning="Layout variants = concept planning (p. 3, §2).",
+        time_horizon_explicitly_stated=YesNoUnclear.YES,
         time_horizon_explicitly_stated_reasoning="p. 3: '5-year horizon'.",
+        stated_horizon_value="5 years",
         planning_horizon_tiers=[PlanningHorizonTier.STRATEGIC],
         planning_horizon_rationale="p. 3: '5-year horizon'.",
+        authors_claimed_tier=[PlanningHorizonTier.STRATEGIC],
+        authors_claimed_tier_reasoning="p. 1: 'strategic factory planning'.",
+        system_configuring_decision=True,
+        system_configuring_decision_reasoning="p. 3: 'selects machines and sets capacities'.",
         system_configuring_decision_stated=True,
         system_configuring_decision_stated_reasoning="p. 3, §2.",
         theoretical_framework_cited=[TheoreticalFrameworkType.VDI_5200],
@@ -120,31 +107,50 @@ record = StudyExtraction(
     llm_intervention=LLMIntervention(
         intervention_description="LLM agent elicits requirements and generates layout alternatives; solver evaluates material flow.",
         models=["GPT-4o"],
-        model_family=[ModelFamilyType.GPT],
-        open_weight=OpenWeightType.NO,
-        fine_tuning=FineTuningType.PROMPT_ENGINEERING_ONLY,
-        architectural_pattern=[ArchitecturalPatternType.LLM_SOLVER],
-        agentic_architecture=AgenticArchitectureType.SINGLE_AGENT,
-        integrations=[IntegrationType.SOLVER],
         models_rationale="No other LLMs discussed.",
+        model_family=[ModelFamilyType.GPT],
         model_family_reasoning="p. 5.",
+        open_weight=OpenWeightType.NO,
         open_weight_rationale="GPT-4o is proprietary.",
+        deployment=DeploymentType.API,
+        deployment_reasoning="OpenAI API (p. 5).",
+        modality=ModalityType.TEXT,
+        modality_reasoning="Layouts passed as JSON (p. 4).",
+        fine_tuning=[FineTuningType.NONE],
         fine_tuning_reasoning="p. 5, §3.2.",
-        architectural_pattern_reasoning="p. 4, Fig. 2.",
+        prompting_techniques=[PromptingTechnique.FEW_SHOT, PromptingTechnique.REACT],
+        prompting_techniques_reasoning="Appendix B.",
+        agentic_architecture=AgenticArchitectureType.SINGLE_AGENT,
         agentic_architecture_reasoning="p. 4, Fig. 2.",
+        workflow_patterns=[WorkflowPattern.NONE],
+        workflow_patterns_reasoning="Single ReAct loop (p. 4).",
+        agent_memory=AgentMemory.SHORT_TERM,
+        planning_reflection=False,
+        tool_use=True,
+        agent_capabilities_reasoning="Agent calls the solver tool at run time (p. 4).",
+        integrations=[IntegrationType.SOLVER],
         integrations_reasoning="p. 4, Fig. 2.",
     ),
     or_substrate=ORSubstrate(
         optimization_tradition_present=True,
-        formalization_level=FormalizationLevel.MATURE_MILP,
-        solver_type="Gurobi",
         optimization_tradition_present_reasoning="p. 5, §3.3.",
+        formalization_level=FormalizationLevel.HIGH,
         formalization_level_reasoning="p. 5, Eq. 1-4.",
+        optimization_paradigm=[OptimizationParadigm.MILP_LP],
+        optimization_paradigm_reasoning="p. 5, Eq. 1-4.",
+        llm_or_role=[LLMORRole.SOLVER_ORCHESTRATOR],
+        llm_or_role_reasoning="Agent calls Gurobi as a tool (p. 4).",
+        solver_type="Gurobi",
         solver_type_reasoning="p. 6.",
     ),
     evaluation_and_outcomes=EvaluationAndOutcomes(
-        validation_method=["benchmark comparison"],
+        study_design=[StudyDesignType.TEST_SET],
+        study_design_reasoning="p. 8, §5.",
+        evaluation_paradigm=EvaluationParadigm.ARTIFICIAL,
+        evaluation_paradigm_reasoning="Lab cases only (p. 8).",
+        dataset_or_benchmark_reasoning="NR: no named dataset (searched 'dataset', 'benchmark').",
         comparator=[ComparatorType.HUMAN_PLANNER],
+        comparator_reasoning="p. 8, Table 3.",
         reported_metrics=[ReportedMetric(
             metric="planning time reduction",
             value="35",
@@ -152,15 +158,17 @@ record = StudyExtraction(
             context="vs. human planner baseline across 12 cases",
             page_section_reference="p. 8, Table 3",
         )],
-        study_design=StudyDesignType.BENCHMARK,
-        sample_size="12 test cases",
-        reported_limitations=["Single LLM evaluated."],
-        validation_method_reasoning="p. 8, §5.",
-        dataset_or_benchmark_reasoning="NR: no named dataset (searched 'dataset', 'benchmark').",
-        comparator_reasoning="p. 8, Table 3.",
         reported_metrics_reasoning="p. 8, Table 3.",
-        study_design_reasoning="p. 8, §5.",
+        independent_evaluation=YesNoUnclear.NO,
+        independent_evaluation_reasoning="Authors ran all tests (p. 8).",
+        sample_size="12 test cases",
         sample_size_reasoning="p. 8, §5.",
+        repeated_runs="NR",
+        llm_as_judge=False,
+        efficiency_metrics_reported=True,
+        statistical_testing=False,
+        llm_evaluation_properties_reasoning="Run time reported (Table 3); runs per case not stated.",
+        reported_limitations=["Single LLM evaluated."],
         reported_limitations_reasoning="p. 10, §6.",
     ),
     retrieval_traceability=RetrievalTraceability(
@@ -170,12 +178,16 @@ record = StudyExtraction(
     gap_indicators=GapIndicators(
         hitl_pattern_present=True,
         hitl_pattern_present_reasoning="p. 4: 'the planner approves each layout'.",
-        hitl_type=HITLType.APPROVAL_GATE,
+        hitl_type=[HITLType.APPROVAL_GATE],
         hitl_type_reasoning="p. 4: 'the planner approves each layout'.",
         domain_knowledge_formalization_present=False,
         domain_knowledge_formalization_present_reasoning="No ontology/KG/standards encoding found (full-text search).",
         evaluation_framework_used=False,
         evaluation_framework_used_reasoning="Ad-hoc metrics only (p. 8).",
+        automation_stage=[AutomationStage.INFORMATION_ANALYSIS, AutomationStage.DECISION_SELECTION],
+        automation_stage_reasoning="Generates and ranks layout variants (p. 4).",
+        decision_autonomy=DecisionAutonomy.L2_RECOMMENDATION,
+        decision_autonomy_reasoning="p. 4: 'the planner selects the final layout'.",
     ),
     quality_appraisal=QualityAppraisal(
         q1_methodological_transparency=AppraisalAnswer.YES,
@@ -186,6 +198,13 @@ record = StudyExtraction(
         q3_validity_and_limitation_discussion_reasoning="Scalability discussed, external validity not (p. 10).",
         q4_positioning_against_prior_work=AppraisalAnswer.YES,
         q4_positioning_against_prior_work_reasoning="Comparison table vs. prior work (p. 3).",
+        model_version_reported=True,
+        prompts_disclosed=PromptDisclosure.FULL,
+        decoding_params_reported=True,
+        code_available=False,
+        data_available=False,
+        run_date_reported=False,
+        reproducibility_reasoning="'gpt-4o-2024-08-06', temperature 0 (Appendix B); no repository link.",
     ),
     extraction_metadata=ExtractionMetaData(
         provenance={"strategic_planning_scope.subdomain": ProvenanceTag.LLM_VERIFIED},
@@ -196,6 +215,7 @@ record = StudyExtraction(
 )
 
 print(record.study_type_category)  # StudyTypeCategory.A, derived from validation_status
+print(record.consistency_flags)    # [] - soft warnings for reviewers
 print(record.model_dump_json(indent=2))
 ```
 
@@ -207,27 +227,36 @@ from slr_data_model import StudyExtraction
 schema = StudyExtraction.model_json_schema()  # use for structured-output validation (§7); excludes derived fields
 ```
 
+For strict structured-output modes that reject defaults (e.g. OpenAI `strict: true`), use `strict_json_schema()`: every property is required and no defaults remain. Cross-field rules are not expressible in JSON Schema; validate the LLM output with `StudyExtraction.model_validate_json(...)` and feed the `ValidationError` text back to the LLM as a repair prompt.
+
 ## Key Components
 
 - **`StudyExtraction`** — top-level record; composes all field groups plus `extraction_metadata`
 - **`BibliographicMetadata`** — §3.1; imported, no `_reasoning` columns; `VenueType` per Scimago quartile (current-year lookup) (`journal-q1` … `journal-q4`, `conference-proceedings`, `tier-1-preprint`, `grey-literature`)
-- **`StudyCharacterization`** — §3.2; `research_type`, `validation_status` with rationale fields
-- **`StrategicPlanningScope`** — §3.3; subdomains, planning tasks (§5 vocabulary), horizon tier, system-configuring decision, theoretical frameworks — each with free-text rationale/specification fields
-- **`LLMIntervention`** — §3.4; flat intervention description with models, families, open-weight, fine-tuning, patterns, integrations
-- **`ORSubstrate`** — §3.5; optimization tradition, formalization level, solver
-- **`EvaluationAndOutcomes`** — §3.6; `ReportedMetric` requires value, unit, context, and page/section reference per numeric metric
+- **`StudyCharacterization`** — §3.2; `research_type` (Wieringa et al. 2006: validation/evaluation research, solution proposal, philosophical/opinion/experience paper), `validation_status` (maturity axis) with rationale fields
+- **`StrategicPlanningScope`** — §3.3; subdomains (closed inclusion gate), planning tasks (§5 vocabulary, `TASK_SUBDOMAINS` mapping), SCP-matrix process, VDI 5200 phase, stated horizon, reviewer-judged and author-claimed tiers, system-configuring decision, theoretical frameworks
+- **`LLMIntervention`** — §3.4; models, families, open-weight, size, deployment, modality, fine-tuning (multi), prompting techniques, agentic architecture + workflow patterns (Anthropic 2024), memory / reflection / tool use, integrations
+- **`ORSubstrate`** — §3.5; optimization tradition, ordinal formalization level, optimization paradigm (incl. MCDM, simulation-optimization, stochastic/robust), LLM role relative to the optimizer, solver
+- **`EvaluationAndOutcomes`** — §3.6; study design, FEDS paradigm, LLM-specific evaluation properties; `ReportedMetric` requires value, unit, context, and page/section reference per numeric metric
 - **`RetrievalTraceability`** — §3.7; `anchor_papers` required iff source is `snowballing`
-- **`GapIndicators`** — §3.8; type enums and their `_reasoning` enforced conditional on `*_present` flags via validators
-- **`QualityAppraisal`** — §3.9; Q1–Q4 (`AppraisalAnswer`) each with `_reasoning`; computed `low_quality_flag`. `StudyExtraction.study_type_category` (A/B/C) is computed from `validation_status` via `CATEGORY_BY_VALIDATION_STATUS`
+- **`GapIndicators`** — §3.8; type enums and their `_reasoning` enforced conditional on `*_present` flags via validators; automation stage and decision autonomy (Parasuraman et al. 2000); KG detail fields
+- **`QualityAppraisal`** — §3.9; Q1–Q4 (`AppraisalAnswer`) each with `_reasoning` and a documented MMAT/Hevner mapping; non-scored reproducibility block (TRIPOD-LLM); computed `low_quality_flag`. `StudyExtraction.study_type_category` (A/B/C) is computed from `validation_status` via `CATEGORY_BY_VALIDATION_STATUS`
 - **`ExtractionMetaData`** — §7/§8; per-field provenance (`M`/`H`/`L-V`/`L-C`/`D`), `FieldVerdict` list per field (reviewer, status `Y`/`corrected`/`unverifiable`, own value + reasoning), computed `verified_by` (e.g. `R1;R2`), `llm_raw` originals
 
 Free-text conventions: `*_reasoning` / `*_rationale` (justification + evidence locator for the sibling value, §4), `*_description` (elaboration of what the paper reports), `*_other_specification` (required detail when an enum `other` value is used).
 
 ## Validation Rules
 
-- Gap indicator type fields (and their `_reasoning`) required iff the corresponding `*_present` flag is true
+- Gap indicator type fields (and their `_reasoning`) required iff the corresponding `*_present` flag is true; `kg_*` fields required iff `domain_knowledge_type` includes `ontology` or `knowledge-graph`; `standards_encoded` non-empty iff it includes `standards-encoding`
+- Every `other` value requires its `*_other_specification` / `other_*_specification` field, which must be null otherwise
 - `QualityAppraisal.low_quality_flag` auto-computed (`No` on ≥ 2 items); study-type category derived, not coded
-- `integrations` / `comparator` / `theoretical_framework_cited`: `none` mutually exclusive; `planning_horizon_tiers`: `NA` exclusive
+- `none` / `NA` values are mutually exclusive with other values in every multi-select; multi-selects that make no sense empty (`subdomain`, `planning_task_type`, `integrations`, `comparator`, `theoretical_framework_cited`, …) need at least one value; duplicates are dropped
+- `model_family` non-empty iff `models` is non-empty
+- `study_design` is `["none"]` iff `validation_status` is `framework-only` or `conceptual`; `evaluation_paradigm` is `NA` iff `study_design` is `none`
+- `formalization_level` is `none` and `optimization_paradigm` empty iff `optimization_tradition_present` is false
+- `vdi5200_phase` is `NA` iff `factory-planning` is not in `subdomain`
+- `extraction_metadata` keys must be field paths of `StudyExtraction` (typos are rejected)
+- Soft checks (reviewers may override) are reported in the computed `StudyExtraction.consistency_flags`, e.g. `open_weight = Y` with only GPT/Claude/Gemini, a `solver` integration without optimization, metrics on a `prototype`, planning tasks outside the coded subdomains (`TASK_SUBDOMAINS`)
 - `FieldVerdict.corrected_value` required iff status is `corrected`
 - `ReportedMetric.page_section_reference` mandatory for every numeric metric (§2)
 
@@ -249,6 +278,7 @@ slr-data-model/
 │   ├── provenance.py               # §7/§8 provenance and verification
 │   ├── study_extraction.py         # Top-level StudyExtraction record
 │   ├── descriptive_enum.py         # Base enumeration with descriptions
+│   ├── common.py                   # NR sentinel, YesNoUnclear, shared cross-field rules
 │   └── annotation_helper.py        # Helper for enum type annotations
 ├── test/                           # Test files
 ├── pyproject.toml                  # Project configuration
@@ -265,12 +295,20 @@ pytest
 
 ## Requirements
 
-- Python >= 3.8
+- Python >= 3.9
 - Pydantic >= 2.0.0
 
 ## Version
 
-Current version: 0.7.0
+Current version: 0.9.0 (`StudyExtraction.schema_version`)
+
+### 0.9.0 — revision after the v0.8.0 review
+
+Records coded under 0.8.0 need re-coding of the changed fields (protocol deviation; log it). Sources for each change are cited in the code comments and enum docstrings.
+
+- **Fixes (A1–A10):** `study_design = none` for conceptual papers; enforced `formalization_level`/`optimization_tradition_present` link; generic `other`-specification rule; non-empty and de-duplicated multi-selects; soft `consistency_flags`; shared `NR` sentinel and `YesNoUnclear`; validated metadata keys; tests import the package (`pythonpath = ["src"]`), Python ≥ 3.9; `strict_json_schema()`
+- **Renamed / removed:** `ResearchType` values replaced by the Wieringa et al. (2006) facet; `StudyDesignType.BENCHMARK` → `test-set`; `FormalizationLevel` values → `high`/`medium`/`low`/`none`; `validation_method` removed; `IntegrationType.KG` removed (derived as `kg_integrated`); planning tasks `site-selection` → `facility-location`, `distribution-network-planning` + `logistics-network-planning` → `logistics-distribution-network-planning`; `fine_tuning` is now a list; `time_horizon_explicitly_stated` and `independent_evaluation` are `YesNoUnclear`
+- **Added (B1–B9):** see the field groups above
 
 ## License
 

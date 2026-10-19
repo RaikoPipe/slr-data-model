@@ -2,7 +2,7 @@
 import pytest
 from pydantic import ValidationError
 
-from src.slr_data_model import (
+from slr_data_model import (
     StudyExtraction,
     BibliographicMetadata,
     VenueType,
@@ -18,7 +18,6 @@ from src.slr_data_model import (
     ModelFamilyType,
     OpenWeightType,
     FineTuningType,
-    ArchitecturalPatternType,
     AgenticArchitectureType,
     IntegrationType,
     ORSubstrate,
@@ -41,6 +40,25 @@ from src.slr_data_model import (
     ReviewerRole,
     VerificationStatus,
     FieldVerdict,
+    NR,
+    YesNoUnclear,
+    SCPProcess,
+    VDI5200Phase,
+    PromptingTechnique,
+    WorkflowPattern,
+    AgentMemory,
+    DeploymentType,
+    ModalityType,
+    OptimizationParadigm,
+    LLMORRole,
+    EvaluationParadigm,
+    KGModel,
+    KGConstruction,
+    KGUsage,
+    AutomationStage,
+    DecisionAutonomy,
+    PromptDisclosure,
+    strict_json_schema,
 )
 
 R = "p. 3, §2"  # placeholder reasoning + locator
@@ -66,7 +84,7 @@ def make_bibliographic(**overrides):
 
 def make_characterization(**overrides):
     defaults = dict(
-        research_type=ResearchType.DESIGN_SCIENCE,
+        research_type=ResearchType.VALIDATION_RESEARCH,
         research_type_rationale="Artifact creation with iterative evaluation.",
         validation_status=ValidationStatusType.IMPLEMENTED_VALIDATED,
         validation_status_rationale="Working system evaluated on benchmark with quantitative metrics.",
@@ -86,14 +104,23 @@ def make_strategic_scope(**overrides):
         subdomain=[SubdomainType.FACTORY_PLANNING],
         subdomain_mapping_rationale="Task mapped per Appendix A decision tree.",
         planning_task_type=[PlanningTaskType.FACTORY_LAYOUT_PLANNING, PlanningTaskType.CAPACITY_DIMENSIONING],
-        time_horizon_explicitly_stated=True,
+        scp_process=[SCPProcess.PRODUCTION],
+        vdi5200_phase=[VDI5200Phase.CONCEPT_PLANNING],
+        time_horizon_explicitly_stated=YesNoUnclear.YES,
+        stated_horizon_value="5 years",
         planning_horizon_tiers=[PlanningHorizonTier.STRATEGIC],
+        authors_claimed_tier=[PlanningHorizonTier.STRATEGIC],
         planning_horizon_rationale="Paper states a 5-year planning horizon.",
+        system_configuring_decision=True,
         system_configuring_decision_stated=True,
         system_configuring_decision_description="Determines workshop layout and machine capacities.",
         theoretical_framework_cited=[TheoreticalFrameworkType.VDI_5200],
         planning_task_type_reasoning=R,
+        scp_process_reasoning=R,
+        vdi5200_phase_reasoning=R,
+        authors_claimed_tier_reasoning=R,
         time_horizon_explicitly_stated_reasoning=R,
+        system_configuring_decision_reasoning=R,
         system_configuring_decision_stated_reasoning=R,
         theoretical_framework_cited_reasoning=R,
     )
@@ -107,16 +134,26 @@ def make_llm_intervention(**overrides):
         models=["GPT-4o"],
         model_family=[ModelFamilyType.GPT],
         open_weight=OpenWeightType.NO,
-        fine_tuning=FineTuningType.PROMPT_ENGINEERING_ONLY,
-        architectural_pattern=[ArchitecturalPatternType.LLM_SOLVER],
+        deployment=DeploymentType.API,
+        modality=ModalityType.TEXT,
+        fine_tuning=[FineTuningType.NONE],
+        prompting_techniques=[PromptingTechnique.FEW_SHOT, PromptingTechnique.REACT],
         agentic_architecture=AgenticArchitectureType.SINGLE_AGENT,
+        workflow_patterns=[WorkflowPattern.NONE],
+        agent_memory=AgentMemory.SHORT_TERM,
+        planning_reflection=False,
+        tool_use=True,
         integrations=[IntegrationType.SOLVER],
         models_rationale="No other LLMs discussed.",
         model_family_reasoning=R,
         open_weight_rationale=R,
+        deployment_reasoning=R,
+        modality_reasoning=R,
         fine_tuning_reasoning=R,
-        architectural_pattern_reasoning=R,
+        prompting_techniques_reasoning=R,
         agentic_architecture_reasoning=R,
+        workflow_patterns_reasoning=R,
+        agent_capabilities_reasoning=R,
         integrations_reasoning=R,
     )
     defaults.update(overrides)
@@ -126,11 +163,15 @@ def make_llm_intervention(**overrides):
 def make_or_substrate(**overrides):
     defaults = dict(
         optimization_tradition_present=True,
-        formalization_level=FormalizationLevel.MATURE_MILP,
+        formalization_level=FormalizationLevel.HIGH,
+        optimization_paradigm=[OptimizationParadigm.MILP_LP],
+        llm_or_role=[LLMORRole.SOLVER_ORCHESTRATOR],
         solver_type="Gurobi",
         optimization_description="MILP minimizing material flow distance over layout alternatives.",
         optimization_tradition_present_reasoning=R,
         formalization_level_reasoning=R,
+        optimization_paradigm_reasoning=R,
+        llm_or_role_reasoning=R,
         solver_type_reasoning=R,
     )
     defaults.update(overrides)
@@ -139,7 +180,6 @@ def make_or_substrate(**overrides):
 
 def make_evaluation(**overrides):
     defaults = dict(
-        validation_method=["benchmark comparison"],
         dataset_or_benchmark="12 layout cases from VDI 5200 companion examples",
         comparator=[ComparatorType.HUMAN_PLANNER],
         reported_metrics=[
@@ -151,15 +191,23 @@ def make_evaluation(**overrides):
                 page_section_reference="p. 8, Table 3",
             )
         ],
-        study_design=StudyDesignType.BENCHMARK,
+        study_design=[StudyDesignType.TEST_SET],
+        evaluation_paradigm=EvaluationParadigm.ARTIFICIAL,
+        independent_evaluation=YesNoUnclear.NO,
+        repeated_runs=3,
+        llm_as_judge=False,
+        efficiency_metrics_reported=True,
+        statistical_testing=False,
+        llm_evaluation_properties_reasoning=R,
         sample_size="12 test cases",
         reported_limitations=["Single LLM evaluated; results may not generalize to other models."],
         outcome_summary="LLM-assisted planning reduced time by 12-15% with equal layout quality.",
-        validation_method_reasoning=R,
+        evaluation_paradigm_reasoning=R,
         dataset_or_benchmark_reasoning=R,
         comparator_reasoning=R,
         reported_metrics_reasoning=R,
         study_design_reasoning=R,
+        independent_evaluation_reasoning=R,
         sample_size_reasoning=R,
         reported_limitations_reasoning=R,
     )
@@ -170,13 +218,18 @@ def make_evaluation(**overrides):
 def make_gap_indicators(**overrides):
     defaults = dict(
         hitl_pattern_present=True,
-        hitl_type=HITLType.APPROVAL_GATE,
+        hitl_type=[HITLType.APPROVAL_GATE],
         hitl_description="Planner approves generated layout before solver runs.",
         domain_knowledge_formalization_present=True,
-        domain_knowledge_type=DomainKnowledgeType.STANDARDS_ENCODING,
+        domain_knowledge_type=[DomainKnowledgeType.STANDARDS_ENCODING],
         domain_knowledge_description="VDI 5200 phase model encoded as structured prompts.",
+        standards_encoded=["VDI 5200"],
+        automation_stage=[AutomationStage.INFORMATION_ANALYSIS, AutomationStage.DECISION_SELECTION],
+        automation_stage_reasoning=R,
+        decision_autonomy=DecisionAutonomy.L2_RECOMMENDATION,
+        decision_autonomy_reasoning=R,
         evaluation_framework_used=True,
-        evaluation_framework_type=EvaluationFrameworkType.BENCHMARK,
+        evaluation_framework_type=[EvaluationFrameworkType.BENCHMARK],
         hitl_pattern_present_reasoning=R,
         hitl_type_reasoning=R,
         domain_knowledge_formalization_present_reasoning=R,
@@ -198,6 +251,13 @@ def make_quality_appraisal(**overrides):
         q3_validity_and_limitation_discussion_reasoning="Scalability discussed, external validity not.",
         q4_positioning_against_prior_work=AppraisalAnswer.YES,
         q4_positioning_against_prior_work_reasoning="Explicit comparison table vs. prior work.",
+        model_version_reported=True,
+        prompts_disclosed=PromptDisclosure.FULL,
+        decoding_params_reported=True,
+        code_available=False,
+        data_available=False,
+        run_date_reported=False,
+        reproducibility_reasoning=R,
     )
     defaults.update(overrides)
     return QualityAppraisal(**defaults)
@@ -232,6 +292,24 @@ def make_study_extraction(**overrides):
     return StudyExtraction(**defaults)
 
 
+def make_conceptual_study(status=ValidationStatusType.FRAMEWORK_ONLY, **overrides):
+    """A1: category-C study without any evaluation of its own method."""
+    return make_study_extraction(
+        study_characterization=make_characterization(
+            research_type=ResearchType.SOLUTION_PROPOSAL, validation_status=status
+        ),
+        evaluation_and_outcomes=make_evaluation(
+            study_design=[StudyDesignType.NONE],
+            evaluation_paradigm=EvaluationParadigm.NA,
+            comparator=[ComparatorType.NONE],
+            reported_metrics=[],
+            repeated_runs="NR",
+            efficiency_metrics_reported=False,
+        ),
+        **overrides,
+    )
+
+
 class TestStudyExtraction:
     def test_complete_record_valid(self):
         record = make_study_extraction()
@@ -241,7 +319,7 @@ class TestStudyExtraction:
         assert record.llm_intervention.models == ["GPT-4o"]
         assert record.or_substrate.solver_type == "Gurobi"
         assert record.evaluation_and_outcomes.reported_metrics[0].page_section_reference == "p. 8, Table 3"
-        assert record.gap_indicators.hitl_type == HITLType.APPROVAL_GATE
+        assert record.gap_indicators.hitl_type == [HITLType.APPROVAL_GATE]
 
     def test_json_roundtrip(self):
         record = make_study_extraction()
@@ -259,13 +337,13 @@ class TestStudyExtraction:
 
     def test_study_type_category_derived_from_validation_status(self):
         assert make_study_extraction().study_type_category == StudyTypeCategory.A
-        for status, category in (
-            (ValidationStatusType.PROTOTYPE, StudyTypeCategory.B),
-            (ValidationStatusType.FRAMEWORK_ONLY, StudyTypeCategory.C),
-            (ValidationStatusType.CONCEPTUAL, StudyTypeCategory.C),
-        ):
-            record = make_study_extraction(study_characterization=make_characterization(validation_status=status))
-            assert record.study_type_category == category
+        record = make_study_extraction(
+            study_characterization=make_characterization(validation_status=ValidationStatusType.PROTOTYPE)
+        )
+        assert record.study_type_category == StudyTypeCategory.B
+        for status in (ValidationStatusType.FRAMEWORK_ONLY, ValidationStatusType.CONCEPTUAL):
+            record = make_conceptual_study(status)
+            assert record.study_type_category == StudyTypeCategory.C
         dumped = make_study_extraction().model_dump(mode="json")
         assert dumped["study_type_category"] == "A"
         assert dumped["quality_appraisal"]["low_quality_flag"] is False
@@ -274,6 +352,7 @@ class TestStudyExtraction:
         schema = StudyExtraction.model_json_schema()
         assert "study_type_category" not in schema["properties"]
         assert "low_quality_flag" not in schema["$defs"]["QualityAppraisal"]["properties"]
+        assert "consistency_flags" not in schema["properties"] and "kg_integrated" not in schema["properties"]
 
     def test_reasoning_fields_required(self):
         with pytest.raises(ValidationError, match="industry_sector_reasoning"):
@@ -316,21 +395,39 @@ class TestStudyExtraction:
             domain_knowledge_formalization_present=False,
             domain_knowledge_type=None,
             domain_knowledge_type_reasoning=None,
+            standards_encoded=[],
         ).domain_knowledge_type is None
 
     def test_integrations_none_exclusive(self):
         with pytest.raises(ValidationError, match="'none' cannot be combined"):
             make_llm_intervention(integrations=[IntegrationType.SOLVER, IntegrationType.NONE])
 
-    def test_architectural_pattern_list_valid(self):
-        # §5 pattern vocabulary has no 'none' member; multi-pattern selection is allowed.
-        intervention = make_llm_intervention(
-            architectural_pattern=[
-                ArchitecturalPatternType.RAG,
-                ArchitecturalPatternType.LLM_SOLVER,
-            ]
+    def test_gap_indicator_types_multi_select(self):
+        gi = make_gap_indicators(
+            hitl_type=[HITLType.APPROVAL_GATE, HITLType.WHAT_IF_INTERFACE],
+            evaluation_framework_type=[EvaluationFrameworkType.CUSTOM_TEST_SET, EvaluationFrameworkType.RUBRIC],
         )
-        assert len(intervention.architectural_pattern) == 2
+        assert len(gi.hitl_type) == 2 and len(gi.evaluation_framework_type) == 2
+        with pytest.raises(ValidationError, match="hitl_type is required"):
+            make_gap_indicators(hitl_type=[])
+
+    def test_study_design_multi_select(self):
+        ev = make_evaluation(study_design=[StudyDesignType.MULTI_CASE, StudyDesignType.USER_STUDY])
+        assert len(ev.study_design) == 2
+        with pytest.raises(ValidationError):
+            make_evaluation(study_design=[])
+
+    def test_system_configuring_decision_drives_strategic_tier(self):
+        tactical = [PlanningHorizonTier.TACTICAL]
+        with pytest.raises(ValidationError, match="iff system_configuring_decision"):
+            make_strategic_scope(system_configuring_decision=False, system_configuring_decision_stated=False)
+        with pytest.raises(ValidationError, match="iff system_configuring_decision"):
+            make_strategic_scope(planning_horizon_tiers=tactical)
+        with pytest.raises(ValidationError, match="requires system_configuring_decision"):
+            make_strategic_scope(system_configuring_decision=False, planning_horizon_tiers=tactical)
+        assert not make_strategic_scope(
+            system_configuring_decision=False, system_configuring_decision_stated=False, planning_horizon_tiers=tactical
+        ).system_configuring_decision
 
     def test_model_family_multiple_valid(self):
         # model_family has no 'none' member; multiple families for multiple models.
@@ -434,6 +531,138 @@ class TestStudyExtraction:
             )
 
     def test_bibliographic_defaults_optional_fields(self):
-        bib = make_bibliographic(funding_description=None)
-        assert bib.funding_source == "NR"
+        bib = make_bibliographic(funding_description=None, funding_source=None)
+        assert bib.funding_source == NR
         assert bib.funding_description is None
+
+
+class TestV090Rules:
+    """Rules added in schema 0.9.0 (v0.8.0 review items A1-A10, B1-B9)."""
+
+    def test_schema_version_recorded(self):
+        assert make_study_extraction().schema_version == "0.9.0"
+
+    def test_a1_conceptual_paper_encodable(self):
+        assert make_conceptual_study().evaluation_and_outcomes.study_design == [StudyDesignType.NONE]
+        with pytest.raises(ValidationError, match="iff validation_status is framework-only"):
+            make_study_extraction(evaluation_and_outcomes=make_conceptual_study().evaluation_and_outcomes)
+        with pytest.raises(ValidationError, match="iff validation_status is framework-only"):
+            make_study_extraction(study_characterization=make_characterization(
+                validation_status=ValidationStatusType.CONCEPTUAL))
+        with pytest.raises(ValidationError, match="'none' cannot be combined"):
+            make_evaluation(study_design=[StudyDesignType.NONE, StudyDesignType.SINGLE_CASE])
+        with pytest.raises(ValidationError, match="evaluation_paradigm must be 'NA'"):
+            make_evaluation(evaluation_paradigm=EvaluationParadigm.NA)
+
+    def test_a2_formalization_none_iff_no_optimization(self):
+        with pytest.raises(ValidationError, match="formalization_level must be 'none'"):
+            make_or_substrate(formalization_level=FormalizationLevel.NONE)
+        with pytest.raises(ValidationError, match="formalization_level must be 'none'"):
+            make_or_substrate(optimization_tradition_present=False, optimization_paradigm=[])
+        with pytest.raises(ValidationError, match="optimization_paradigm must be null"):
+            make_or_substrate(optimization_tradition_present=False, formalization_level=FormalizationLevel.NONE)
+        assert make_or_substrate(
+            optimization_tradition_present=False, formalization_level=FormalizationLevel.NONE,
+            optimization_paradigm=[], llm_or_role=[LLMORRole.NONE], solver_type=None,
+        ).solver_type == NR
+
+    def test_a3_other_requires_specification_everywhere(self):
+        cases = [
+            (make_strategic_scope, "planning_task_type", [PlanningTaskType.OTHER], "other_planning_task_specification"),
+            (make_llm_intervention, "model_family", [ModelFamilyType.OTHER], "other_model_family_specification"),
+            (make_llm_intervention, "fine_tuning", [FineTuningType.OTHER], "other_fine_tuning_specification"),
+            (make_llm_intervention, "prompting_techniques", [PromptingTechnique.OTHER], "other_prompting_technique_specification"),
+            (make_gap_indicators, "hitl_type", [HITLType.OTHER], "hitl_type_other_specification"),
+            (make_gap_indicators, "evaluation_framework_type", [EvaluationFrameworkType.OTHER], "evaluation_framework_type_other_specification"),
+            (make_or_substrate, "optimization_paradigm", [OptimizationParadigm.OTHER], "other_optimization_paradigm_specification"),
+        ]
+        for factory, field, value, spec in cases:
+            with pytest.raises(ValidationError, match=f"{spec} is required"):
+                factory(**{field: value})
+            assert getattr(factory(**{field: value, spec: "x"}), spec) == "x"
+            with pytest.raises(ValidationError, match=f"{spec} must be null"):
+                factory(**{spec: "stray"})
+
+    def test_a4_empty_lists_rejected(self):
+        for factory, field in (
+            (make_strategic_scope, "subdomain"),
+            (make_strategic_scope, "planning_task_type"),
+            (make_strategic_scope, "theoretical_framework_cited"),
+            (make_llm_intervention, "integrations"),
+            (make_evaluation, "comparator"),
+        ):
+            with pytest.raises(ValidationError, match=field):
+                factory(**{field: []})
+        with pytest.raises(ValidationError, match="model_family is required"):
+            make_llm_intervention(model_family=[])
+        with pytest.raises(ValidationError, match="model_family must be null"):
+            make_llm_intervention(models=[])
+
+    def test_a5_duplicates_dropped_in_order(self):
+        scope = make_strategic_scope(planning_task_type=[
+            PlanningTaskType.MATERIAL_FLOW_DESIGN, PlanningTaskType.FACTORY_LAYOUT_PLANNING,
+            PlanningTaskType.MATERIAL_FLOW_DESIGN,
+        ])
+        assert scope.planning_task_type == [PlanningTaskType.MATERIAL_FLOW_DESIGN, PlanningTaskType.FACTORY_LAYOUT_PLANNING]
+
+    def test_a6_consistency_flags_are_soft(self):
+        assert make_study_extraction().consistency_flags == []
+        record = make_study_extraction(
+            study_characterization=make_characterization(validation_status=ValidationStatusType.PROTOTYPE),
+            llm_intervention=make_llm_intervention(open_weight=OpenWeightType.YES),
+            or_substrate=make_or_substrate(
+                optimization_tradition_present=False, formalization_level=FormalizationLevel.NONE,
+                optimization_paradigm=[],
+            ),
+        )
+        flags = " | ".join(record.consistency_flags)
+        assert "open_weight" in flags and "'solver'" in flags and "llm_or_role" in flags and "prototype" in flags
+        mismatch = make_study_extraction(strategic_planning_scope=make_strategic_scope(
+            planning_task_type=[PlanningTaskType.GPN_CONFIGURATION]))
+        assert any("GPN-configuration" in f for f in mismatch.consistency_flags)
+
+    def test_a7_not_reported_sentinel(self):
+        ev = make_evaluation(sample_size="n/a", dataset_or_benchmark=None, reported_limitations=["NR"], repeated_runs="NR")
+        assert ev.sample_size == NR and ev.dataset_or_benchmark == NR
+        assert ev.reported_limitations == [] and ev.repeated_runs == NR
+        with pytest.raises(ValidationError):
+            make_evaluation(repeated_runs=0)
+        assert make_evaluation(independent_evaluation=YesNoUnclear.UNCLEAR).independent_evaluation == YesNoUnclear.UNCLEAR
+
+    def test_a8_metadata_keys_validated(self):
+        bad = ExtractionMetaData(provenance={"strategic_planing_scope.subdomain": ProvenanceTag.LLM_VERIFIED})
+        with pytest.raises(ValidationError, match="strategic_planing_scope.subdomain"):
+            make_study_extraction(extraction_metadata=bad)
+        nested = ExtractionMetaData(llm_raw={"evaluation_and_outcomes.reported_metrics.value": "x"})
+        assert make_study_extraction(extraction_metadata=nested)
+
+    def test_a10_strict_schema(self):
+        schema = strict_json_schema()
+        nodes = [schema, *schema["$defs"].values()]
+        for node in nodes:
+            if "properties" in node:
+                assert set(node["required"]) == set(node["properties"])
+                assert node["additionalProperties"] is False
+                assert not any("default" in prop for prop in node["properties"].values())
+
+    def test_b4_vdi_phase_na_iff_not_factory_planning(self):
+        with pytest.raises(ValidationError, match="vdi5200_phase must be 'NA'"):
+            make_strategic_scope(vdi5200_phase=[VDI5200Phase.NA])
+        with pytest.raises(ValidationError, match="vdi5200_phase must be 'NA'"):
+            make_strategic_scope(subdomain=[SubdomainType.SITE_SELECTION],
+                                 planning_task_type=[PlanningTaskType.FACILITY_LOCATION])
+        with pytest.raises(ValidationError, match="'NA' cannot be combined"):
+            make_strategic_scope(scp_process=[SCPProcess.NA, SCPProcess.PRODUCTION])
+
+    def test_b8_kg_details_required_iff_kg(self):
+        kg = [DomainKnowledgeType.KNOWLEDGE_GRAPH]
+        with pytest.raises(ValidationError, match="kg_model is required"):
+            make_gap_indicators(domain_knowledge_type=kg, standards_encoded=[])
+        gi = make_gap_indicators(
+            domain_knowledge_type=kg, standards_encoded=[], kg_model=KGModel.RDF_OWL,
+            kg_construction=KGConstruction.HYBRID, kg_usage=[KGUsage.RETRIEVAL], kg_reasoning=R,
+        )
+        assert make_study_extraction(gap_indicators=gi).kg_integrated is True
+        assert make_study_extraction().kg_integrated is False
+        with pytest.raises(ValidationError, match="standards_encoded is required"):
+            make_gap_indicators(standards_encoded=[])

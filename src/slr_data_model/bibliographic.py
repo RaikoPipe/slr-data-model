@@ -3,6 +3,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 from .annotation_helper import make_type_annotations
+from .common import NR, ReportedStr
 from .descriptive_enum import DescriptiveEnum
 
 
@@ -19,8 +20,8 @@ class VenueType(DescriptiveEnum):
 
 class BibliographicMetadata(BaseModel):
     """Bibliographic metadata (§3.1): imported from search-stage records, gaps filled by R1; not LLM-extracted, so no _reasoning columns."""
-    doi: Optional[str] = Field(
-        default=None,
+    doi: ReportedStr = Field(
+        default=NR,
         description="Digital Object Identifier as reported. NR if absent."
     )
     title: str = Field(
@@ -48,8 +49,8 @@ class BibliographicMetadata(BaseModel):
     language: str = Field(
         description="Language of publication (e.g., 'English', 'German')."
     )
-    funding_source: Optional[str] = Field(
-        default=None,
+    funding_source: ReportedStr = Field(
+        default=NR,
         description="Funding source as reported. NR if absent."
     )
     funding_description: Optional[str] = Field(
