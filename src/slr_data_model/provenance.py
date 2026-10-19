@@ -61,7 +61,8 @@ class ExtractionMetaData(BaseModel):
     """Provenance and verification metadata (§7, §8).
 
     All maps are keyed by field path relative to the study record
-    (e.g., 'strategic_planning_scope.planning_horizon_tiers').
+    (e.g., 'strategic_planning_scope.planning_horizon_tiers'); keys are checked against the real field paths
+    on StudyExtraction, so typos are rejected (A8, v0.8.0 review).
     Per-field notes live in the record's `<field>_reasoning` columns (§4).
     """
     provenance: dict[str, ProvenanceTag] = Field(
