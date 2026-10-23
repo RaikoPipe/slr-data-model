@@ -48,10 +48,10 @@ from slr_data_model import (
     LLMIntervention, ModelFamilyType, OpenWeightType, DeploymentType, ModalityType, FineTuningType,
     PromptingTechnique, AgenticArchitectureType, WorkflowPattern, AgentMemory, IntegrationType,
     ORSubstrate, FormalizationLevel, OptimizationParadigm, LLMORRole,
-    EvaluationAndOutcomes, EvaluationParadigm, ReportedMetric, ComparatorType, StudyDesignType,
+    EvaluationAndOutcomes, EvaluationParadigm, EfficiencyReporting, ReportedMetric, ComparatorType, StudyDesignType,
     GapIndicators, HITLType, AutomationStage, DecisionAutonomy,
     RetrievalTraceability, RetrievalSource,
-    QualityAppraisal, AppraisalAnswer, PromptDisclosure,
+    QualityAppraisal, AppraisalAnswer, PromptDisclosure, DataAvailability,
     ExtractionMetaData, ProvenanceTag, ReviewerRole, VerificationStatus, FieldVerdict,
 )
 
@@ -165,7 +165,7 @@ record = StudyExtraction(
         sample_size_reasoning="p. 8, §5.",
         repeated_runs="NR",
         llm_as_judge=False,
-        efficiency_metrics_reported=True,
+        efficiency_metrics_reported=EfficiencyReporting.YES,
         statistical_testing=False,
         llm_evaluation_properties_reasoning="Run time reported (Table 3); runs per case not stated.",
         reported_limitations=["Single LLM evaluated."],
@@ -202,7 +202,7 @@ record = StudyExtraction(
         prompts_disclosed=PromptDisclosure.FULL,
         decoding_params_reported=True,
         code_available=False,
-        data_available=False,
+        data_available=DataAvailability.NONE,
         run_date_reported=False,
         reproducibility_reasoning="'gpt-4o-2024-08-06', temperature 0 (Appendix B); no repository link.",
     ),
@@ -253,7 +253,7 @@ Free-text conventions: `*_reasoning` / `*_rationale` (justification + evidence l
 - `none` / `NA` values are mutually exclusive with other values in every multi-select; multi-selects that make no sense empty (`subdomain`, `planning_task_type`, `integrations`, `comparator`, `theoretical_framework_cited`, …) need at least one value; duplicates are dropped
 - `model_family` non-empty iff `models` is non-empty
 - `study_design` is `["none"]` iff `validation_status` is `framework-only` or `conceptual`; `evaluation_paradigm` is `NA` iff `study_design` is `none`
-- `formalization_level` is `none` and `optimization_paradigm` empty iff `optimization_tradition_present` is false
+- `formalization_level` is `none` and `optimization_paradigm` empty iff `optimization_tradition_present` is false; `llm_or_role` is `none` if it is false
 - `vdi5200_phase` is `NA` iff `factory-planning` is not in `subdomain`
 - `extraction_metadata` keys must be field paths of `StudyExtraction` (typos are rejected)
 - Soft checks (reviewers may override) are reported in the computed `StudyExtraction.consistency_flags`, e.g. `open_weight = Y` with only GPT/Claude/Gemini, a `solver` integration without optimization, metrics on a `prototype`, planning tasks outside the coded subdomains (`TASK_SUBDOMAINS`)
@@ -300,7 +300,15 @@ pytest
 
 ## Version
 
-Current version: 0.9.0 (`StudyExtraction.schema_version`)
+Current version: 0.10.0 (`StudyExtraction.schema_version`)
+
+### 0.10.0 — revision after the R1/R2 triage
+
+Records coded under 0.9.0 need re-coding of the three retyped fields and of `llm_or_role` where it conflicts.
+
+- **Type changes:** `repeated_runs` is free text so the count can be tied to its case (D015); `data_available` is `DataAvailability` full/partial/none (D025); `efficiency_metrics_reported` is `EfficiencyReporting` yes/partially/no (D153)
+- **Enforced:** `llm_or_role` must be `none` when `optimization_tradition_present` is false (was a soft flag; D075/D079)
+- **Clarified definitions:** `authors_claimed_tier` only on explicit tier labels (D035, D060, D140); `vdi5200_phase` only with `factory-planning` (D034); real-company-data cases are `evaluation-research` (D001); `models` excludes preliminary-test models (D065); `approval-gate` requires active correction (D086); `decision-selection` requires the system to rank (D092); `rubric` requires an explicit scoring scale (D052); `database-SQL` only for LLM-generated SQL, `simulation-platform` only for an external platform (D111); `parallelization` also at system level (D110)
 
 ### 0.9.0 — revision after the v0.8.0 review
 

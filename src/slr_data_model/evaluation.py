@@ -1,9 +1,9 @@
-from typing import Annotated, Optional, Union
+from typing import Optional
 
 from pydantic import BaseModel, Field, model_validator
 
 from .annotation_helper import make_type_annotations, reasoning_field
-from .common import NR, NotReported, ReportedList, ReportedStr, UniqueList, YesNoUnclear, exclusive
+from .common import NR, ReportedList, ReportedStr, UniqueList, YesNoUnclear, exclusive
 from .descriptive_enum import DescriptiveEnum
 
 
@@ -43,6 +43,13 @@ class EvaluationParadigm(DescriptiveEnum):
     NATURALISTIC = "naturalistic", "All evaluation episodes are naturalistic"
     BOTH = "both", "Both artificial and naturalistic episodes"
     NA = "NA", "No evaluation (study_design is 'none')"
+
+
+class EfficiencyReporting(DescriptiveEnum):
+    """How completely cost, latency/run time or token usage of the LLM system is reported (v0.10.0, D153)."""
+    YES = "yes", "Reported quantitatively for the evaluated configurations"
+    PARTIALLY = "partially", "Reported only for some cases/configurations, or only qualitatively (e.g., 'a few minutes')"
+    NO = "no", "Not reported"
 
 
 class ReportedMetric(BaseModel):
@@ -119,15 +126,17 @@ class EvaluationAndOutcomes(BaseModel):
     # and Chatbot Arena", NeurIPS 2023); efficiency as an evaluation dimension (Liang et al., "Holistic
     # Evaluation of Language Models", TMLR 2023); significance testing (Dror et al., "The Hitchhiker's Guide to
     # Testing Statistical Significance in NLP", ACL 2018).
-    repeated_runs: Union[Annotated[int, Field(ge=1)], NotReported] = Field(
-        description="Number of repeated runs per test item/case used to capture LLM output variability "
-        "(1 if explicitly a single run). NR if not reported."
+    repeated_runs: ReportedStr = Field(
+        description="Number of repeated runs per test item/case used to capture LLM output variability, tied to "
+        "the case it refers to when it differs (e.g., '10 for Case A, 11 for Case B'); '1' if explicitly a single "
+        "run. NR if not reported. Free text since v0.10.0 (D015)."
     )
     llm_as_judge: bool = Field(
         description="True if an LLM scores or judges the outputs of the paper's method."
     )
-    efficiency_metrics_reported: bool = Field(
-        description="True if cost, latency/run time, or token usage of the LLM system is reported."
+    efficiency_metrics_reported: EfficiencyReporting = Field(
+        description="Whether cost, latency/run time, or token usage of the LLM system is reported."
+        + make_type_annotations(EfficiencyReporting)
     )
     statistical_testing: bool = Field(
         description="True if a statistical significance test or confidence interval is reported for a comparison."

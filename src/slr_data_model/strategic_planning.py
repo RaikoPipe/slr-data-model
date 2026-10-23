@@ -186,8 +186,8 @@ class StrategicPlanningScope(BaseModel):
     scp_process_reasoning: str = reasoning_field()
     vdi5200_phase: UniqueList[VDI5200Phase] = Field(
         min_length=1,
-        description="VDI 5200 factory planning phase(s) the method supports, pick all applicable. 'NA' (exclusive) "
-        "iff 'factory-planning' is not in subdomain." + make_type_annotations(VDI5200Phase)
+        description="VDI 5200 factory planning phase(s) the method supports, pick all applicable. Applies only when "
+        "'factory-planning' is among the subdomains; 'NA' (exclusive) iff it is not (D034)." + make_type_annotations(VDI5200Phase)
     )
     vdi5200_phase_reasoning: str = reasoning_field()
     time_horizon_explicitly_stated: YesNoUnclear = Field(
@@ -211,7 +211,8 @@ class StrategicPlanningScope(BaseModel):
     authors_claimed_tier: UniqueList[PlanningHorizonTier] = Field(
         min_length=1,
         description="Tier(s) the authors themselves claim to address (e.g., 'strategic planning'), regardless of "
-        "the reviewer judgement in planning_horizon_tiers; 'NA' if the authors make no tier claim. Compared with "
+        "the reviewer judgement in planning_horizon_tiers. Code a tier only if the paper explicitly uses its label "
+        "('strategic', 'tactical', 'operational'); otherwise 'NA', never inferred from the task (D035, D060, D140). Compared with "
         "planning_horizon_tiers in the analysis ('claimed strategic, actually tactical')."
         + make_type_annotations(PlanningHorizonTier)
     )

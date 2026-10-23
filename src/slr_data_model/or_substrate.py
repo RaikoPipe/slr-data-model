@@ -93,7 +93,8 @@ class ORSubstrate(BaseModel):
     llm_or_role: UniqueList[LLMORRole] = Field(
         min_length=1,
         description="All roles the LLM plays relative to the optimizer, pick all applicable; 'none' (exclusive) if "
-        "there is no optimizer or the LLM does not interact with it." + make_type_annotations(LLMORRole)
+        "there is no optimizer or the LLM does not interact with it; must be 'none' if optimization_tradition_present "
+        "is false (D075/D079)." + make_type_annotations(LLMORRole)
     )
     llm_or_role_reasoning: str = reasoning_field()
     solver_type: ReportedStr = Field(
@@ -108,11 +109,14 @@ class ORSubstrate(BaseModel):
 
     @model_validator(mode="after")
     def validate_optimization_present(self):
-        """A2 (v0.8.0 review): formalization_level 'none' and an empty paradigm list iff no optimization is present."""
+        """A2 (v0.8.0 review): formalization_level 'none' and an empty paradigm list iff no optimization is present;
+        llm_or_role 'none' if no optimization is present (v0.10.0, D075/D079: was only a soft flag)."""
         present = self.optimization_tradition_present
         if present == (self.formalization_level == FormalizationLevel.NONE):
             raise ValueError("formalization_level must be 'none' iff optimization_tradition_present is false")
         require_iff(self, "optimization_paradigm", present, "optimization_tradition_present is true")
         require_spec_iff(self, "optimization_paradigm", OptimizationParadigm.OTHER, "other_optimization_paradigm_specification")
         exclusive(self, "llm_or_role", LLMORRole.NONE)
+        if not present and self.llm_or_role != [LLMORRole.NONE]:
+            raise ValueError("llm_or_role must be 'none' when optimization_tradition_present is false")
         return self

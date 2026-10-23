@@ -52,12 +52,14 @@ from slr_data_model import (
     OptimizationParadigm,
     LLMORRole,
     EvaluationParadigm,
+    EfficiencyReporting,
     KGModel,
     KGConstruction,
     KGUsage,
     AutomationStage,
     DecisionAutonomy,
     PromptDisclosure,
+    DataAvailability,
     strict_json_schema,
 )
 
@@ -194,9 +196,9 @@ def make_evaluation(**overrides):
         study_design=[StudyDesignType.TEST_SET],
         evaluation_paradigm=EvaluationParadigm.ARTIFICIAL,
         independent_evaluation=YesNoUnclear.NO,
-        repeated_runs=3,
+        repeated_runs="3",
         llm_as_judge=False,
-        efficiency_metrics_reported=True,
+        efficiency_metrics_reported=EfficiencyReporting.YES,
         statistical_testing=False,
         llm_evaluation_properties_reasoning=R,
         sample_size="12 test cases",
@@ -255,7 +257,7 @@ def make_quality_appraisal(**overrides):
         prompts_disclosed=PromptDisclosure.FULL,
         decoding_params_reported=True,
         code_available=False,
-        data_available=False,
+        data_available=DataAvailability.NONE,
         run_date_reported=False,
         reproducibility_reasoning=R,
     )
@@ -304,7 +306,7 @@ def make_conceptual_study(status=ValidationStatusType.FRAMEWORK_ONLY, **override
             comparator=[ComparatorType.NONE],
             reported_metrics=[],
             repeated_runs="NR",
-            efficiency_metrics_reported=False,
+            efficiency_metrics_reported=EfficiencyReporting.NO,
         ),
         **overrides,
     )
@@ -540,7 +542,7 @@ class TestV090Rules:
     """Rules added in schema 0.9.0 (v0.8.0 review items A1-A10, B1-B9)."""
 
     def test_schema_version_recorded(self):
-        assert make_study_extraction().schema_version == "0.9.0"
+        assert make_study_extraction().schema_version == "0.10.0"
 
     def test_a1_conceptual_paper_encodable(self):
         assert make_conceptual_study().evaluation_and_outcomes.study_design == [StudyDesignType.NONE]
@@ -565,6 +567,11 @@ class TestV090Rules:
             optimization_tradition_present=False, formalization_level=FormalizationLevel.NONE,
             optimization_paradigm=[], llm_or_role=[LLMORRole.NONE], solver_type=None,
         ).solver_type == NR
+        with pytest.raises(ValidationError, match="llm_or_role must be 'none'"):
+            make_or_substrate(
+                optimization_tradition_present=False, formalization_level=FormalizationLevel.NONE,
+                optimization_paradigm=[],
+            )
 
     def test_a3_other_requires_specification_everywhere(self):
         cases = [
@@ -612,11 +619,13 @@ class TestV090Rules:
             llm_intervention=make_llm_intervention(open_weight=OpenWeightType.YES),
             or_substrate=make_or_substrate(
                 optimization_tradition_present=False, formalization_level=FormalizationLevel.NONE,
-                optimization_paradigm=[],
+                optimization_paradigm=[], llm_or_role=[LLMORRole.NONE],
             ),
         )
         flags = " | ".join(record.consistency_flags)
-        assert "open_weight" in flags and "'solver'" in flags and "llm_or_role" in flags and "prototype" in flags
+        assert "open_weight" in flags and "'solver'" in flags and "prototype" in flags
+        no_role = make_study_extraction(or_substrate=make_or_substrate(llm_or_role=[LLMORRole.NONE]))
+        assert any("llm_or_role" in f for f in no_role.consistency_flags)
         mismatch = make_study_extraction(strategic_planning_scope=make_strategic_scope(
             planning_task_type=[PlanningTaskType.GPN_CONFIGURATION]))
         assert any("GPN-configuration" in f for f in mismatch.consistency_flags)
@@ -625,8 +634,7 @@ class TestV090Rules:
         ev = make_evaluation(sample_size="n/a", dataset_or_benchmark=None, reported_limitations=["NR"], repeated_runs="NR")
         assert ev.sample_size == NR and ev.dataset_or_benchmark == NR
         assert ev.reported_limitations == [] and ev.repeated_runs == NR
-        with pytest.raises(ValidationError):
-            make_evaluation(repeated_runs=0)
+        assert make_evaluation(repeated_runs="10 for Case A, 11 for Case B").repeated_runs == "10 for Case A, 11 for Case B"
         assert make_evaluation(independent_evaluation=YesNoUnclear.UNCLEAR).independent_evaluation == YesNoUnclear.UNCLEAR
 
     def test_a8_metadata_keys_validated(self):

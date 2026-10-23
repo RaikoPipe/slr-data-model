@@ -17,7 +17,7 @@ from .common import NR, YesNoUnclear
 
 # Protocol caveat in the v0.8.0 review: vocabulary changes after extraction has started are protocol deviations.
 # Every record carries the schema version it was coded under, so affected fields can be found and re-coded.
-SCHEMA_VERSION = "0.9.0"
+SCHEMA_VERSION = "0.10.0"
 
 NON_EVALUATED = frozenset({ValidationStatusType.FRAMEWORK_ONLY, ValidationStatusType.CONCEPTUAL})
 
@@ -111,8 +111,8 @@ class StudyExtraction(BaseModel):
             flags.append("open_weight is 'Y' but all model families are usually proprietary (GPT/Claude/Gemini)")
         if IntegrationType.SOLVER in llm.integrations and not opt.optimization_tradition_present:
             flags.append("integrations includes 'solver' but optimization_tradition_present is false")
-        if (LLMORRole.NONE in opt.llm_or_role) == opt.optimization_tradition_present:
-            flags.append("llm_or_role should be 'none' iff optimization_tradition_present is false")
+        if LLMORRole.NONE in opt.llm_or_role and opt.optimization_tradition_present:
+            flags.append("llm_or_role is 'none' although optimization_tradition_present is true")
         if ev.reported_metrics and self.study_characterization.validation_status == ValidationStatusType.PROTOTYPE:
             flags.append("reported_metrics present but validation_status 'prototype' is defined as 'without defined metrics'")
         if scope.time_horizon_explicitly_stated == YesNoUnclear.NO and scope.stated_horizon_value != NR:
