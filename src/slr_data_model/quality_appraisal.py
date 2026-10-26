@@ -36,6 +36,13 @@ class PromptDisclosure(DescriptiveEnum):
     NONE = "none", "Prompts not disclosed"
 
 
+class DataAvailability(DescriptiveEnum):
+    """How completely the evaluation data/test cases are available (v0.10.0, D025); ordinal like PromptDisclosure."""
+    FULL = "full", "All evaluation data/test cases publicly available (in paper, appendix or repository)"
+    PARTIAL = "partial", "Some of the data, a sample, excerpts, or available on request only"
+    NONE = "none", "Data not available"
+
+
 def _item(question: str):
     return Field(description=question + make_type_annotations(AppraisalAnswer))
 
@@ -95,8 +102,8 @@ class QualityAppraisal(BaseModel):
     code_available: bool = Field(
         description="True if source code of the method is publicly available (link given and stated as available)."
     )
-    data_available: bool = Field(
-        description="True if the evaluation data/test cases are publicly available."
+    data_available: DataAvailability = Field(
+        description="How completely the evaluation data/test cases are available." + make_type_annotations(DataAvailability)
     )
     run_date_reported: bool = Field(
         description="True if the date or period in which the models were queried is reported."

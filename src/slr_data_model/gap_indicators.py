@@ -10,7 +10,8 @@ from .descriptive_enum import DescriptiveEnum
 class HITLType(DescriptiveEnum):
     """Types of human-in-the-loop patterns per §3.8."""
     APPROVAL_GATE = "approval-gate", (
-        "Workflow-initiated: a human must check and accept or repair output before the workflow proceeds"
+        "Workflow-initiated: a human must check the output and actively correct it when wrong before the workflow "
+        "proceeds; mere acknowledgement or display does not count (D086)"
     )
     WHAT_IF_INTERFACE = "what-if-interface", "Human-initiated: human poses scenarios or changes inputs to explore outcomes"
     ESCALATION_PROTOCOL = "escalation-protocol", (
@@ -81,7 +82,10 @@ class AutomationStage(DescriptiveEnum):
     """
     INFORMATION_ACQUISITION = "information-acquisition", "Gathering and filtering input data/documents (intelligence)"
     INFORMATION_ANALYSIS = "information-analysis", "Integrating, interpreting, predicting; generating alternatives (intelligence/design)"
-    DECISION_SELECTION = "decision-selection", "Evaluating and ranking alternatives, recommending or choosing one (choice)"
+    DECISION_SELECTION = "decision-selection", (
+        "System actively evaluates and ranks alternatives, recommending or choosing one (choice); generating "
+        "alternatives for the human to rank does not count (D092)"
+    )
     ACTION_IMPLEMENTATION = "action-implementation", "Carrying out the decision (writing it into a plan/system, triggering actions)"
 
 
@@ -99,7 +103,10 @@ class EvaluationFrameworkType(DescriptiveEnum):
     BENCHMARK = "benchmark", "Public, standardised benchmark reused from prior work"
     CUSTOM_TEST_SET = "custom-test-set", "Test items or cases built by the authors for this paper"
     EXPERT_GROUND_TRUTH = "expert-ground-truth", "Outputs compared with expert or practitioner decisions"
-    RUBRIC = "rubric", "Graded scoring scale or criteria (incl. Likert ratings, ordinal suitability levels)"
+    RUBRIC = "rubric", (
+        "Explicit graded scoring scale (incl. Likert ratings, ordinal suitability levels); comparing outcome "
+        "categories (e.g., correct/incorrect, match/mismatch) is not enough (D052)"
+    )
     DOMAIN_SPECIFIC_METRIC = "domain-specific-metric", (
         "Metric defined by the planning domain (e.g., throughput, space utilisation, cost); not generic accuracy/F1"
     )

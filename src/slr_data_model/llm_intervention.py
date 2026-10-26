@@ -114,7 +114,10 @@ class WorkflowPattern(DescriptiveEnum):
     """
     PROMPT_CHAINING = "prompt-chaining", "Fixed sequence of LLM calls, each processing the previous output"
     ROUTING = "routing", "An LLM call classifies the input and sends it to a specialised follow-up"
-    PARALLELIZATION = "parallelization", "Independent LLM calls run in parallel (sectioning or voting) and are aggregated"
+    PARALLELIZATION = "parallelization", (
+        "Independent LLM calls or agents run in parallel (sectioning or voting) and are aggregated; also at the "
+        "level of the whole system, not only within a single chain (D110)"
+    )
     ORCHESTRATOR_WORKERS = "orchestrator-workers", "A central LLM breaks the task down at run time and delegates to workers"
     EVALUATOR_OPTIMIZER = "evaluator-optimizer", "One LLM generates, another evaluates and feeds back, in a loop"
     NONE = "none", "None of these patterns (single call or single autonomous agent)"
@@ -141,9 +144,14 @@ class IntegrationType(DescriptiveEnum):
     SOLVER = "solver", "Mathematical optimization/OR solver (MILP, CP, heuristics), incl. tools wrapping one"
     ML_MODEL = "ML-model", "Non-LLM predictive or explanatory ML model (regression, GNN, SHAP, forecasting)"
     DIGITAL_TWIN = "digital-twin", "Digital twin integration"
-    SIMULATION_PLATFORM = "simulation-platform", "Simulation platform integration"
+    SIMULATION_PLATFORM = "simulation-platform", (
+        "External simulation platform the LLM system calls (e.g., AnyLogic, Plant Simulation); not a system that "
+        "is itself the simulation (D111)"
+    )
     CODE_EXECUTION = "code-execution", "Generated code is executed (Python interpreter, sandbox)"
-    DATABASE_SQL = "database-SQL", "Queries against a database (SQL or similar)"
+    DATABASE_SQL = "database-SQL", (
+        "LLM generates SQL (or similar) queries itself; calling predefined queries does not count"
+    )
     ENTERPRISE_SYSTEM = "enterprise-system", "Enterprise system (ERP, MES, PLM, WMS, APS)"
     CAD_GIS = "CAD-GIS", "CAD/layout tool or GIS / map service"
     WEB_SEARCH_API = "web-search-API", "Web search or other external web API"
@@ -159,11 +167,12 @@ class LLMIntervention(BaseModel):
         description="Exact name(s) + version (e.g., 'GPT-4o', 'Llama 3.1 70B') of only those LLMs deployed and evaluated "
         "with the paper's own method. If the version is not given, write e.g. 'ChatGPT (unspecified version)'. "
         "Do not list models that are merely discussed, cited or used outside the method "
-        "(e.g., related work, external baselines); record those in models_rationale."
+        "(e.g., related work, external baselines) or only in preliminary tests/model selection; record those in "
+        "models_rationale (D065)."
     )
     models_rationale: str = reasoning_field(
         description="Reasoning for models; list other LLMs discussed in the paper but not deployed and evaluated "
-        "with the paper's method, and in what role they appear (e.g., related work, baseline). "
+        "with the paper's method, and in what role they appear (e.g., related work, baseline, preliminary test). "
     )
     model_usage_context: Optional[str] = Field(
         default=None,

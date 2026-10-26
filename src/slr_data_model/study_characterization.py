@@ -20,7 +20,7 @@ class ResearchType(DescriptiveEnum):
     )
     EVALUATION_RESEARCH = "evaluation-research", (
         "Technique evaluated in practice (naturalistic setting: real organisation, real users, real data in "
-        "operational use), incl. industrial case studies"
+        "operational use), incl. industrial case studies; a case built on real company data counts as one (D001)"
     )
     SOLUTION_PROPOSAL = "solution-proposal", (
         "Novel or significantly extended technique, argued for with a small example or none; no thorough evaluation"
@@ -47,7 +47,8 @@ class StudyCharacterization(BaseModel):
     """Study characterization fields (LLM pre-fill; R1 verifies 100%; validation status is interpretive, R1 + R2 verify)."""
     research_type: ResearchType = Field(
         description="Research type of the paper's contribution (Wieringa et al. 2006 facet). Lab/benchmark "
-        "evaluation -> validation-research; evaluation in operational practice -> evaluation-research."
+        "evaluation -> validation-research; evaluation in operational practice or on a case built on real company data "
+        "(industrial case study) -> evaluation-research."
         + make_type_annotations(ResearchType)
     )
     research_type_rationale: str = reasoning_field(

@@ -1,5 +1,5 @@
 """
-SLR Data Model — v5.0 Extraction Schema (schema version 0.9.0)
+SLR Data Model — v5.0 Extraction Schema (schema version 0.10.0)
 
 Pydantic models for LLM-based decision support for the strategic planning
 horizon in manufacturing and logistics (SLR extraction schema, v5.0).
@@ -48,6 +48,7 @@ from .evaluation import (
     ComparatorType,
     StudyDesignType,
     EvaluationParadigm,
+    EfficiencyReporting,
 )
 from .retrieval import RetrievalTraceability, RetrievalSource
 
@@ -66,6 +67,7 @@ from .gap_indicators import (
 from .quality_appraisal import (
     QualityAppraisal,
     PromptDisclosure,
+    DataAvailability,
     AppraisalAnswer,
     StudyTypeCategory,
     CATEGORY_BY_VALIDATION_STATUS,
@@ -137,6 +139,7 @@ __all__ = [
     # Quality appraisal
     "QualityAppraisal",
     "PromptDisclosure",
+    "DataAvailability",
     "AppraisalAnswer",
     "StudyTypeCategory",
     "CATEGORY_BY_VALIDATION_STATUS",
