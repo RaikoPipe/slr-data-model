@@ -86,7 +86,10 @@ class EvaluationAndOutcomes(BaseModel):
     )
     study_design_reasoning: str = reasoning_field()
     evaluation_paradigm: EvaluationParadigm = Field(
-        description="Artificial vs. naturalistic evaluation (FEDS); 'NA' iff study_design is 'none'."
+        description="Artificial vs. naturalistic evaluation (FEDS); 'NA' iff study_design is 'none'. An episode is "
+        "naturalistic only with real users, a real problem and a real system or organisation together; synthetic or "
+        "mock-up data, or researcher-run or lab sessions, make it artificial. 'both' needs at least one episode of each "
+        "kind (pilot 0.10.1)."
         + make_type_annotations(EvaluationParadigm)
     )
     evaluation_paradigm_reasoning: str = reasoning_field()

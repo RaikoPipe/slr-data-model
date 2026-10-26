@@ -215,7 +215,10 @@ class GapIndicators(BaseModel):
     )
     automation_stage_reasoning: str = reasoning_field(interpretive=True)
     decision_autonomy: DecisionAutonomy = Field(
-        description="Highest decision autonomy the system has over the planning decision it supports."
+        description="Highest decision autonomy the system has over the real-world planning decision it supports; "
+        "decisions made by agents inside a simulation do not count. '2-recommendation' requires the system to select or "
+        "rank and present its preferred option; generating candidates for humans to evaluate and adjust is "
+        "'1-options' (pilot 0.10.1)."
         + make_type_annotations(DecisionAutonomy)
     )
     decision_autonomy_reasoning: str = reasoning_field(interpretive=True)

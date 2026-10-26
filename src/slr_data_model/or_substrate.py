@@ -72,12 +72,18 @@ class ORSubstrate(BaseModel):
         description="True only if the proposed method itself formulates or solves an optimization/OR problem "
         "(e.g., a MILP, a metaheuristic or RL search, an MCDM ranking, a solver call, or an LLM-generated model "
         "that is then solved). False if optimization appears only in the introduction, related work, or "
-        "background, or only as a baseline the method is compared against; note such mentions in the reasoning."
+        "background, or only as a baseline the method is compared against; note such mentions in the reasoning. An LLM proposing and "
+        "refining solutions through its own reasoning (generate-evaluate, reflection or OPRO-style loops) is not "
+        "optimization. Ranking alternatives against explicit, weighted criteria computed by the method (MCDM) is, even if "
+        "an LLM sets the weights or the authors call the tool exploratory (pilot 0.10.1)."
     )
     optimization_tradition_present_reasoning: str = reasoning_field()
     formalization_level: FormalizationLevel = Field(
         description="Formalization level of the optimization the proposed method itself performs; 'none' iff "
-        "optimization_tradition_present is false." + make_type_annotations(FormalizationLevel)
+        "optimization_tradition_present is false. 'high' also when the mathematical program is only cited, not printed; "
+        "'medium' when explicit criteria or an objective are scored or searched by an algorithm (MCDM, metaheuristic, RL, "
+        "simulation-optimization); 'low' when optimization is present but its objective is only informal (pilot 0.10.1)."
+        + make_type_annotations(FormalizationLevel)
     )
     formalization_level_reasoning: str = reasoning_field()
     optimization_paradigm: UniqueList[OptimizationParadigm] = Field(

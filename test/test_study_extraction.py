@@ -546,7 +546,12 @@ class TestV090Rules:
         assert set(REPRODUCIBILITY_FIELDS) <= set(QualityAppraisal.model_fields)
 
     def test_schema_version_recorded(self):
-        assert make_study_extraction().schema_version == "0.10.0"
+        assert make_study_extraction().schema_version == "0.10.1"
+
+    def test_placeholder_reasoning_rejected(self):
+        with pytest.raises(ValidationError, match="should match pattern"):
+            make_study_extraction(study_characterization=make_study_extraction().study_characterization.model_copy(
+                update={"research_type_rationale": "..."}).model_dump())
 
     def test_a1_conceptual_paper_encodable(self):
         assert make_conceptual_study().evaluation_and_outcomes.study_design == [StudyDesignType.NONE]

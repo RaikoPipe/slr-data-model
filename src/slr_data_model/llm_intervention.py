@@ -165,7 +165,8 @@ class LLMIntervention(BaseModel):
     )
     models: list[str] = Field(
         description="Exact name(s) + version (e.g., 'GPT-4o', 'Llama 3.1 70B') of only those LLMs deployed and evaluated "
-        "with the paper's own method. If the version is not given, write e.g. 'ChatGPT (unspecified version)'. "
+        "with the paper's own method, including alternative LLMs run with the method in its evaluation (e.g., several "
+        "backbones compared) (pilot 0.10.1). If the version is not given, write e.g. 'ChatGPT (unspecified version)'. "
         "Do not list models that are merely discussed, cited or used outside the method "
         "(e.g., related work, external baselines) or only in preliminary tests/model selection; record those in "
         "models_rationale (D065)."
@@ -188,7 +189,9 @@ class LLMIntervention(BaseModel):
         description="Free-text specification of the model family. Required if 'other' was selected, otherwise null."
     )
     open_weight: OpenWeightType = Field(
-        description="Whether the weights of the models listed in 'models' are openly available." + make_type_annotations(OpenWeightType)
+        description="Whether the weights of the models listed in 'models' are openly available. Judge the named variant, not "
+        "the family: an API-only tier of an open-weight family (e.g., 'Qwen3-VL-Flash') counts as proprietary (pilot 0.10.1)."
+        + make_type_annotations(OpenWeightType)
     )
     open_weight_rationale: str = reasoning_field(
         description="Reasoning for open_weight; when 'mixed', state which models are open-weight and which proprietary. "

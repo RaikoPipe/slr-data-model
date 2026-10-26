@@ -311,11 +311,16 @@ pytest
 
 ## Version
 
-Current version: 0.10.0 (`StudyExtraction.schema_version`)
+Current version: 0.10.1 (`StudyExtraction.schema_version`)
 
-### Unreleased
+### 0.10.1 — rule revision after the extraction pilot
 
-- **Added:** reproducibility tier: the six reproducibility items of `QualityAppraisal` are exported as `REPRODUCIBILITY_FIELDS` so the agreement tool pools them separately from the interpretive Q1–Q4. No field changes; 0.10.0 records stay valid.
+No vocabulary or type changes. Values of the clarified fields coded under 0.10.0 may need re-checking; each rule is tagged `(pilot 0.10.1)` in its field description.
+
+- **Added:** reproducibility tier: the six reproducibility items of `QualityAppraisal` are exported as `REPRODUCIBILITY_FIELDS` so the agreement tool pools them separately from the interpretive Q1–Q4.
+- **Clarified definitions** (fields below the §9 gate in the pilot): `authors_claimed_tier` label must refer to the supported planning decision; `system_configuring_decision_stated` needs a design/configure/select/locate statement; `models` includes alternative LLMs run in the evaluation and `open_weight` judges the named variant; `optimization_tradition_present` excludes LLM self-refinement loops and includes MCDM ranking, with matching `formalization_level` anchors; `evaluation_paradigm` naturalistic needs real users, problem and system together; `decision_autonomy` rates the real-world decision and requires selection for 2; anchors for Q1, Q3 and Q4; `prompts_disclosed` and `decoding_params_reported` boundary cases
+- **Enforced:** reasoning fields must contain a letter or digit, so placeholder reasoning ('...') fails validation and is re-extracted (§4). Records with empty reasoning no longer validate.
+- **Changed:** provenance tag `H` allows AI assistance for evidence location, verification and phrasing (disclosed per reviewer)
 
 ### 0.10.0 — revision after the R1/R2 triage
 

@@ -81,7 +81,9 @@ class QualityAppraisal(BaseModel):
     """
     q1_methodological_transparency: AppraisalAnswer = _item(
         "Q1: Is the method (study design, system architecture, or framework logic) described in enough detail "
-        "for independent replication?"
+        "for independent replication? Yes: architecture, all prompts, models, knowledge/data sources and key parameters "
+        "are available (paper, appendix or repository). Partially: architecture described but at least one of these is "
+        "missing. No: high-level description only (pilot 0.10.1)."
     )
     q1_methodological_transparency_reasoning: str = reasoning_field(interpretive=True)
     q2_empirical_or_demonstration_grounding: AppraisalAnswer = _item(
@@ -93,11 +95,17 @@ class QualityAppraisal(BaseModel):
     q2_empirical_or_demonstration_grounding_reasoning: str = reasoning_field(interpretive=True)
     q3_validity_and_limitation_discussion: AppraisalAnswer = _item(
         "Q3: Are the boundaries of the contribution explicitly discussed (failure modes, scalability, "
-        "external validity, domain assumptions)?"
+        "external validity, domain assumptions)? Yes: discusses both scope or failure modes and threats to the validity "
+        "of the evaluation itself (sample, setting, bias). Partially: only one of these, or only future work. No: "
+        "neither (pilot 0.10.1)."
     )
     q3_validity_and_limitation_discussion_reasoning: str = reasoning_field(interpretive=True)
     q4_positioning_against_prior_work: AppraisalAnswer = _item(
-        "Q4: Is the contribution compared against existing solutions with explicit differentiation?"
+        "Q4: Is the contribution compared against existing solutions with explicit differentiation? Yes: explicit "
+        "differentiation from named prior solutions, conceptually per solution or empirically against one. Partially: "
+        "a related-work review plus a gap claim ('no study has...'). No: comparison only with the manual status quo, the "
+        "authors' own work, or none. An empirical comparison only with a generic prompting baseline (plain CoT, "
+        "zero-shot) does not make it Yes (pilot 0.10.1)."
     )
     q4_positioning_against_prior_work_reasoning: str = reasoning_field(interpretive=True)
 
@@ -106,10 +114,13 @@ class QualityAppraisal(BaseModel):
         "'Llama 3.1 70B Instruct'); False for e.g. 'ChatGPT' or 'GPT-4' without date/snapshot."
     )
     prompts_disclosed: PromptDisclosure = Field(
-        description="How completely the prompts are disclosed." + make_type_annotations(PromptDisclosure)
+        description="How completely the prompts are disclosed. A stated public repository containing the prompts counts "
+        "as 'full'; a described prompt assembly (e.g., 'Q&A pairs are appended to the query') is 'partial'; 'none' only if "
+        "nothing about prompt content or structure is given (pilot 0.10.1)." + make_type_annotations(PromptDisclosure)
     )
     decoding_params_reported: bool = Field(
-        description="True if decoding parameters (temperature, top-p, max tokens, seed) are reported."
+        description="True if at least one decoding parameter (temperature, top-p, max tokens, seed) is reported with its "
+        "value; 'default parameters' without values is False (pilot 0.10.1)."
     )
     code_available: bool = Field(
         description="True if source code of the method is publicly available (link given and stated as available)."

@@ -212,7 +212,9 @@ class StrategicPlanningScope(BaseModel):
         min_length=1,
         description="Tier(s) the authors themselves claim to address (e.g., 'strategic planning'), regardless of "
         "the reviewer judgement in planning_horizon_tiers. Code a tier only if the paper explicitly uses its label "
-        "('strategic', 'tactical', 'operational'); otherwise 'NA', never inferred from the task (D035, D060, D140). Compared with "
+        "('strategic', 'tactical', 'operational'); otherwise 'NA', never inferred from the task (D035, D060, D140). The label must "
+        "be applied to the planning or decision the paper supports (e.g., 'strategic planning', 'tactical decision'); adjective "
+        "uses for anything else (e.g., 'strategic interactions among firms', 'strategic priorities') do not count (pilot 0.10.1). Compared with "
         "planning_horizon_tiers in the analysis ('claimed strategic, actually tactical')."
         + make_type_annotations(PlanningHorizonTier)
     )
@@ -227,7 +229,9 @@ class StrategicPlanningScope(BaseModel):
     system_configuring_decision_reasoning: str = reasoning_field(interpretive=True)
     system_configuring_decision_stated: bool = Field(
         description="True only if the authors themselves frame the decision as configuring or designing the system "
-        "(what exists); a verbatim quote is required in the reasoning. Default False if no such statement exists. "
+        "(what exists); a verbatim quote is required in the reasoning. The quote must state that the decision designs, configures, "
+        "selects or locates system elements (e.g., layout, network, facility, equipment). Framing as improving, adapting or "
+        "operating an existing system, what-if analysis, or an analogy is False (pilot 0.10.1). Default False if no such statement exists. "
         "Can only be true if system_configuring_decision is true."
     )
     system_configuring_decision_stated_reasoning: str = reasoning_field(
