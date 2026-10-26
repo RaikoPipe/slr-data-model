@@ -16,8 +16,19 @@ This package provides the structured-JSON schema for the extraction pipeline: ra
 - **Evaluation and outcomes**: study design, FEDS evaluation paradigm (artificial/naturalistic), dataset, comparator, structured reported metrics (with page/section reference), sample size, LLM-specific evaluation properties (repeated runs, LLM-as-judge, efficiency metrics, statistical testing), limitations
 - **Retrieval traceability** (§3.7): source (Scopus / WoS / OpenAlex / snowballing), anchor paper(s)
 - **Gap indicators** (interpretive, LLM-extracted, R1 + R2 verify 100%): HITL pattern, automation stage and decision autonomy, domain knowledge formalization (with KG model / construction / usage and encoded standards), evaluation framework
-- **Quality appraisal** (§3.9): Q1–Q4 scored `Yes` / `Partially` / `No`; non-scored LLM reproducibility block (model version, prompts, decoding parameters, code, data, run date); study-type category (A/B/C) derived from validation status; low-quality flag (≥ 2 × `No`) auto-computed; no composite score
+- **Quality appraisal** (§3.9): Q1–Q4 scored `Yes` / `Partially` / `No`; LLM reproducibility block (model version, prompts, decoding parameters, code, data, run date; own tier, not in the low-quality flag); study-type category (A/B/C) derived from validation status; low-quality flag (≥ 2 × `No`) auto-computed; no composite score
 - **Extraction metadata** (§7/§8): per-field provenance tags (M / H / L-V / L-C / D), per-verifier verdicts (blind R1 + R2 for interpretive fields), derived `verified_by`, original LLM values (`llm_raw`)
+
+### Tiers
+
+The tier of a field is implied by its group; only the reproducibility tier cuts across a group and is listed explicitly (`REPRODUCIBILITY_FIELDS`). Agreement is pooled per tier.
+
+| Tier | Groups / fields | Scored in pilot? |
+|---|---|---|
+| Bibliographic metadata | `bibliographic_metadata` | No (§9: not piloted) |
+| Descriptive | `study_characterization` (except `validation_status`), `strategic_planning_scope` (except `system_configuring_decision`), `llm_intervention`, `or_substrate`, `evaluation_and_outcomes`, `retrieval_traceability` | Yes |
+| Interpretive | `validation_status`, `system_configuring_decision`, `gap_indicators`, `quality_appraisal` Q1–Q4 | Yes |
+| Reproducibility | `quality_appraisal`: `model_version_reported`, `prompts_disclosed`, `decoding_params_reported`, `code_available`, `data_available`, `run_date_reported` | Yes, pooled separately |
 
 Every extracted value field has a sibling `<field>_reasoning` column (§4: justification + evidence locator; interpretive fields add a verbatim anchor). Existing `*_rationale` fields serve the same role. Blocks of closely related flags share one reasoning column (`agent_capabilities_reasoning`, `llm_evaluation_properties_reasoning`, `kg_reasoning`, `reproducibility_reasoning`).
 
@@ -240,7 +251,7 @@ For strict structured-output modes that reject defaults (e.g. OpenAI `strict: tr
 - **`EvaluationAndOutcomes`** — §3.6; study design, FEDS paradigm, LLM-specific evaluation properties; `ReportedMetric` requires value, unit, context, and page/section reference per numeric metric
 - **`RetrievalTraceability`** — §3.7; `anchor_papers` required iff source is `snowballing`
 - **`GapIndicators`** — §3.8; type enums and their `_reasoning` enforced conditional on `*_present` flags via validators; automation stage and decision autonomy (Parasuraman et al. 2000); KG detail fields
-- **`QualityAppraisal`** — §3.9; Q1–Q4 (`AppraisalAnswer`) each with `_reasoning` and a documented MMAT/Hevner mapping; non-scored reproducibility block (TRIPOD-LLM); computed `low_quality_flag`. `StudyExtraction.study_type_category` (A/B/C) is computed from `validation_status` via `CATEGORY_BY_VALIDATION_STATUS`
+- **`QualityAppraisal`** — §3.9; Q1–Q4 (`AppraisalAnswer`) each with `_reasoning` and a documented MMAT/Hevner mapping; reproducibility block (TRIPOD-LLM; own tier, `REPRODUCIBILITY_FIELDS`, not in the low-quality flag); computed `low_quality_flag`. `StudyExtraction.study_type_category` (A/B/C) is computed from `validation_status` via `CATEGORY_BY_VALIDATION_STATUS`
 - **`ExtractionMetaData`** — §7/§8; per-field provenance (`M`/`H`/`L-V`/`L-C`/`D`), `FieldVerdict` list per field (reviewer, status `Y`/`corrected`/`unverifiable`, own value + reasoning), computed `verified_by` (e.g. `R1;R2`), `llm_raw` originals
 
 Free-text conventions: `*_reasoning` / `*_rationale` (justification + evidence locator for the sibling value, §4), `*_description` (elaboration of what the paper reports), `*_other_specification` (required detail when an enum `other` value is used).
@@ -301,6 +312,10 @@ pytest
 ## Version
 
 Current version: 0.10.0 (`StudyExtraction.schema_version`)
+
+### Unreleased
+
+- **Added:** reproducibility tier: the six reproducibility items of `QualityAppraisal` are exported as `REPRODUCIBILITY_FIELDS` so the agreement tool pools them separately from the interpretive Q1–Q4. No field changes; 0.10.0 records stay valid.
 
 ### 0.10.0 — revision after the R1/R2 triage
 

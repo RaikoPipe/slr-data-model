@@ -43,6 +43,17 @@ class DataAvailability(DescriptiveEnum):
     NONE = "none", "Data not available"
 
 
+REPRODUCIBILITY_FIELDS = (
+    "model_version_reported",
+    "prompts_disclosed",
+    "decoding_params_reported",
+    "code_available",
+    "data_available",
+    "run_date_reported",
+)
+"""Reproducibility tier: the only tier not implied by its field group, so it is listed here."""
+
+
 def _item(question: str):
     return Field(description=question + make_type_annotations(AppraisalAnswer))
 
@@ -58,8 +69,9 @@ class QualityAppraisal(BaseModel):
     - Q3 limitations: Hevner G5 (research rigor); no direct MMAT 2018 item (closest: 3.4/4.4, bias/confounders).
     - Q4 positioning: Hevner G4 (research contributions) + G2 (problem relevance); no direct MMAT 2018 item.
 
-    The reproducibility block below is not scored and does not enter low_quality_flag; it records LLM-specific
-    reporting items as synthesis variables (B3). Source: TRIPOD-LLM, Gallifant et al. (2025), "The TRIPOD-LLM
+    The reproducibility block below is not appraisal-scored and does not enter low_quality_flag; it records
+    LLM-specific reporting items as synthesis variables (B3). It forms its own tier (REPRODUCIBILITY_FIELDS),
+    so inter-rater agreement is pooled separately from the interpretive Q1-Q4. Source: TRIPOD-LLM, Gallifant et al. (2025), "The TRIPOD-LLM
     reporting guideline for studies using large language models", Nature Medicine 31; its methods and
     open-science items (model version, prompts, decoding parameters, output variability, code/data availability,
     date of use) carry over from the clinical setting.

@@ -31,6 +31,7 @@ from slr_data_model import (
     DomainKnowledgeType,
     EvaluationFrameworkType,
     QualityAppraisal,
+    REPRODUCIBILITY_FIELDS,
     AppraisalAnswer,
     StudyTypeCategory,
     RetrievalTraceability,
@@ -540,6 +541,9 @@ class TestStudyExtraction:
 
 class TestV090Rules:
     """Rules added in schema 0.9.0 (v0.8.0 review items A1-A10, B1-B9)."""
+
+    def test_reproducibility_tier_fields_exist(self):
+        assert set(REPRODUCIBILITY_FIELDS) <= set(QualityAppraisal.model_fields)
 
     def test_schema_version_recorded(self):
         assert make_study_extraction().schema_version == "0.10.0"
