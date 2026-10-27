@@ -82,13 +82,19 @@ class QualityAppraisal(BaseModel):
     q1_methodological_transparency: AppraisalAnswer = _item(
         "Q1: Is the method (study design, system architecture, or framework logic) described in enough detail "
         "for independent replication? Yes: architecture, all prompts, models, knowledge/data sources and key parameters "
-        "are available (paper, appendix or repository). Partially: architecture described but at least one of these is "
-        "missing. No: high-level description only (pilot 0.10.1)."
+        "are available (paper, appendix, repository, or a cited publication the paper explicitly defers to, e.g. 'see [1] "
+        "for details'); confidential company data from a naturalistic case, with non-disclosure stated, does not count as "
+        "missing (0.10.2). Partially: architecture described but at least one of these is missing. No: high-level "
+        "description only (pilot 0.10.1)."
     )
     q1_methodological_transparency_reasoning: str = reasoning_field(interpretive=True)
     q2_empirical_or_demonstration_grounding: AppraisalAnswer = _item(
-        "Q2, read by study-type category (derived from validation_status): "
+        "Q2, read by study-type category (derived from validation_status); always apply the criterion of that "
+        "category, never re-read the study as another category (0.10.2). "
         "A: are metrics defined and results reported with context (sample size, variance, comparator)? "
+        "Yes: metrics explicitly defined and sample size, variance or repeated runs, and a comparator all reported. "
+        "Partially: results reported but at least one of these is missing, or metrics only loosely defined. "
+        "No: no defined metrics (0.10.2). "
         "B: is the artifact demonstrated on a case that exercises its core claims? "
         "C: is the argumentation internally consistent and traceable?"
     )

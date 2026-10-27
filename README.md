@@ -311,7 +311,13 @@ pytest
 
 ## Version
 
-Current version: 0.10.1 (`StudyExtraction.schema_version`)
+Current version: 0.10.2 (`StudyExtraction.schema_version`)
+
+### 0.10.2 — consensus review of the pilot rules
+
+No vocabulary or type changes; rules are tagged `(0.10.2)` in the field descriptions.
+
+- **Clarified definitions:** Q1 counts details in a cited publication the paper explicitly defers to, and does not count confidential company data of a naturalistic case as missing; `system_configuring_decision_stated` includes selecting network members (suppliers, partners); `evaluation_paradigm` naturalistic rests on real operational data or real users of the organisation's own system, so researcher execution and expert-constructed auxiliary inputs no longer make an episode artificial; Q2 applies the criterion of the category derived from `validation_status` only, with Yes/Partially/No anchors for category A
 
 ### 0.10.1 — rule revision after the extraction pilot
 

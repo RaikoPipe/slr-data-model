@@ -230,7 +230,8 @@ class StrategicPlanningScope(BaseModel):
     system_configuring_decision_stated: bool = Field(
         description="True only if the authors themselves frame the decision as configuring or designing the system "
         "(what exists); a verbatim quote is required in the reasoning. The quote must state that the decision designs, configures, "
-        "selects or locates system elements (e.g., layout, network, facility, equipment). Framing as improving, adapting or "
+        "selects or locates system elements (e.g., layout, network, network members such as suppliers or partners "
+        "(0.10.2), facility, equipment). Framing as improving, adapting or "
         "operating an existing system, what-if analysis, or an analogy is False (pilot 0.10.1). Default False if no such statement exists. "
         "Can only be true if system_configuring_decision is true."
     )

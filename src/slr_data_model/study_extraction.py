@@ -17,7 +17,7 @@ from .common import NR, YesNoUnclear
 
 # Protocol caveat in the v0.8.0 review: vocabulary changes after extraction has started are protocol deviations.
 # Every record carries the schema version it was coded under, so affected fields can be found and re-coded.
-SCHEMA_VERSION = "0.10.1"
+SCHEMA_VERSION = "0.10.2"
 
 NON_EVALUATED = frozenset({ValidationStatusType.FRAMEWORK_ONLY, ValidationStatusType.CONCEPTUAL})
 
