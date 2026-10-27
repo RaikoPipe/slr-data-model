@@ -86,7 +86,12 @@ class EvaluationAndOutcomes(BaseModel):
     )
     study_design_reasoning: str = reasoning_field()
     evaluation_paradigm: EvaluationParadigm = Field(
-        description="Artificial vs. naturalistic evaluation (FEDS); 'NA' iff study_design is 'none'."
+        description="Artificial vs. naturalistic evaluation (FEDS); 'NA' iff study_design is 'none'. An episode is "
+        "naturalistic when it addresses a real problem of a real organisation on that organisation's own system, using "
+        "its real operational data (e.g., production event logs, network data) or real users; if the core data is real, "
+        "execution by the researchers and expert-constructed auxiliary inputs (e.g., requirement statements) do not make "
+        "it artificial. An episode is artificial when its core data is synthetic or a mock-up, or when it is a lab "
+        "session on a constructed task. 'both' needs at least one episode of each kind (pilot 0.10.1, 0.10.2)."
         + make_type_annotations(EvaluationParadigm)
     )
     evaluation_paradigm_reasoning: str = reasoning_field()

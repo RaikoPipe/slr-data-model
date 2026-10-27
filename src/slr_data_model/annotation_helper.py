@@ -14,4 +14,6 @@ def reasoning_field(interpretive: bool = False, **kwargs):
     description += (
         ". Note uncertainty ('?' per §6), contradictions, and verifier corrections/flags here."
     )
-    return Field(description=kwargs.pop("description", "") + description, **kwargs)
+    # pilot 0.10.1: placeholder reasoning ('...') failed §4 but passed validation; requiring a letter or digit rejects it
+    # (so the LLM retries) while short locators like 'p. 3, §2' stay valid
+    return Field(description=kwargs.pop("description", "") + description, pattern=r"\w", **kwargs)

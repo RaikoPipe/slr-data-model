@@ -9,7 +9,7 @@ from .descriptive_enum import DescriptiveEnum
 class ProvenanceTag(DescriptiveEnum):
     """Provenance tag for extracted fields per §8."""
     METADATA = "M", "Imported from search-stage metadata"
-    HUMAN = "H", "Human extracted"
+    HUMAN = "H", "Human extracted. The reviewer decides the value; a general-purpose AI assistant may have been used for evidence location, verification and phrasing (disclosed per reviewer)."
     LLM_VERIFIED = "L-V", "LLM extracted, human verified"
     LLM_CORRECTED = "L-C", "LLM extracted, human corrected"
     DUAL = "D", "Dual-reviewer extraction"

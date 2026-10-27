@@ -1,5 +1,5 @@
 """
-SLR Data Model — v5.0 Extraction Schema (schema version 0.10.0)
+SLR Data Model — v5.0 Extraction Schema (schema version 0.10.2)
 
 Pydantic models for LLM-based decision support for the strategic planning
 horizon in manufacturing and logistics (SLR extraction schema, v5.0).
@@ -8,6 +8,8 @@ Tiers:
 - Bibliographic metadata (imported from search-stage records, R1 spot-checks 10%)
 - Descriptive fields (LLM pre-fill, R1 verifies 100%)
 - Interpretive fields (LLM-extracted, R1 + R2 each verify 100%, blind)
+- Reproducibility fields (REPRODUCIBILITY_FIELDS in quality_appraisal; verified like interpretive fields,
+  agreement pooled separately)
 """
 from .descriptive_enum import DescriptiveEnum
 from .annotation_helper import make_type_annotations, reasoning_field
@@ -71,6 +73,7 @@ from .quality_appraisal import (
     AppraisalAnswer,
     StudyTypeCategory,
     CATEGORY_BY_VALIDATION_STATUS,
+    REPRODUCIBILITY_FIELDS,
 )
 
 # Metadata (§7, §8)
@@ -143,6 +146,7 @@ __all__ = [
     "AppraisalAnswer",
     "StudyTypeCategory",
     "CATEGORY_BY_VALIDATION_STATUS",
+    "REPRODUCIBILITY_FIELDS",
     # Provenance
     "ExtractionMetaData",
     "ProvenanceTag",

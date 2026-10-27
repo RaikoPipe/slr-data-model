@@ -31,6 +31,7 @@ from slr_data_model import (
     DomainKnowledgeType,
     EvaluationFrameworkType,
     QualityAppraisal,
+    REPRODUCIBILITY_FIELDS,
     AppraisalAnswer,
     StudyTypeCategory,
     RetrievalTraceability,
@@ -541,8 +542,16 @@ class TestStudyExtraction:
 class TestV090Rules:
     """Rules added in schema 0.9.0 (v0.8.0 review items A1-A10, B1-B9)."""
 
+    def test_reproducibility_tier_fields_exist(self):
+        assert set(REPRODUCIBILITY_FIELDS) <= set(QualityAppraisal.model_fields)
+
     def test_schema_version_recorded(self):
-        assert make_study_extraction().schema_version == "0.10.0"
+        assert make_study_extraction().schema_version == "0.10.2"
+
+    def test_placeholder_reasoning_rejected(self):
+        with pytest.raises(ValidationError, match="should match pattern"):
+            make_study_extraction(study_characterization=make_study_extraction().study_characterization.model_copy(
+                update={"research_type_rationale": "..."}).model_dump())
 
     def test_a1_conceptual_paper_encodable(self):
         assert make_conceptual_study().evaluation_and_outcomes.study_design == [StudyDesignType.NONE]
