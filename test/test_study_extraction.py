@@ -546,7 +546,7 @@ class TestV090Rules:
         assert set(REPRODUCIBILITY_FIELDS) <= set(QualityAppraisal.model_fields)
 
     def test_schema_version_recorded(self):
-        assert make_study_extraction().schema_version == "0.10.2"
+        assert make_study_extraction().schema_version == "0.10.3"
 
     def test_placeholder_reasoning_rejected(self):
         with pytest.raises(ValidationError, match="should match pattern"):

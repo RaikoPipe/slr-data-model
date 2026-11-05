@@ -89,14 +89,27 @@ class QualityAppraisal(BaseModel):
     )
     q1_methodological_transparency_reasoning: str = reasoning_field(interpretive=True)
     q2_empirical_or_demonstration_grounding: AppraisalAnswer = _item(
-        "Q2, read by study-type category (derived from validation_status); always apply the criterion of that "
-        "category, never re-read the study as another category (0.10.2). "
-        "A: are metrics defined and results reported with context (sample size, variance, comparator)? "
-        "Yes: metrics explicitly defined and sample size, variance or repeated runs, and a comparator all reported. "
-        "Partially: results reported but at least one of these is missing, or metrics only loosely defined. "
-        "No: no defined metrics (0.10.2). "
-        "B: is the artifact demonstrated on a case that exercises its core claims? "
-        "C: is the argumentation internally consistent and traceable?"
+        "Q2, judged by the study-type category, which follows from validation_status: implemented-validated -> A; "
+        "prototype -> B; framework-only or conceptual -> C. Settle the category first and apply only its criterion; "
+        "evidence typical of another category neither raises nor lowers the score (e.g. a mock-up, expert panel or "
+        "literature support in a C paper is not partial empirical grounding) (0.10.3). "
+        "A: are metrics defined and results reported with context (sample size, variance, comparator)? Judge every "
+        "evaluation that supports the main claims (e.g. benchmark suite and application case); all must meet the bar "
+        "for Yes. Yes: every metric operationally defined (formula, procedure or scoring rule; a name plus 'higher is "
+        "better' is not a definition), sample size, variance or repeated runs, and a comparator all reported, and the "
+        "reported results support the claims in the text. "
+        "Partially: results reported but one of these is missing for at least one evaluation, metrics only named, or "
+        "reported results contradict the text (e.g. significance claimed where the table shows none). "
+        "No: no defined metrics (0.10.3). "
+        "B: is the artifact demonstrated on a case that exercises its core claims? Yes: an actual run of the working "
+        "artifact on a concrete case covers every core claim, with its outputs shown. Partially: the run covers only "
+        "some core claims, or steps are manual. No: no run is shown; mock-ups, intended-output screenshots and "
+        "hypothetical walkthroughs do not count (0.10.3). "
+        "C: is the argumentation internally consistent and traceable? Yes: every central claim follows from cited "
+        "evidence or explicit reasoning, and no claims conflict. Partially: traceable but thin (motivation from "
+        "literature only, framework only sketched) or a few claims asserted without support. No: the paper claims "
+        "results, validation or evaluations it does not present, or its claims contradict each other; a use case that "
+        "is not executed is not evidence (0.10.3)."
     )
     q2_empirical_or_demonstration_grounding_reasoning: str = reasoning_field(interpretive=True)
     q3_validity_and_limitation_discussion: AppraisalAnswer = _item(

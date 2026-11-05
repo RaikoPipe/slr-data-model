@@ -311,7 +311,13 @@ pytest
 
 ## Version
 
-Current version: 0.10.2 (`StudyExtraction.schema_version`)
+Current version: 0.10.3 (`StudyExtraction.schema_version`)
+
+### 0.10.3 — Q2 anchors after the full-extraction review
+
+No vocabulary or type changes; rules are tagged `(0.10.3)` in the field descriptions.
+
+- **Clarified definitions:** Q2 states the `validation_status` → category mapping and settles the category before scoring, so evidence typical of another category does not move the score; category A judges every evaluation behind the main claims, requires operationally defined metrics, and caps results that contradict the text at Partially; categories B and C get Yes/Partially/No anchors (mock-ups and unexecuted walkthroughs are not demonstrations; claimed but unpresented evaluations make C a No)
 
 ### 0.10.2 — consensus review of the pilot rules
 
