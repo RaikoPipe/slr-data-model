@@ -52,17 +52,30 @@ class LLMORRole(DescriptiveEnum):
     FunSearch (Romera-Paredes et al., Nature 2024), EoH (Liu et al., ICML 2024).
     """
     # Wang & Li (automatic modeling); Xiu et al. (model formulation); Zhang et al. 2025 (modeling)
-    FORMULATOR = "formulator", "Translates natural language into an optimization model or solver code"
+    FORMULATOR = "formulator", (
+        "Translates natural language into an optimization model or solver code; the LLM output must be the model itself "
+        "or a change to it (objective, constraints, parameters, or solver code that builds or modifies the model, e.g., "
+        "adding a constraint to existing model code for a what-if query). LLM-generated knowledge that reaches the "
+        "optimizer only through other components (e.g., a knowledge graph or predictive model) is none (0.10.5)"
+    )
     # Liu et al. (LLMaO); Zhang et al. 2025 (stand-alone optimizer); OPRO (Yang et al., ICLR 2024)
     DIRECT_OPTIMIZER = "direct-optimizer", "LLM itself proposes and iteratively improves solutions (OPRO-style)"
     # Liu et al. (LLMaD); Zhang et al. 2025 (high-level algorithm generation); Xiu et al. (designers)
     HEURISTIC_DESIGNER = "heuristic-designer", "LLM designs or evolves algorithms/heuristics that are then run"
     # OR-Toolformer; partly Wang & Li (auxiliary optimization). Not a top-level category in any survey.
-    SOLVER_ORCHESTRATOR = "solver-orchestrator", "LLM calls a solver as a tool and handles inputs/outputs"
+    SOLVER_ORCHESTRATOR = "solver-orchestrator", (
+        "LLM calls a solver as a tool and handles inputs/outputs; also when code the LLM writes invokes the solver and "
+        "the solver output is fed back to the LLM, even if the framework executes that code (0.10.5)"
+    )
     # OptiGuide (Li et al. 2023, arXiv:2307.03875). Not a top-level category in any survey.
     RESULT_INTERPRETER = "result-interpreter", "LLM explains solutions or answers what-if questions on them (OptiGuide-style)"
     # Xiu et al. (solution verification)
-    VERIFIER = "verifier", "LLM checks models or solutions for errors, feasibility or plausibility"
+    VERIFIER = "verifier", (
+        "LLM checks models or solutions for errors, feasibility or plausibility and issues a check verdict (e.g., "
+        "accept/reject, flagged errors or constraint violations); critique or improvement feedback inside an LLM's own "
+        "generate-improve loop belongs to direct-optimizer, and checks of code safety or syntax, or checks disabled in "
+        "the evaluated method, do not count (0.10.5)"
+    )
     NONE = "none", "No optimizer in the method, or the LLM does not interact with it"
 
 

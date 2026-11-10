@@ -311,7 +311,19 @@ pytest
 
 ## Version
 
-Current version: 0.10.3 (`StudyExtraction.schema_version`)
+Current version: 0.10.5 (`StudyExtraction.schema_version`)
+
+### 0.10.5 — domain knowledge types and LLM–optimizer roles after the full-extraction review
+
+No vocabulary or type changes; rules are tagged `(0.10.5)` in the field descriptions.
+
+- **Clarified definitions:** `domain_knowledge_type` codes every type that applies, and a structure implementing another type gets both (model code implementing an optimization model, an AAS serialised as XML); `mathematical-model` is limited to specified optimization or simulation models of the planning domain that the system uses (loss functions, training objectives, ML/statistical predictors, scoring or index formulas and generic objective sketches do not count); `structured-schema` includes predefined input/output schemas for domain entities that LLM output must conform to and XML/JSON serialisations of domain models; `code-template` includes existing domain code the LLM receives to adapt or extend (solver model code), but not tools it only calls; `relational-database` excludes external datasets that only serve as analysis input; `llm_or_role` formulator requires the LLM output to be the optimization model itself or a change to it (objective, constraints, parameters, or solver code that builds or modifies the model, e.g. adding a constraint for a what-if query), so LLM-generated knowledge reaching the optimizer only through other components (a knowledge graph, a predictive model) is `none`; solver-orchestrator also counts when LLM-written code invokes the solver and the solver output is fed back to the LLM, even if the framework executes the code; verifier requires a check verdict on a model or solution (accept/reject, flagged errors or constraint violations), while critique or improvement feedback inside an LLM's own generate-improve loop belongs to direct-optimizer and code safety or syntax checks, or checks disabled in the evaluated method, do not count; `standards-encoding` names the Asset Administration Shell and other Industry 4.0 metamodels, and a standard is also coded as ontology only if the paper presents or uses it as an ontology or semantic model (a standard used as an XML/JSON schema alone is structured-schema)
+
+### 0.10.4 — workflow pattern and automation stage boundaries after the full-extraction review
+
+No vocabulary or type changes; rules are tagged `(0.10.4)` in the field descriptions.
+
+- **Clarified definitions:** `workflow_patterns` evaluator-optimizer requires an LLM evaluator, so feedback from deterministic validation, solvers, simulators or repair code does not count and a single agent with such feedback is `none`; the fixed generator→evaluator order of separate LLM calls in an evaluator-optimizer loop is also coded as prompt-chaining; every pattern needs two LLM calls with distinct roles; `automation_stage` information-acquisition requires gathering input from sources beyond the given problem instance (encoding or pre-processing the supplied instance does not count); stages refer to the planning decision the method supports and count for any component of the method (incl. the solver or algorithm the LLM drives), while decision-selection and action-implementation refer to the final planning decision only (choices inside the search, such as an LLM tuning the algorithm, parent selection or Pareto filtering, and decisions of agents inside a simulation are neither, and handing the human a Pareto front is not decision-selection); action-implementation requires the system itself to write the selected decision into a plan, model or system, while returning or reporting the solution or a human triggering the action does not count
 
 ### 0.10.3 — Q2 anchors after the full-extraction review
 

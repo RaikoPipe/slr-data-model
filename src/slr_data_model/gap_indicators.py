@@ -34,11 +34,30 @@ class DomainKnowledgeType(DescriptiveEnum):
     """
     ONTOLOGY = "ontology", "Formal ontology: classes, relations and axioms of the domain (e.g., OWL), schema level"
     KNOWLEDGE_GRAPH = "knowledge-graph", "Knowledge graph: domain instances and their relations stored as a graph"
-    STANDARDS_ENCODING = "standards-encoding", "Machine-readable encoding of domain standards (e.g., VDI 5200, ISA-95, ISO 22400)"
-    STRUCTURED_SCHEMA = "structured-schema", "Non-graph metamodel or schema (e.g., JSON Schema, UML) for domain entities and constraints"
-    RELATIONAL_DATABASE = "relational-database", "Relational database or taxonomy of domain entities and attributes"
-    CODE_TEMPLATE = "code-template", "Code or model template encoding domain structure (e.g., simulation blueprint)"
-    MATHEMATICAL_MODEL = "mathematical-model", "Optimization or simulation model encoding domain structure and rules"
+    STANDARDS_ENCODING = "standards-encoding", (
+        "Machine-readable encoding of domain standards (e.g., VDI 5200, ISA-95, ISO 22400, Asset Administration Shell "
+        "and other Industry 4.0 metamodels); also coded as ontology only if the paper presents or uses the standard as an "
+        "ontology or semantic model, a standard used as an XML/JSON schema alone is structured-schema (0.10.5)"
+    )
+    STRUCTURED_SCHEMA = "structured-schema", (
+        "Non-graph metamodel or schema (e.g., JSON Schema, UML) for domain entities and constraints; includes predefined "
+        "input/output schemas for domain entities that LLM output must conform to and XML/JSON serialisations of domain "
+        "models (0.10.5)"
+    )
+    RELATIONAL_DATABASE = "relational-database", (
+        "Relational database or taxonomy of domain entities and attributes; external datasets that only serve as input "
+        "data for the analysis do not count (0.10.5)"
+    )
+    CODE_TEMPLATE = "code-template", (
+        "Code or model template encoding domain structure (e.g., simulation blueprint); includes existing domain code the "
+        "LLM receives as content to adapt or extend, such as solver model code; tools or functions the LLM only calls "
+        "do not count (0.10.5)"
+    )
+    MATHEMATICAL_MODEL = "mathematical-model", (
+        "Optimization or simulation model of the planning domain encoding its structure and rules, specified (variables, "
+        "constraints or simulation logic) and used by the system; loss functions, training objectives, ML/statistical "
+        "predictors, scoring or index formulas and generic objective sketches do not count (0.10.5)"
+    )
     OTHER = "other", "Other domain knowledge formalization (specify)"
 
 
@@ -80,13 +99,24 @@ class AutomationStage(DescriptiveEnum):
     automation", IEEE Trans. Systems, Man, and Cybernetics A 30(3). The first three map onto Simon's (1960,
     The New Science of Management Decision) intelligence, design and choice phases.
     """
-    INFORMATION_ACQUISITION = "information-acquisition", "Gathering and filtering input data/documents (intelligence)"
+    INFORMATION_ACQUISITION = "information-acquisition", (
+        "System gathers or filters input from sources beyond the given problem instance at run time (retrieval over "
+        "documents/databases, web/API search, sensor or ERP queries, archives of past runs) (intelligence). Encoding the "
+        "given instance for the LLM (serialising, summary statistics, rendered images) and deterministic pre-processing "
+        "of the supplied input data do not count (0.10.4)"
+    )
     INFORMATION_ANALYSIS = "information-analysis", "Integrating, interpreting, predicting; generating alternatives (intelligence/design)"
     DECISION_SELECTION = "decision-selection", (
-        "System actively evaluates and ranks alternatives, recommending or choosing one (choice); generating "
-        "alternatives for the human to rank does not count (D092)"
+        "System actively evaluates and ranks alternatives, recommending or choosing one final option (choice); "
+        "generating alternatives for the human to rank does not count (D092), nor does handing the human a set of "
+        "non-dominated alternatives (Pareto front) or selection inside the search (0.10.4)"
     )
-    ACTION_IMPLEMENTATION = "action-implementation", "Carrying out the decision (writing it into a plan/system, triggering actions)"
+    ACTION_IMPLEMENTATION = "action-implementation", (
+        "System writes the selected decision into a plan, model or system (e.g., a tool call updating the layout, code "
+        "edits to the simulation model, triggering actions) and carries it out itself; counts even if not deployed in "
+        "real production. Returning or reporting the selected solution, or a human triggering the action (e.g., a "
+        "dashboard button), does not count (0.10.4)"
+    )
 
 
 class DecisionAutonomy(DescriptiveEnum):
@@ -144,7 +174,9 @@ class GapIndicators(BaseModel):
     domain_knowledge_formalization_present_reasoning: str = reasoning_field(interpretive=True)
     domain_knowledge_type: Optional[UniqueList[DomainKnowledgeType]] = Field(
         default=None,
-        description="All types of domain knowledge formalization present, required if domain_knowledge_formalization_present is true."
+        description="All types of domain knowledge formalization present, required if domain_knowledge_formalization_present is true. "
+        "Code every type that applies; a structure implementing another type (e.g., model code implementing an "
+        "optimization model, an Asset Administration Shell serialised as XML) gets both (0.10.5)."
         + make_type_annotations(DomainKnowledgeType)
     )
     domain_knowledge_type_reasoning: Optional[str] = reasoning_field(
@@ -210,7 +242,12 @@ class GapIndicators(BaseModel):
     )
     automation_stage: UniqueList[AutomationStage] = Field(
         min_length=1,
-        description="All information-processing stages the LLM system automates (Parasuraman et al. 2000)."
+        description="All information-processing stages the LLM system automates (Parasuraman et al. 2000). Stages refer "
+        "to the planning decision the method supports and count when any component of the method performs them, incl. "
+        "the solver or algorithm the LLM drives, not only the LLM. decision-selection and action-implementation refer "
+        "to the final planning decision only: choices inside the search (an LLM tuning parameters or choosing "
+        "heuristics/evaluation functions, parent or elitist selection, Pareto filtering) and decisions of agents inside "
+        "a simulation are neither (0.10.4)."
         + make_type_annotations(AutomationStage)
     )
     automation_stage_reasoning: str = reasoning_field(interpretive=True)

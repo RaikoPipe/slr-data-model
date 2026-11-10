@@ -112,15 +112,25 @@ class WorkflowPattern(DescriptiveEnum):
     workflow patterns and contrasts them with autonomous agents. supervisor-agent ~ orchestrator-workers;
     v0.8.0 'evaluator/repair loops' ~ evaluator-optimizer.
     """
-    PROMPT_CHAINING = "prompt-chaining", "Fixed sequence of LLM calls, each processing the previous output"
+    PROMPT_CHAINING = "prompt-chaining", (
+        "Fixed sequence of LLM calls, each processing the previous output; includes the fixed generator->evaluator "
+        "order of separate LLM calls inside an evaluator-optimizer loop (code both) (0.10.4)"
+    )
     ROUTING = "routing", "An LLM call classifies the input and sends it to a specialised follow-up"
     PARALLELIZATION = "parallelization", (
         "Independent LLM calls or agents run in parallel (sectioning or voting) and are aggregated; also at the "
         "level of the whole system, not only within a single chain (D110)"
     )
     ORCHESTRATOR_WORKERS = "orchestrator-workers", "A central LLM breaks the task down at run time and delegates to workers"
-    EVALUATOR_OPTIMIZER = "evaluator-optimizer", "One LLM generates, another evaluates and feeds back, in a loop"
-    NONE = "none", "None of these patterns (single call or single autonomous agent)"
+    EVALUATOR_OPTIMIZER = "evaluator-optimizer", (
+        "One LLM call generates, a different LLM call or agent evaluates and feeds critique back, in a loop. Feedback "
+        "from deterministic code (schema/constraint validation, solver, simulator, repair algorithm) to the generating "
+        "LLM is not this pattern (0.10.4)"
+    )
+    NONE = "none", (
+        "None of these patterns: a single call, or a single autonomous agent, also when deterministic code validates, "
+        "repairs or scores its output and feeds back in a loop (0.10.4)"
+    )
 
 
 class AgentMemory(DescriptiveEnum):
@@ -241,7 +251,9 @@ class LLMIntervention(BaseModel):
     agentic_architecture_reasoning: str = reasoning_field()
     workflow_patterns: UniqueList[WorkflowPattern] = Field(
         min_length=1,
-        description="All workflow patterns used inside the method, at any level of nesting; 'none' is exclusive."
+        description="All workflow patterns used inside the method, at any level of nesting; 'none' is exclusive. "
+        "Each pattern needs at least two LLM calls with distinct roles; name the LLM component on each side in the "
+        "reasoning (0.10.4)."
         + make_type_annotations(WorkflowPattern)
     )
     workflow_patterns_reasoning: str = reasoning_field()

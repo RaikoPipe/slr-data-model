@@ -1,5 +1,5 @@
 """
-SLR Data Model — v5.0 Extraction Schema (schema version 0.10.3)
+SLR Data Model — v5.0 Extraction Schema (schema version 0.10.5)
 
 Pydantic models for LLM-based decision support for the strategic planning
 horizon in manufacturing and logistics (SLR extraction schema, v5.0).
